@@ -1,0 +1,4 @@
+.scratch/
+*.gguf
+*.log
+__pycache__/
