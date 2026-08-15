@@ -3,90 +3,294 @@
   "$id": "https://github.com/que-bert/perf-lab/results/schema.json",
   "title": "perf-lab ledger row",
   "type": "object",
-  "required": ["ts", "run_id", "kind", "fp", "cfg", "m", "ok"],
+  "required": [
+    "ts",
+    "run_id",
+    "kind",
+    "fp",
+    "cfg",
+    "m",
+    "ok"
+  ],
   "additionalProperties": false,
-
   "properties": {
-    "ts":     { "type": "string", "format": "date-time" },
-    "run_id": { "type": "string", "pattern": "^r-[0-9a-f]{6,}$" },
-    "kind":   { "enum": ["nightly", "manual", "backfill", "skipped"] },
-    "tag":    { "type": ["string", "null"] },
-    "reason": { "type": ["string", "null"] },
-    "notes":  { "type": ["string", "null"] },
-    "fp":     { "$ref": "#/$defs/fp" },
-    "cfg":    { "$ref": "#/$defs/cfg" },
-    "m":      { "$ref": "#/$defs/m" },
-    "ok":     { "$ref": "#/$defs/ok" },
-    "env":    { "$ref": "#/$defs/env" }
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^r-[0-9a-f]{6,}$"
+    },
+    "kind": {
+      "enum": [
+        "nightly",
+        "manual",
+        "backfill",
+        "skipped"
+      ]
+    },
+    "tag": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "fp": {
+      "$ref": "#/$defs/fp"
+    },
+    "cfg": {
+      "$ref": "#/$defs/cfg"
+    },
+    "m": {
+      "$ref": "#/$defs/m"
+    },
+    "ok": {
+      "$ref": "#/$defs/ok"
+    },
+    "env": {
+      "$ref": "#/$defs/env"
+    }
   },
-
   "allOf": [
     {
-      "if":   { "properties": { "kind": { "const": "skipped" } }, "required": ["kind"] },
-      "then": { "required": ["reason"],
-                "properties": { "reason": { "type": "string", "minLength": 1 } } }
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "skipped"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
     },
     {
-      "if":   { "properties": { "kind": { "enum": ["nightly", "manual"] } }, "required": ["kind"] },
-      "then": { "properties": { "m": {
-                  "required": ["rep", "cold_prefill"],
-                  "anyOf": [
-                    { "required": ["pp2048"], "properties": { "pp2048":  { "type": "number" } } },
-                    { "required": ["pp_deep"], "properties": { "pp_deep": { "type": "number" } } }
-                  ],
-                  "properties": {
-                    "rep":          { "type": "integer", "minimum": 1 },
-                    "cold_prefill": { "type": "boolean" }
-                  } } } }
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "nightly",
+              "manual"
+            ]
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "m": {
+            "required": [
+              "rep",
+              "cold_prefill"
+            ],
+            "anyOf": [
+              {
+                "required": [
+                  "pp2048"
+                ],
+                "properties": {
+                  "pp2048": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "required": [
+                  "pp_deep"
+                ],
+                "properties": {
+                  "pp_deep": {
+                    "type": "number"
+                  }
+                }
+              }
+            ],
+            "properties": {
+              "rep": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "cold_prefill": {
+                "type": "boolean"
+              }
+            }
+          },
+          "cfg": {
+            "required": [
+              "ctx"
+            ],
+            "properties": {
+              "ctx": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
     },
     {
       "$comment": "Acceptance is only meaningful when speculation is on. llama-bench has no spec-decode flags, so canary rows legitimately have none.",
-      "if": { "allOf": [
-                { "properties": { "kind": { "enum": ["nightly", "manual"] } }, "required": ["kind"] },
-                { "properties": { "cfg": { "properties": { "spec": { "type": "string" } },
-                                           "required": ["spec"] } }, "required": ["cfg"] } ] },
-      "then": { "properties": { "m": {
-                  "required": ["mtp_acceptance"],
-                  "properties": { "mtp_acceptance": { "type": "number", "minimum": 0, "maximum": 1 } } } } }
+      "if": {
+        "allOf": [
+          {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "nightly",
+                  "manual"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          {
+            "properties": {
+              "cfg": {
+                "properties": {
+                  "spec": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "spec"
+                ]
+              }
+            },
+            "required": [
+              "cfg"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "m": {
+            "required": [
+              "mtp_acceptance"
+            ],
+            "properties": {
+              "mtp_acceptance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
     }
   ],
-
   "$defs": {
     "fp": {
       "type": "object",
       "description": "Environment fingerprint. Every axis that could explain a change.",
-      "required": ["llamacpp_sha", "patches", "build", "mesa", "kernel", "gpu", "model"],
+      "required": [
+        "llamacpp_sha",
+        "patches",
+        "build",
+        "mesa",
+        "kernel",
+        "gpu",
+        "model"
+      ],
       "additionalProperties": false,
       "properties": {
-        "llamacpp_sha": { "type": "string", "pattern": "^[0-9a-f]{7,40}$" },
+        "llamacpp_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$"
+        },
         "patches": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["name", "sha256"],
+            "required": [
+              "name",
+              "sha256"
+            ],
             "additionalProperties": false,
             "properties": {
-              "name":   { "type": "string" },
-              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+              "name": {
+                "type": "string"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
             }
           }
         },
         "build": {
           "type": "object",
-          "required": ["backend", "target", "rocm"],
+          "required": [
+            "backend",
+            "target",
+            "rocm"
+          ],
           "additionalProperties": false,
           "properties": {
-            "backend": { "enum": ["rocm", "vulkan", "cpu"] },
-            "target":  { "type": "string" },
-            "rocm":    { "type": ["string", "null"] }
+            "backend": {
+              "enum": [
+                "rocm",
+                "vulkan",
+                "cpu"
+              ]
+            },
+            "target": {
+              "type": "string"
+            },
+            "rocm": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           }
         },
-        "mesa":   { "type": "string", "minLength": 1 },
-        "kernel": { "type": "string", "minLength": 1 },
+        "mesa": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kernel": {
+          "type": "string",
+          "minLength": 1
+        },
         "gpu": {
           "type": "object",
           "description": "Identity only. Never an index: rocm-smi GPU[1] and DRM card0 are the same device.",
-          "required": ["pci", "uid", "gfx"],
+          "required": [
+            "pci",
+            "uid",
+            "gfx"
+          ],
           "additionalProperties": false,
           "properties": {
             "pci": {
@@ -94,83 +298,297 @@
               "description": "Lowercase. rocm-smi emits uppercase hex; normalize or a fingerprint fails to match itself.",
               "pattern": "^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\\.[0-9a-f]$"
             },
-            "uid": { "type": "string", "pattern": "^0x[0-9a-f]{16}$" },
-            "gfx": { "type": "string", "pattern": "^gfx[0-9a-z]+$" }
+            "uid": {
+              "type": "string",
+              "pattern": "^0x[0-9a-f]{16}$"
+            },
+            "gfx": {
+              "type": "string",
+              "pattern": "^gfx[0-9a-z]+$"
+            }
           }
         },
         "model": {
           "type": "object",
-          "required": ["name", "sha256", "quant"],
+          "required": [
+            "name",
+            "sha256",
+            "quant"
+          ],
           "additionalProperties": false,
           "properties": {
-            "name":   { "type": "string" },
-            "sha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
-            "quant":  { "type": "string" }
+            "name": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "quant": {
+              "type": "string"
+            }
           }
         }
       }
     },
-
     "cfg": {
       "type": "object",
-      "required": ["ctx", "ctk", "ctv", "fa"],
+      "required": [
+        "ctk",
+        "ctv",
+        "fa"
+      ],
       "additionalProperties": false,
       "properties": {
-        "ctx":    { "type": "integer", "minimum": 1 },
-        "ctk":    { "type": "string" },
-        "ctv":    { "type": "string" },
-        "fa":     { "enum": ["on", "off", "auto"] },
-        "spec":   { "type": ["string", "null"] },
-        "n_max":  { "type": ["integer", "null"], "minimum": 1 },
-        "ngl":    { "type": ["integer", "null"] },
-        "np":     { "type": ["integer", "null"] },
-        "ub":     { "type": ["integer", "null"] },
-        "b":      { "type": ["integer", "null"] },
-        "prompt_tokens": { "type": ["integer", "null"] },
-        "yarn_scale":    { "type": ["number", "null"] }
+        "ctx": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "ctk": {
+          "type": "string"
+        },
+        "ctv": {
+          "type": "string"
+        },
+        "fa": {
+          "enum": [
+            "on",
+            "off",
+            "auto"
+          ]
+        },
+        "spec": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "n_max": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "ngl": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "np": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "ub": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "b": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "prompt_tokens": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "yarn_scale": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
       }
     },
-
     "m": {
       "type": "object",
-      "description": "At least one throughput metric. Live rows (nightly/manual) additionally require a prefill metric — a tg-only row is blind to the kernel-fallback regression this repo exists to catch. Backfill rows are exempt; historical logs predate the rule.",
+      "description": "At least one throughput metric. Live rows (nightly/manual) additionally require a prefill metric \u2014 a tg-only row is blind to the kernel-fallback regression this repo exists to catch. Backfill rows are exempt; historical logs predate the rule.",
       "additionalProperties": false,
       "anyOf": [
-        { "required": ["pp2048"] },
-        { "required": ["pp_deep"] },
-        { "required": ["tg"] }
+        {
+          "required": [
+            "pp2048"
+          ],
+          "properties": {
+            "pp2048": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "required": [
+            "pp_deep"
+          ],
+          "properties": {
+            "pp_deep": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "required": [
+            "tg"
+          ],
+          "properties": {
+            "tg": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "required": [
+            "tg_deep"
+          ],
+          "properties": {
+            "tg_deep": {
+              "type": "number"
+            }
+          }
+        },
+        {
+          "required": [
+            "wall_s"
+          ],
+          "properties": {
+            "wall_s": {
+              "type": "number"
+            }
+          }
+        }
       ],
       "properties": {
-        "pp2048":         { "type": ["number", "null"], "minimum": 0 },
-        "pp_deep":        { "type": ["number", "null"], "minimum": 0 },
-        "tg":             { "type": ["number", "null"], "minimum": 0 },
-        "tg_deep":        { "type": ["number", "null"], "minimum": 0 },
-        "mtp_acceptance": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
-        "depth":          { "type": ["integer", "null"] },
-        "rep":            { "type": ["integer", "null"], "minimum": 1 },
-        "cold_prefill":   { "type": ["boolean", "null"] },
-        "unit":           { "type": "string", "default": "tok/s" },
-        "vram_mib":       { "type": ["integer", "null"] }
+        "pp2048": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "pp_deep": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "tg": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "tg_deep": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "mtp_acceptance": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "depth": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "rep": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "cold_prefill": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "default": "tok/s"
+        },
+        "vram_mib": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "wall_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Wall-clock seconds for the whole request, including prefill. Used where tok/s was not separable."
+        }
       }
     },
-
     "ok": {
       "type": "object",
-      "required": ["token_identical"],
+      "required": [
+        "token_identical"
+      ],
       "additionalProperties": false,
       "properties": {
-        "token_identical": { "type": ["boolean", "null"] },
-        "corpus_sha":      { "type": ["string", "null"] }
+        "token_identical": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "corpus_sha": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-
     "env": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "gpu_temp_c":     { "type": ["number", "null"] },
-        "gpu_clock_mhz":  { "type": ["integer", "null"] },
-        "loadavg":        { "type": ["number", "null"] }
+        "gpu_temp_c": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "gpu_clock_mhz": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "loadavg": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
       }
     }
   }
