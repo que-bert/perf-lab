@@ -22,9 +22,20 @@ See [FINDINGS.md](FINDINGS.md) for the measurements behind those claims.
 ## Usage
 
 ```
+make row          # one live canary row
+make canaries     # all five canary configs (~4 min)
 make validate     # check the ledger against results/schema.json
 make test         # validator acceptance cases
 ```
+
+Requires `PERF_LAB_MODEL`, `PERF_LAB_BIN` and `PERF_LAB_GPU_UID`. The GPU is selected
+by unique ID; if it is absent the run aborts rather than silently measuring a different
+card and stamping the row with a fingerprint that lies.
+
+### Current known-good config
+
+Qwen3.8-27B Q6_K, 262,144 context, `q4_0` K and V, `--spec-type draft-mtp
+--spec-draft-n-max 4`. 46.15 tok/s decode, 711 t/s prefill, 29.3 of 32 GB VRAM.
 
 ## Layout
 

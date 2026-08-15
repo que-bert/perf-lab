@@ -1,0 +1,50 @@
+# Findings
+
+Measured facts, each citing the ledger rows that produced them. Judgment — why an
+avenue was rejected, what not to reopen — lives in MuninnDB, not here.
+
+Reproduce any of these with `jq` over `results/ledger.jsonl`.
+
+## Only two KV cache types have optimized kernels
+
+On gfx1201 with llama.cpp b10082, `pp2048` by cache type:
+
+| K | V | pp2048 t/s | run_id |
+|---|---|---|---|
+| `q4_0` | `q4_0` | **710.84** | `r-427fe526` |
+| `q8_0` | `q8_0` | **684.02** | `r-f688609f` |
+| `q8_0` | `q4_0` | **83.85** | `r-2a4be1c1` |
+| `q4_1` | `q4_1` | **83.19** | `r-ee5bf3fe` |
+| `q8_0` | `q5_1` | **56.12** | `r-6384e54d` |
+| `q5_1` | `q5_1` | **54.96** | `r-a53161e1` |
+
+`q5_1`, `q5_0` and `q4_1` — and any mismatched K/V pair — fall off the flash-attention
+path and run **8–13× slower at prefill**. Decode is unaffected, which is why short-prompt
+testing does not reveal it.
+
+## Upstream is not monotonically improving
+- build `86b94708f` — pp_deep@d16384 = **517.34** t/s  (`r-b4688392`)
+- build `fb0e6b621` — pp_deep@d16384 = **786.52** t/s  (`r-a97f17c0`)
+- build `fb0e6b621` — pp_deep@d16384 = **840.85** t/s  (`r-7ecf3046`)
+- build `9d57ce456` — pp_deep@d16384 = **649.98** t/s  (`r-f10b6edf`)
+- build `fb0e6b621` — pp_deep@d16384 = **838.94** t/s  (`r-a1df7ce9`)
+
+b10438 (master, 2026-08-15) is **22.5% slower** at deep prefill than the pinned b10082.
+
+## MTP draft depth has an optimum, and ngram-simple hurts
+- n_max=2: 38.21 tok/s, acceptance 0.6423  (`r-93594161`)
+- n_max=3: 38.99 tok/s, acceptance 0.6519  (`r-67e4c5a3`)
+- n_max=4: 38.23 tok/s, acceptance 0.6539  (`r-ef581561`)
+- n_max=5: 35.73 tok/s, acceptance 0.5604  (`r-13c3e979`)
+- n_max=6: 30.39 tok/s, acceptance 0.5000  (`r-ea640b54`)
+
+- no speculation: 21.80 tok/s  (`r-3adbab6b`)
+- draft-mtp n=4: 46.15 tok/s, acceptance 0.7708  (`r-3e958f9f`)
+- draft-mtp,ngram-simple n=4: 45.12 tok/s, acceptance 0.6715  (`r-d322912c`)
+- draft-mtp,ngram-mod n=4: 45.46 tok/s, acceptance 0.7556  (`r-dca743d9`)
+
+Adding `ngram-simple` to `draft-mtp` lowers acceptance and throughput. On a copy-heavy
+193K-token task — ngram's best case — MTP alone reached **100% acceptance** while adding
+ngram dropped it to 92.6% and took 25 s longer.
+- draft-mtp alone: acceptance 1.00000, wall 542.6s  (`r-49df4a7e`)
+- draft-mtp,ngram-simple: acceptance 0.92587, wall 567.7s  (`r-1a0394cc`)
