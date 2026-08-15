@@ -16,11 +16,13 @@ set -euo pipefail
 BACKEND=rocm
 WANT_UID=""
 WANT_PCI=""
+EMIT_INDEX=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --gpu-uid) WANT_UID="${2,,}"; shift 2 ;;
     --gpu-pci) WANT_PCI="${2,,}"; shift 2 ;;
     --backend) BACKEND="$2";      shift 2 ;;
+    --emit-index) EMIT_INDEX=1;   shift 1 ;;
     -h|--help) sed -n '2,9p' "$0"; exit 0 ;;
     *) echo "probe.sh: unknown argument $1" >&2; exit 64 ;;
   esac
@@ -38,7 +40,7 @@ MESA="$(dpkg-query -W -f='${Version}\n' mesa-vulkan-drivers:amd64 2>/dev/null | 
 KERNEL="$(uname -r)"
 
 HW="$HW" UIDS="$UIDS" ROCM="$ROCM" MESA="$MESA" KERNEL="$KERNEL" \
-BACKEND="$BACKEND" WANT_UID="$WANT_UID" WANT_PCI="$WANT_PCI" python3 - <<'PY'
+BACKEND="$BACKEND" WANT_UID="$WANT_UID" WANT_PCI="$WANT_PCI" EMIT_INDEX="$EMIT_INDEX" python3 - <<'PY'
 import json, os, re, sys
 
 hw, uids = os.environ["HW"], os.environ["UIDS"]
@@ -49,7 +51,7 @@ gpus = {}
 for m in re.finditer(
         r"^(\d+)\s+\d+\s+\S+\s+\S+\s+(gfx\w+)\s+.*?([0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.\d)",
         hw, re.M):
-    gpus[m.group(1)] = {"gfx": m.group(2).lower(), "pci": m.group(3).lower()}
+    gpus[m.group(1)] = {"gfx": m.group(2).lower(), "pci": m.group(3).lower(), "idx": m.group(1)}
 
 # GPU index -> uid
 for m in re.finditer(r"GPU\[(\d+)\]\s*:\s*Unique ID:\s*(\S+)", uids):
@@ -73,6 +75,11 @@ elif len(found) == 1:
 else:
     have = ", ".join(f"{g['uid']} ({g['pci']}, {g['gfx']})" for g in found)
     sys.exit(f"probe.sh: {len(found)} GPUs present, pass --gpu-uid or --gpu-pci. Present: {have}")
+
+if os.environ.get("EMIT_INDEX") == "1":
+    # Runtime-only: used to set ROCR_VISIBLE_DEVICES within this same snapshot.
+    # Never written to a ledger row.
+    print(sel["idx"]); sys.exit(0)
 
 json.dump({
     "build":  {"backend": os.environ["BACKEND"], "target": sel["gfx"],

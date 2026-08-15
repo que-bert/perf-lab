@@ -1,0 +1,67 @@
+# Canary configurations — the cheap early warning.
+#
+# These are NOT the configs we serve. They are probes of kernel dispatch: each one
+# has a known throughput on a known-good stack, and the point is to notice when that
+# number moves. An 8-13x flash-attention fallback is visible at 2048 tokens, so a
+# canary costs seconds rather than the minutes a long-context run takes.
+#
+# Baselines measured 2026-08-15 on gfx1201 (AI PRO R9700) with llama.cpp b10082
+# (fb0e6b621), ROCm 7.2.53211, Mesa 26.0.3-1ubuntu1, kernel 7.0.0-29-generic,
+# using Qwen3.8-27B-Q6_K.
+#
+# Model path comes from $PERF_LAB_MODEL — never committed, this repo is public.
+
+defaults:
+  n_gen: 64
+  threads: 8
+  ngl: 99
+  fa: "on"
+  reps: 1
+
+canaries:
+  fast-q4:
+    ctk: q4_0
+    ctv: q4_0
+    prompt_tokens: 2048
+    expect_pp2048: 710.84
+    tolerance_pct: 10
+    note: >
+      The alarm this repo exists for. q4_0/q4_0 is the shipped config and sits on the
+      optimized flash-attention path. If this falls toward ~85 t/s we have lost kernel
+      support and every long-context prefill just got 8x slower, while decode looks fine.
+
+  fast-q8:
+    ctk: q8_0
+    ctv: q8_0
+    prompt_tokens: 2048
+    expect_pp2048: 684.02
+    tolerance_pct: 10
+    note: The other supported type. Second fast path; a fallback here is equally serious.
+
+  slow-q5_1:
+    ctk: q8_0
+    ctv: q5_1
+    prompt_tokens: 2048
+    expect_pp2048: 54.96
+    tolerance_pct: 10
+    note: >
+      Known-unsupported. Expected to be slow. If this ever gets FAST, upstream added
+      q5_1 kernel support and a previously rejected operating point is worth retesting.
+
+  slow-q4_1:
+    ctk: q4_1
+    ctv: q4_1
+    prompt_tokens: 2048
+    expect_pp2048: 83.19
+    tolerance_pct: 10
+    note: Known-unsupported, matched pair. Confirms matching K/V is not what matters.
+
+  slow-mixed:
+    ctk: q8_0
+    ctv: q4_0
+    prompt_tokens: 2048
+    expect_pp2048: 83.85
+    tolerance_pct: 10
+    note: >
+      Both types individually fast, mixed pair slow. This is the trap that nearly
+      shipped: decode is normal, only prefill collapses.
