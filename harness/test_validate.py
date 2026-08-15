@@ -21,6 +21,11 @@ cases.append(("tg-only BACKFILL row (exempt)", c, True))
 c=copy.deepcopy(GOOD); c["kind"]="skipped"; cases.append(("skipped without reason", c, False))
 c=copy.deepcopy(GOOD); c["fp"]["gpu"]["idx"]=1;          cases.append(("gpu index smuggled in", c, False))
 pathlib.Path(".scratch").mkdir(exist_ok=True)
+c=copy.deepcopy(GOOD); c["cfg"]["spec"]=None; c["cfg"]["n_max"]=None
+c["m"]={"pp2048":710.84,"rep":1,"cold_prefill":True}
+cases.append(("canary row: spec off, no acceptance", c, True))
+c=copy.deepcopy(GOOD); del c["m"]["mtp_acceptance"]
+cases.append(("spec ON but acceptance missing", c, False))
 p=pathlib.Path(".scratch/t.jsonl")
 fails=0
 for name,row,should_pass in cases:

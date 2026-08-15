@@ -29,16 +29,25 @@
     {
       "if":   { "properties": { "kind": { "enum": ["nightly", "manual"] } }, "required": ["kind"] },
       "then": { "properties": { "m": {
-                  "required": ["rep", "cold_prefill", "mtp_acceptance"],
+                  "required": ["rep", "cold_prefill"],
                   "anyOf": [
                     { "required": ["pp2048"], "properties": { "pp2048":  { "type": "number" } } },
                     { "required": ["pp_deep"], "properties": { "pp_deep": { "type": "number" } } }
                   ],
                   "properties": {
-                    "rep":            { "type": "integer", "minimum": 1 },
-                    "cold_prefill":   { "type": "boolean" },
-                    "mtp_acceptance": { "type": "number", "minimum": 0, "maximum": 1 }
+                    "rep":          { "type": "integer", "minimum": 1 },
+                    "cold_prefill": { "type": "boolean" }
                   } } } }
+    },
+    {
+      "$comment": "Acceptance is only meaningful when speculation is on. llama-bench has no spec-decode flags, so canary rows legitimately have none.",
+      "if": { "allOf": [
+                { "properties": { "kind": { "enum": ["nightly", "manual"] } }, "required": ["kind"] },
+                { "properties": { "cfg": { "properties": { "spec": { "type": "string" } },
+                                           "required": ["spec"] } }, "required": ["cfg"] } ] },
+      "then": { "properties": { "m": {
+                  "required": ["mtp_acceptance"],
+                  "properties": { "mtp_acceptance": { "type": "number", "minimum": 0, "maximum": 1 } } } } }
     }
   ],
 
