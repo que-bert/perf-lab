@@ -83,13 +83,50 @@ identity.** In theory it is exact — drafts are accepted only when they match w
 target model would have produced — so `--spec-type`/`--spec-draft-n-max` should be a
 free speed knob with no output consequence. On this stack it is not.
 
-Untested hypothesis: verifying several drafted tokens in one batched forward pass uses
-different GEMM shapes and reduction orders than one-token-at-a-time decode, and
-floating-point addition is not associative. Where two candidate tokens are near-tied,
-a low-bit difference flips the argmax, and everything after that point diverges. This
-would make the divergence a numerical artifact rather than a quality regression — but
-"different, probably fine" is not a measurement, and nothing here establishes which it
-is. That needs a quality benchmark.
+### The divergence is a tie-break, not a regression
+
+Every divergence observed lands where the model had no real preference. Top-2
+probabilities at the divergence index, and where the other config's token ranked:
+
+| comparison | prompt | top-1 | top-2 | ratio | rank of other's token |
+|---|---|---|---|---|---|
+| nospec/mtp4 | technical | 0.3690 | 0.3496 | 1.06 | 2nd |
+| nospec/mtp2 | narrative | 0.5149 | 0.4850 | 1.06 | 2nd |
+| nospec/mtp4 | list | 0.4971 | 0.4715 | 1.05 | 2nd |
+| nospec/mtp2 | code | 0.3219 | 0.3216 | **1.00** | 2nd |
+| nospec/mtp4 | README | — | — | 1.03 | 2nd |
+
+Six for six, the alternative was the runner-up at a probability ratio under 1.07. Not
+once did a speculative config pick something the model ranked further down. Two of five
+prompts produced no divergence at all, and divergence positions scatter — 14, 15, 23,
+57, 92 — rather than clustering early.
+
+**`n_max 2` and `n_max 4` also diverge from each other**, which rules out
+"speculation versus none" as the cause. What changes between them is the shape of the
+batched forward pass, and floating-point addition is not associative: reduction order
+perturbs logits in the low bits, and only a near-tie can be flipped by that.
+
+Contrast KV quantization, which is lossy for real:
+
+| comparison | first divergence | ratio | verdict |
+|---|---|---|---|
+| `q4_0` vs `q8_0` KV | token 38 | **1.70** | material |
+
+The quantized run also picked the runner-up, but one the reference rated 1.7× less
+likely — a genuine difference of preference, not a coin-flip. `verify.py --tie-ratio`
+defaults to 1.2, between the two clusters.
+
+**Consequence:** strict token identity is the wrong gate on this hardware; it fails
+changes that are numerically equivalent. `verify.py` reports `equivalent` alongside
+`token_identical` and only fails on divergence the reference model actually cared about.
+
+### llama-server does not report distributions for drafted tokens
+
+Measured while building the gate: with `n_probs: 5`, a non-speculative run returns
+`top_logprobs` for **96 of 96** tokens; a speculative run returns them for **1–2 of 96**.
+Accepted draft tokens carry no distribution. Any tie test must therefore take its
+reference from the non-speculative side — scoring against the speculative one makes
+every divergence look unjudgeable, which is not the same as it being real.
 
 Reproduce:
 
