@@ -45,10 +45,13 @@ CARD="$(for c in /sys/class/drm/card[0-9]*; do
 USED_MIB=$(( $(cat "/sys/class/drm/$CARD/device/mem_info_vram_used" 2>/dev/null || echo 0) / 1048576 ))
 GUARD_MIB="${PERF_LAB_GUARD_MIB:-500}"
 
+# A skip carries the batch tag like any other row. Without it the skip is
+# invisible to check.py, and a night where every canary was guarded off looks
+# identical to a night that never ran.
 emit_skip () {
   python3 "$HERE/emit_row.py" --config "$CFG" --key "$KEY" --kind skipped \
-    --reason "$1" --gpu-uid "$PERF_LAB_GPU_UID" --model "$PERF_LAB_MODEL" \
-    --bin "$PERF_LAB_BIN" >> "$LEDGER"
+    --reason "$1" --tag "$TAG" --gpu-uid "$PERF_LAB_GPU_UID" \
+    --model "$PERF_LAB_MODEL" --bin "$PERF_LAB_BIN" >> "$LEDGER"
   echo "bench.sh: skipped — $1" >&2
 }
 

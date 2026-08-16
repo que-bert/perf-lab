@@ -33,6 +33,14 @@ cases.append(("apt row missing rep", c, False))
 c=copy.deepcopy(GOOD); c["kind"]="apt"; del c["m"]["mtp_acceptance"]
 cases.append(("apt row, spec ON, acceptance missing", c, False))
 c=copy.deepcopy(GOOD); c["kind"]="nightly-ish"; cases.append(("unknown kind", c, False))
+# A skip records an absence and carries no metric. Stage 1 had a case for a skip
+# WITHOUT a reason but none for a well-formed one, so every skip the harness
+# emitted was silently schema-invalid until the first one was actually written.
+c=copy.deepcopy(GOOD); c["kind"]="skipped"; c["reason"]="deadline"
+c["m"]={"pp2048":None,"unit":"tok/s"}
+cases.append(("well-formed skipped row", c, True))
+c=copy.deepcopy(GOOD); c["kind"]="backfill"; c["m"]={"rep":None,"cold_prefill":None,"unit":"tok/s"}
+cases.append(("non-skip row with no metric at all", c, False))
 p=pathlib.Path(".scratch/t.jsonl")
 fails=0
 for name,row,should_pass in cases:

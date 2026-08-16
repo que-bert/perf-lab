@@ -219,6 +219,79 @@
           }
         }
       }
+    },
+    {
+      "$comment": "Every row except a skip must carry at least one throughput metric. Gated on kind because a skip has none by definition.",
+      "if": {
+        "properties": {
+          "kind": {
+            "not": {
+              "const": "skipped"
+            }
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "m": {
+            "anyOf": [
+              {
+                "required": [
+                  "pp2048"
+                ],
+                "properties": {
+                  "pp2048": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "required": [
+                  "pp_deep"
+                ],
+                "properties": {
+                  "pp_deep": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "required": [
+                  "tg"
+                ],
+                "properties": {
+                  "tg": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "required": [
+                  "tg_deep"
+                ],
+                "properties": {
+                  "tg_deep": {
+                    "type": "number"
+                  }
+                }
+              },
+              {
+                "required": [
+                  "wall_s"
+                ],
+                "properties": {
+                  "wall_s": {
+                    "type": "number"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
     }
   ],
   "$defs": {
@@ -428,60 +501,8 @@
     },
     "m": {
       "type": "object",
-      "description": "At least one throughput metric. Live rows (nightly/manual) additionally require a prefill metric \u2014 a tg-only row is blind to the kernel-fallback regression this repo exists to catch. Backfill rows are exempt; historical logs predate the rule.",
+      "description": "Live rows (nightly/manual/apt) require a prefill metric - a tg-only row is blind to the kernel-fallback regression this repo exists to catch. Backfill rows are exempt; historical logs predate the rule. Skipped rows carry no metric at all: they record an absence.",
       "additionalProperties": false,
-      "anyOf": [
-        {
-          "required": [
-            "pp2048"
-          ],
-          "properties": {
-            "pp2048": {
-              "type": "number"
-            }
-          }
-        },
-        {
-          "required": [
-            "pp_deep"
-          ],
-          "properties": {
-            "pp_deep": {
-              "type": "number"
-            }
-          }
-        },
-        {
-          "required": [
-            "tg"
-          ],
-          "properties": {
-            "tg": {
-              "type": "number"
-            }
-          }
-        },
-        {
-          "required": [
-            "tg_deep"
-          ],
-          "properties": {
-            "tg_deep": {
-              "type": "number"
-            }
-          }
-        },
-        {
-          "required": [
-            "wall_s"
-          ],
-          "properties": {
-            "wall_s": {
-              "type": "number"
-            }
-          }
-        }
-      ],
       "properties": {
         "pp2048": {
           "type": [
