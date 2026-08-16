@@ -41,6 +41,15 @@ c["m"]={"pp2048":None,"unit":"tok/s"}
 cases.append(("well-formed skipped row", c, True))
 c=copy.deepcopy(GOOD); c["kind"]="backfill"; c["m"]={"rep":None,"cold_prefill":None,"unit":"tok/s"}
 cases.append(("non-skip row with no metric at all", c, False))
+# Build identity. Two builds of fb0e6b621 live on this host and differ only by
+# compiler; one segfaults on every model. llamacpp_sha alone cannot tell them apart.
+c=copy.deepcopy(GOOD); c["fp"]["build"]["binary_sha256"]="0"*64
+c["fp"]["build"]["toolchain"]="GNU 11.4.0"
+cases.append(("row carrying build identity", c, True))
+c=copy.deepcopy(GOOD); c["fp"]["build"]["binary_sha256"]="deadbeef"
+cases.append(("malformed binary_sha256", c, False))
+c=copy.deepcopy(GOOD); c["fp"]["build"]["binary_sha256"]=None
+cases.append(("null build identity (pre-stage-3 rows)", c, True))
 p=pathlib.Path(".scratch/t.jsonl")
 fails=0
 for name,row,should_pass in cases:

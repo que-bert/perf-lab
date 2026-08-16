@@ -357,8 +357,24 @@
                 "string",
                 "null"
               ]
+            },
+            "binary_sha256": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[0-9a-f]{64}$",
+              "description": "Composite digest over the tool binary, its -impl.so, and the ggml backends."
+            },
+            "toolchain": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Compiler banner, e.g. 'GNU 11.4.0'. Human-readable companion to binary_sha256."
             }
-          }
+          },
+          "$comment": "llamacpp_sha names the upstream commit, which is not enough to identify a binary: two builds of fb0e6b621 on this host differ only by compiler, and one segfaults on every model."
         },
         "mesa": {
           "type": "string",

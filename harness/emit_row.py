@@ -35,6 +35,47 @@ def sha256_cached(path: pathlib.Path):
     return db[key]
 
 
+def build_identity(bindir: pathlib.Path, tool: str):
+    """Digest the files that actually decide performance, plus the toolchain.
+
+    `llamacpp_sha` is not enough on its own. Two builds of fb0e6b621 exist on
+    this machine: one segfaults on every model, the other is what Mimir runs.
+    They differ only by compiler, so a ledger keyed on the upstream SHA calls
+    them the same thing and silently mixes two populations.
+
+    The tool binaries here are ~18 KB launcher shims -- the code lives in
+    <tool>-impl.so and the ggml backends -- so hashing the named binary alone
+    would miss a rebuilt backend entirely.
+    """
+    wanted = [bindir / tool, bindir / f"lib{tool}-impl.so"]
+    wanted += sorted(bindir.glob("libggml*.so.[0-9]*"))
+    digest = hashlib.sha256()
+    seen = 0
+    for path in wanted:
+        if not path.exists():
+            continue
+        real = path.resolve()
+        digest.update(real.name.encode())
+        digest.update(sha256_cached(real).encode())
+        seen += 1
+    if not seen:
+        return None, None
+
+    toolchain = None
+    env = dict(os.environ, LD_LIBRARY_PATH=str(bindir))
+    for exe in (tool, "llama-cli", "llama-bench"):
+        path = bindir / exe
+        if not path.exists():
+            continue
+        out = subprocess.run([str(path), "--version"], capture_output=True,
+                             text=True, env=env, timeout=60)
+        m = re.search(r"^built with (.+?) for ", out.stdout + out.stderr, re.M)
+        if m:
+            toolchain = m.group(1).strip()
+            break
+    return digest.hexdigest(), toolchain
+
+
 def llamacpp_sha(bindir: pathlib.Path):
     """`version: 10082 (fb0e6b621)` -> fb0e6b621.
 
@@ -159,6 +200,9 @@ def main():
     ap.add_argument("--model", required=True)
     ap.add_argument("--bin", required=True)
     ap.add_argument("--run", action="store_true")
+    ap.add_argument("--tool", default="llama-bench",
+                    help="which binary produced this row; its identity is "
+                         "hashed into fp.build.binary_sha256")
     a = ap.parse_args()
 
     import yaml
@@ -169,6 +213,9 @@ def main():
     fp = probe(a.gpu_uid)
     fp["llamacpp_sha"] = llamacpp_sha(bindir)
     fp["patches"] = []
+    binsha, toolchain = build_identity(bindir, a.tool)
+    fp["build"]["binary_sha256"] = binsha
+    fp["build"]["toolchain"] = toolchain
     fp["model"] = {"name": model.stem, "sha256": sha256_cached(model),
                    "quant": model.stem.rsplit("-", 1)[-1]}
 
