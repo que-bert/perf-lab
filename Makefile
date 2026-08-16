@@ -1,6 +1,6 @@
 LEDGER ?= results/ledger.jsonl
 
-.PHONY: validate test help row canaries check rebaseline heartbeat nightly drain verify
+.PHONY: validate test help row canaries check rebaseline heartbeat nightly drain verify sweep quality
 
 help:
 	@echo "make validate   validate $(LEDGER) against results/schema.json"
@@ -11,6 +11,9 @@ help:
 	@echo "make nightly    run every canary as one tagged batch"
 	@echo "make heartbeat  file Issues for sustained breaches / 72h silence"
 	@echo "make rebaseline re-derive canary bands from measured spread"
+	@echo "make verify     are two configs equivalent? (ties tolerated)"
+	@echo "make sweep      search n_max for the fastest equivalent config"
+	@echo "make quality    perplexity for a lossy config (KV quantization)"
 	@echo ""
 	@echo "requires: PERF_LAB_MODEL, PERF_LAB_BIN, PERF_LAB_GPU_UID"
 	@echo "heartbeat also needs GH_TOKEN (see ~/.perf-lab/env)"
@@ -50,3 +53,10 @@ canaries:
 # Two configs, same prompts, compared by token id. Exit 1 on divergence.
 verify:
 	@harness/verify.py configs/tracked.yaml baseline no-spec
+
+# The search. Refuses lossy axes -- those need `make quality` first.
+sweep:
+	@harness/sweep.py --axis n_max=2,3,4,5,6 --ledger $(LEDGER)
+
+quality:
+	@harness/quality.py configs/tracked.yaml baseline --ledger $(LEDGER)

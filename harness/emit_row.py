@@ -202,6 +202,26 @@ def run_bench(bindir, model, c, defaults):
     return pp, tg
 
 
+def fingerprint(gpu_uid, model: pathlib.Path, bindir: pathlib.Path, tool: str):
+    """Every axis that could explain a number. Shared with sweep.py so there is
+    one implementation -- a fingerprint assembled twice is a fingerprint that
+    disagrees with itself."""
+    fp = probe(gpu_uid)
+    fp["llamacpp_sha"] = llamacpp_sha(bindir)
+    fp["patches"] = []
+    binsha, toolchain = build_identity(bindir, tool)
+    fp["build"]["binary_sha256"] = binsha
+    fp["build"]["toolchain"] = toolchain
+    fp["model"] = {"name": model.stem, "sha256": sha256_cached(model),
+                   "quant": model.stem.rsplit("-", 1)[-1]}
+    return fp
+
+
+def new_run_id(*parts):
+    return "r-" + hashlib.sha1(
+        f"{time.time()}{'|'.join(str(p) for p in parts)}".encode()).hexdigest()[:8]
+
+
 def free_port():
     import socket
     s = socket.socket()
@@ -331,15 +351,7 @@ def main():
     defaults, c = doc["defaults"], entries[a.key]
     bindir, model = pathlib.Path(a.bin), pathlib.Path(a.model)
 
-    fp = probe(a.gpu_uid)
-    fp["llamacpp_sha"] = llamacpp_sha(bindir)
-    fp["patches"] = []
-    binsha, toolchain = build_identity(bindir, a.tool)
-    fp["build"]["binary_sha256"] = binsha
-    fp["build"]["toolchain"] = toolchain
-    fp["model"] = {"name": model.stem, "sha256": sha256_cached(model),
-                   "quant": model.stem.rsplit("-", 1)[-1]}
-
+    fp = fingerprint(a.gpu_uid, model, bindir, a.tool)
     env_pre = env_probe(fp["gpu"]["pci"])
 
     row = {

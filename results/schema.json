@@ -287,6 +287,16 @@
                     "type": "number"
                   }
                 }
+              },
+              {
+                "required": [
+                  "ppl"
+                ],
+                "properties": {
+                  "ppl": {
+                    "type": "number"
+                  }
+                }
               }
             ]
           }
@@ -592,6 +602,21 @@
           ],
           "minimum": 0,
           "description": "Wall-clock seconds for the whole request, including prefill. Used where tok/s was not separable."
+        },
+        "ppl": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "Perplexity over a held-out corpus. Comparable only at a fixed ctx and corpus_sha."
+        },
+        "ppl_stderr": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
         }
       }
     },
