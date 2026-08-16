@@ -12,6 +12,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import tempfile
 import time
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -124,9 +125,14 @@ def env_probe(pci):
 
     The design called for these so that a shift is visible rather than
     mysterious; without them a 70% move on two canaries with an identical
-    fingerprint has no explanation available. vram_used_mib_before is the
-    contention check: a card that was not idle when measurement started did
-    not measure what the row claims.
+    fingerprint has no explanation available.
+
+    Called twice, because the two halves want opposite moments.
+    vram_used_mib_before is a contention check and is only meaningful BEFORE
+    the run: a card that was not idle did not measure what the row claims.
+    Temperature and clock are only meaningful AFTER it -- sampled first they
+    describe a sleeping card (17 C, 0 MHz) and say nothing about whether the
+    measurement throttled.
     """
     env = {"gpu_temp_c": None, "gpu_clock_mhz": None, "loadavg": None,
            "vram_used_mib_before": None}
@@ -142,16 +148,24 @@ def env_probe(pci):
         env["vram_used_mib_before"] = used // (1 << 20)
     except (OSError, ValueError):
         pass
+    # By label, not by position: this card exposes edge, junction and mem, and
+    # which one is temp1 is not guaranteed across drivers.
     for hwmon in (card / "device" / "hwmon").glob("hwmon*"):
-        try:
-            env["gpu_temp_c"] = int((hwmon / "temp1_input").read_text()) / 1000.0
+        for label_file in sorted(hwmon.glob("temp*_label")):
+            try:
+                if label_file.read_text().strip() == "edge":
+                    inp = label_file.with_name(
+                        label_file.name.replace("_label", "_input"))
+                    env["gpu_temp_c"] = int(inp.read_text()) / 1000.0
+                    break
+            except (OSError, ValueError):
+                continue
+        if env["gpu_temp_c"] is not None:
             break
-        except (OSError, ValueError):
-            continue
     try:
         for line in (card / "device" / "pp_dpm_sclk").read_text().splitlines():
             if line.strip().endswith("*"):          # the active DPM state
-                env["gpu_clock_mhz"] = int(re.search(r"(\d+)Mhz", line, re.I).group(1))
+                env["gpu_clock_mhz"] = int(re.search(r"(\d+)\s*Mhz", line, re.I).group(1))
                 break
     except (OSError, ValueError, AttributeError):
         pass
@@ -188,6 +202,94 @@ def run_bench(bindir, model, c, defaults):
     return pp, tg
 
 
+def free_port():
+    import socket
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    port = s.getsockname()[1]
+    s.close()
+    return port
+
+
+def run_server(bindir, model, c, defaults, prompt):
+    """Measure one request through llama-server; return (pp, tg, acceptance, n).
+
+    llama-bench cannot do this: it has no speculative-decoding flags, so the
+    config actually served -- 262K context with draft-mtp -- was unmeasurable
+    by the stage-1 harness. Acceptance comes from the response's own
+    draft_n/draft_n_accepted rather than scraped from the log.
+    """
+    import urllib.error
+    import urllib.request
+
+    port = free_port()
+    cmd = [str(bindir / "llama-server"), "-m", str(model),
+           "--port", str(port), "--host", "127.0.0.1", "--no-webui",
+           "-c", str(c["ctx"]), "-ctk", c["ctk"], "-ctv", c["ctv"],
+           "-fa", str(defaults["fa"]), "-ngl", str(defaults["ngl"]),
+           "-t", str(defaults["threads"])]
+    if c.get("spec"):
+        cmd += ["--spec-type", c["spec"]]
+        if c.get("n_max"):
+            cmd += ["--spec-draft-n-max", str(c["n_max"])]
+
+    env = dict(os.environ, LD_LIBRARY_PATH=str(bindir))
+    log = tempfile.NamedTemporaryFile("w+", suffix=".log", delete=False)
+    proc = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, env=env)
+
+    def stop():
+        proc.terminate()
+        try:
+            proc.wait(timeout=60)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait(timeout=30)
+
+    try:
+        # A 503 body means "still loading" -- treating any HTTP reply as ready
+        # kills the server mid-load and reports a crash that never happened.
+        deadline = time.time() + float(os.environ.get("PERF_LAB_LOAD_TIMEOUT", 900))
+        while True:
+            if proc.poll() is not None:
+                log.flush()
+                tail = pathlib.Path(log.name).read_text()[-1200:]
+                sys.exit(f"emit_row: llama-server exited {proc.returncode}\n{tail}")
+            try:
+                with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=5) as r:
+                    if r.status == 200:
+                        break
+            except (urllib.error.URLError, urllib.error.HTTPError, OSError):
+                pass
+            if time.time() > deadline:
+                stop()
+                sys.exit(f"emit_row: llama-server never became ready on port {port}")
+            time.sleep(3)
+
+        body = json.dumps({
+            "prompt": prompt,
+            "n_predict": c.get("n_predict", defaults.get("n_gen", 64)),
+            "temperature": 0,
+            # Without this a repeat rep reports a prefill it never computed.
+            "cache_prompt": False,
+        }).encode()
+        req = urllib.request.Request(
+            f"http://127.0.0.1:{port}/completion", data=body,
+            headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=3600) as r:
+            resp = json.load(r)
+    finally:
+        stop()
+        log.close()
+
+    t = resp.get("timings", {})
+    if not t:
+        sys.exit(f"emit_row: no timings in response: {str(resp)[:400]}")
+    drafted, accepted = t.get("draft_n"), t.get("draft_n_accepted")
+    acceptance = (accepted / drafted) if drafted else None
+    return (t.get("prompt_per_second"), t.get("predicted_per_second"),
+            acceptance, t.get("prompt_n"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
@@ -200,6 +302,9 @@ def main():
     ap.add_argument("--model", required=True)
     ap.add_argument("--bin", required=True)
     ap.add_argument("--run", action="store_true")
+    ap.add_argument("--mode", choices=("bench", "server"), default="bench",
+                    help="bench = llama-bench (canaries); server = llama-server, "
+                         "the only path that can set ctx/spec/n_max")
     ap.add_argument("--tool", default="llama-bench",
                     help="which binary produced this row; its identity is "
                          "hashed into fp.build.binary_sha256")
@@ -207,7 +312,12 @@ def main():
 
     import yaml
     doc = yaml.safe_load(open(a.config))
-    defaults, c = doc["defaults"], doc["canaries"][a.key]
+    # canary.yaml keys its entries under "canaries", tracked.yaml under
+    # "tracked". Same row shape either way.
+    entries = doc.get("canaries") or doc.get("tracked") or {}
+    if a.key not in entries:
+        sys.exit(f"emit_row: no config '{a.key}' in {a.config}")
+    defaults, c = doc["defaults"], entries[a.key]
     bindir, model = pathlib.Path(a.bin), pathlib.Path(a.model)
 
     fp = probe(a.gpu_uid)
@@ -219,6 +329,8 @@ def main():
     fp["model"] = {"name": model.stem, "sha256": sha256_cached(model),
                    "quant": model.stem.rsplit("-", 1)[-1]}
 
+    env_pre = env_probe(fp["gpu"]["pci"])
+
     row = {
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "run_id": "r-" + hashlib.sha1(
@@ -226,13 +338,16 @@ def main():
         "kind": a.kind,
         "key": a.key,
         "fp": fp,
-        "cfg": {"ctx": c["prompt_tokens"] + defaults["n_gen"],
+        "cfg": {"ctx": (c["ctx"] if a.mode == "server"
+                        else c["prompt_tokens"] + defaults["n_gen"]),
                 "ctk": c["ctk"], "ctv": c["ctv"], "fa": str(defaults["fa"]),
-                "spec": None, "n_max": None, "ngl": defaults["ngl"],
-                "np": 1, "prompt_tokens": c["prompt_tokens"]},
+                "spec": c.get("spec") if a.mode == "server" else None,
+                "n_max": c.get("n_max") if a.mode == "server" else None,
+                "ngl": defaults["ngl"],
+                "np": 1, "prompt_tokens": c.get("prompt_tokens")},
         "m": {"unit": "tok/s"},
         "ok": {"token_identical": None, "corpus_sha": None},
-        "env": env_probe(fp["gpu"]["pci"]),
+        "env": env_pre,
     }
     if a.tag:
         row["tag"] = a.tag
@@ -240,10 +355,31 @@ def main():
     if a.kind == "skipped":
         row["reason"] = a.reason or "unspecified"
         row["m"] = {"pp2048": None, "unit": "tok/s"}
+    elif a.mode == "server":
+        prompt_path = pathlib.Path(
+            os.environ.get("PERF_LAB_PROMPT", str(pathlib.Path.home()
+                                                  / ".perf-lab/prompts/default.txt")))
+        if not prompt_path.is_file():
+            sys.exit(f"emit_row: no prompt file at {prompt_path}. Set "
+                     "PERF_LAB_PROMPT. Prompts are never committed -- this "
+                     "repo is public -- so the row cites its sha256 instead.")
+        prompt = prompt_path.read_text()
+        pp, tg, acceptance, prompt_n = run_server(bindir, model, c, defaults, prompt)
+        row["cfg"]["prompt_tokens"] = prompt_n
+        row["m"].update({"pp2048": pp, "tg": tg, "rep": a.rep,
+                         "cold_prefill": True, "mtp_acceptance": acceptance})
+        row["ok"]["corpus_sha"] = hashlib.sha256(prompt.encode()).hexdigest()
     else:
         pp, tg = run_bench(bindir, model, c, defaults)
         row["m"].update({"pp2048": pp, "tg": tg, "rep": a.rep,
                          "cold_prefill": True, "mtp_acceptance": None})
+
+    if a.kind != "skipped":
+        # Thermal state as the run left it. Sampled before, these describe an
+        # idle card and cannot show whether the measurement throttled.
+        post = env_probe(fp["gpu"]["pci"])
+        row["env"]["gpu_temp_c"] = post["gpu_temp_c"]
+        row["env"]["gpu_clock_mhz"] = post["gpu_clock_mhz"]
 
     json.dump(row, sys.stdout)
     print()

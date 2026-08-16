@@ -1,0 +1,73 @@
+# Configurations we actually serve, measured through llama-server.
+#
+# These are the opposite of canaries. A canary is a probe of kernel dispatch that
+# nobody runs; these are the real operating points, at real context lengths, with
+# speculative decoding on. llama-bench cannot measure them at all -- it has no
+# spec-decode flags -- which is why the stage-1 harness could only ever produce
+# canary rows and why every `spec` row in the ledger before 2026-08-16 was scraped
+# from a log rather than measured.
+#
+# Measured via `harness/bench_server.sh`, which needs PERF_LAB_SERVER_BIN pointing
+# at a working llama-server. Note that this is NOT the same build as PERF_LAB_BIN:
+# the local GCC 15 build's llama-server segfaults on any model, so the official
+# ROCm prebuilt is used here. fp.build.binary_sha256 records which one produced a
+# row, since both report upstream fb0e6b621.
+#
+# Prompt text is never committed -- this repo is public. It comes from
+# $PERF_LAB_PROMPT and each row cites its sha256 in ok.corpus_sha.
+
+defaults:
+  n_gen: 256
+  threads: 8
+  ngl: 99
+  fa: "on"
+  reps: 3
+
+tracked:
+  baseline:
+    ctx: 262144
+    ctk: q4_0
+    ctv: q4_0
+    spec: draft-mtp
+    n_max: 4
+    n_predict: 256
+    role: baseline
+    note: >
+      The shipped config. 46.15 tok/s decode at 0.7708 acceptance when it was found
+      by hand on 2026-08-15 (run r-3e958f9f, backfilled), against a 21.80 tok/s
+      unspeculated baseline. Everything else here is judged against this.
+
+  no-spec:
+    ctx: 262144
+    ctk: q4_0
+    ctv: q4_0
+    spec: null
+    n_max: null
+    n_predict: 256
+    role: candidate
+    note: >
+      Speculation off. The reference point that says what speculative decoding is
+      actually buying, and the config every spec variant must be token-identical to.
+
+  mtp-n2:
+    ctx: 262144
+    ctk: q4_0
+    ctv: q4_0
+    spec: draft-mtp
+    n_max: 2
+    n_predict: 256
+    role: candidate
+    note: Shallower draft. Cheaper per step, lower acceptance ceiling.
+
+  mtp-n6:
+    ctx: 262144
+    ctk: q4_0
+    ctv: q4_0
+    spec: draft-mtp
+    n_max: 6
+    n_predict: 256
+    role: candidate
+    note: >
+      Deeper draft. Backfilled data says acceptance collapses past n=4 (0.5000 at
+      n_max 6, run r-ea640b54); this is the measurement that confirms it on the
+      current stack rather than trusting a log from another day.
