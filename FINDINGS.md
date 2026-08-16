@@ -62,6 +62,44 @@ Leading hypothesis, untested: the 2026-08-15 readings were taken while ollama's
 2026-08-16. Kernel selection for the fallback paths may depend on free VRAM.
 Testing it means re-measuring `slow-q4_1` with a deliberate VRAM occupant present.
 
+## Speculative decoding is not output-identical here
+
+Measured 2026-08-16 with `harness/verify.py`, greedy sampling (temperature 0), 96
+predicted tokens, prompt corpus `db3bc6c727a3…`, Qwen3.8-27B-Q6_K on the b10082 ROCm
+prebuilt (`binary_sha256 068f5c54…`):
+
+| comparison | token-identical | first divergence |
+|---|---|---|
+| `draft-mtp n_max 4` vs **itself** | **yes** | — |
+| `draft-mtp n_max 4` vs **no speculation** | **no** | token 57 |
+| `q4_0` KV vs `q8_0` KV | no | token 38 |
+
+The control is what makes the other two rows mean anything: the same config run twice
+through two freshly spawned servers produced byte-identical token ids, so this harness
+is deterministic and the divergences are attributable rather than noise.
+
+That **falsifies the assumption that speculative decoding can be validated by token
+identity.** In theory it is exact — drafts are accepted only when they match what the
+target model would have produced — so `--spec-type`/`--spec-draft-n-max` should be a
+free speed knob with no output consequence. On this stack it is not.
+
+Untested hypothesis: verifying several drafted tokens in one batched forward pass uses
+different GEMM shapes and reduction orders than one-token-at-a-time decode, and
+floating-point addition is not associative. Where two candidate tokens are near-tied,
+a low-bit difference flips the argmax, and everything after that point diverges. This
+would make the divergence a numerical artifact rather than a quality regression — but
+"different, probably fine" is not a measurement, and nothing here establishes which it
+is. That needs a quality benchmark.
+
+Reproduce:
+
+```
+harness/verify.py configs/tracked.yaml baseline no-spec --n-predict 96
+```
+
+*(These rows cite a reproduction command rather than a run_id: `verify.py` does not yet
+append to the ledger. It should.)*
+
 ## Spread on an idle card is under 2%, not 7%
 
 Robust (MAD-scaled) spread over 5 reps, tag `rebase-20260816T052925Z`:

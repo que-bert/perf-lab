@@ -1,6 +1,6 @@
 LEDGER ?= results/ledger.jsonl
 
-.PHONY: validate test help row canaries check rebaseline heartbeat nightly drain
+.PHONY: validate test help row canaries check rebaseline heartbeat nightly drain verify
 
 help:
 	@echo "make validate   validate $(LEDGER) against results/schema.json"
@@ -46,3 +46,7 @@ canaries:
 	@for k in fast-q4 fast-q8 slow-q5_1 slow-q4_1 slow-mixed; do \
 		echo "--- $$k ---"; harness/bench.sh configs/canary.yaml $$k --reps 1 || exit 1; \
 	done
+
+# Two configs, same prompts, compared by token id. Exit 1 on divergence.
+verify:
+	@harness/verify.py configs/tracked.yaml baseline no-spec

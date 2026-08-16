@@ -211,13 +211,11 @@ def free_port():
     return port
 
 
-def run_server(bindir, model, c, defaults, prompt):
-    """Measure one request through llama-server; return (pp, tg, acceptance, n).
+def start_server(bindir, model, c, defaults):
+    """Spawn llama-server for one config and wait until it is actually serving.
 
-    llama-bench cannot do this: it has no speculative-decoding flags, so the
-    config actually served -- 262K context with draft-mtp -- was unmeasurable
-    by the stage-1 harness. Acceptance comes from the response's own
-    draft_n/draft_n_accepted rather than scraped from the log.
+    Returns (proc, port, stop). Shared with verify.py, which needs the same
+    lifecycle to run two configs over identical prompts.
     """
     import urllib.error
     import urllib.request
@@ -245,41 +243,54 @@ def run_server(bindir, model, c, defaults, prompt):
             proc.kill()
             proc.wait(timeout=30)
 
-    try:
-        # A 503 body means "still loading" -- treating any HTTP reply as ready
-        # kills the server mid-load and reports a crash that never happened.
-        deadline = time.time() + float(os.environ.get("PERF_LAB_LOAD_TIMEOUT", 900))
-        while True:
-            if proc.poll() is not None:
-                log.flush()
-                tail = pathlib.Path(log.name).read_text()[-1200:]
-                sys.exit(f"emit_row: llama-server exited {proc.returncode}\n{tail}")
-            try:
-                with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=5) as r:
-                    if r.status == 200:
-                        break
-            except (urllib.error.URLError, urllib.error.HTTPError, OSError):
-                pass
-            if time.time() > deadline:
-                stop()
-                sys.exit(f"emit_row: llama-server never became ready on port {port}")
-            time.sleep(3)
+    # A 503 body means "still loading" -- treating any HTTP reply as ready
+    # kills the server mid-load and reports a crash that never happened.
+    deadline = time.time() + float(os.environ.get("PERF_LAB_LOAD_TIMEOUT", 900))
+    while True:
+        if proc.poll() is not None:
+            log.flush()
+            tail = pathlib.Path(log.name).read_text()[-1200:]
+            sys.exit(f"emit_row: llama-server exited {proc.returncode}\n{tail}")
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/health", timeout=5) as r:
+                if r.status == 200:
+                    break
+        except (urllib.error.URLError, urllib.error.HTTPError, OSError):
+            pass
+        if time.time() > deadline:
+            stop()
+            sys.exit(f"emit_row: llama-server never became ready on port {port}")
+        time.sleep(3)
+    return proc, port, stop
 
-        body = json.dumps({
-            "prompt": prompt,
-            "n_predict": c.get("n_predict", defaults.get("n_gen", 64)),
-            "temperature": 0,
-            # Without this a repeat rep reports a prefill it never computed.
-            "cache_prompt": False,
-        }).encode()
-        req = urllib.request.Request(
-            f"http://127.0.0.1:{port}/completion", data=body,
-            headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=3600) as r:
-            resp = json.load(r)
+
+def complete(port, prompt, n_predict, extra=None):
+    """One completion request. temperature 0 and cache_prompt off, always:
+    a cached prompt reports a prefill that was never computed."""
+    import urllib.request
+    body = {"prompt": prompt, "n_predict": n_predict,
+            "temperature": 0, "cache_prompt": False}
+    body.update(extra or {})
+    req = urllib.request.Request(
+        f"http://127.0.0.1:{port}/completion", data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=3600) as r:
+        return json.load(r)
+
+
+def run_server(bindir, model, c, defaults, prompt):
+    """Measure one request through llama-server; return (pp, tg, acceptance, n).
+
+    llama-bench cannot do this: it has no speculative-decoding flags, so the
+    config actually served -- 262K context with draft-mtp -- was unmeasurable
+    by the stage-1 harness. Acceptance comes from the response's own
+    draft_n/draft_n_accepted rather than scraped from the log.
+    """
+    proc, port, stop = start_server(bindir, model, c, defaults)
+    try:
+        resp = complete(port, prompt, c.get("n_predict", defaults.get("n_gen", 64)))
     finally:
         stop()
-        log.close()
 
     t = resp.get("timings", {})
     if not t:
