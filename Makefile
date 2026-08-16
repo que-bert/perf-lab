@@ -1,6 +1,6 @@
 LEDGER ?= results/ledger.jsonl
 
-.PHONY: validate test help row canaries check rebaseline heartbeat nightly
+.PHONY: validate test help row canaries check rebaseline heartbeat nightly drain
 
 help:
 	@echo "make validate   validate $(LEDGER) against results/schema.json"
@@ -28,6 +28,10 @@ check:
 
 nightly:
 	@harness/run_set.sh --kind nightly
+
+# What the drain timer calls every 15 minutes. Silent unless apt queued something.
+drain:
+	@harness/run_set.sh --kind apt --if-queued
 
 heartbeat:
 	@python3 harness/alert.py --ledger $(LEDGER)

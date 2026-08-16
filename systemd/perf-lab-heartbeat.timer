@@ -1,0 +1,10 @@
+[Unit]
+Description=perf-lab heartbeat and Issue filing
+
+[Timer]
+OnCalendar=*-*-* 09:00:00
+Persistent=true
+Unit=perf-lab@heartbeat.service
+
+[Install]
+WantedBy=timers.target

@@ -18,7 +18,8 @@ ROOT="$(dirname "$HERE")"
 LEDGER="${PERF_LAB_LEDGER:-$ROOT/results/ledger.jsonl}"
 STAMP="${PERF_LAB_QUEUE:-/var/lib/perf-lab/queued}"
 
-KIND=nightly; REPS=3; DEADLINE=""; DEADLINE_IN=""; CFG="$ROOT/configs/canary.yaml"
+KIND=nightly; REPS=3; DEADLINE=""; DEADLINE_IN=""; IF_QUEUED=0
+CFG="$ROOT/configs/canary.yaml"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --kind)        KIND="$2"; shift 2 ;;
@@ -26,9 +27,16 @@ while [[ $# -gt 0 ]]; do
     --deadline)    DEADLINE="$2"; shift 2 ;;
     --deadline-in) DEADLINE_IN="$2"; shift 2 ;;
     --config)      CFG="$2"; shift 2 ;;
+    --if-queued)   IF_QUEUED=1; shift ;;
     *) echo "run_set.sh: unknown argument $1" >&2; exit 64 ;;
   esac
 done
+
+# The drain timer wakes every 15 minutes and almost always has nothing to do.
+# Checking before the environment checks keeps a quiet wake-up silent.
+if (( IF_QUEUED )) && [[ ! -s "${PERF_LAB_QUEUE:-/var/lib/perf-lab/queued}" ]]; then
+  exit 0
+fi
 case "$KIND" in
   nightly|apt|manual) ;;
   *) echo "run_set.sh: --kind must be nightly, apt or manual" >&2; exit 64 ;;

@@ -1,0 +1,14 @@
+[Unit]
+Description=perf-lab apt-queue drain
+
+[Timer]
+# unattended-upgrades lands around 06:00; draining only on the nightly would
+# give a post-upgrade run the same before/after pair the nightly already has,
+# which is to say no information at all. Fifteen minutes makes the upgrade and
+# the measurement adjacent.
+OnBootSec=10m
+OnUnitActiveSec=15m
+Unit=perf-lab@drain.service
+
+[Install]
+WantedBy=timers.target

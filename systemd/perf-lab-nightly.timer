@@ -1,0 +1,19 @@
+[Unit]
+Description=perf-lab nightly canary run
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+
+# Nothing else contends for this slot, but a fixed instant across machines is
+# a habit worth not forming.
+RandomizedDelaySec=20m
+
+# A desktop is not always up at 03:00. Without this a machine that sleeps
+# through the window simply never measures, and the 72h heartbeat would report
+# a fault that is really just a sleeping laptop.
+Persistent=true
+
+Unit=perf-lab@nightly.service
+
+[Install]
+WantedBy=timers.target

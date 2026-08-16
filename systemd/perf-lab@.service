@@ -1,0 +1,26 @@
+[Unit]
+Description=perf-lab %i
+Documentation=https://github.com/que-bert/perf-lab
+After=network-online.target
+
+[Service]
+Type=oneshot
+
+# The gh keyring cannot be unlocked from here, and the model path is private to
+# this machine. Both come from a file the repo never sees.
+EnvironmentFile=@HOME@/.perf-lab/env
+Environment=PATH=@HOME@/.local/bin:/usr/local/bin:/usr/bin:/bin
+WorkingDirectory=@REPO@
+
+# The Makefile is the dispatcher: %i is a target (nightly, drain, heartbeat),
+# so the units stay identical to what a human runs by hand.
+ExecStart=/usr/bin/make -C @REPO@ %i
+
+# run_set.sh enforces its own 07:00 deadline. This is the backstop for a
+# process that wedges without honouring it -- a hung benchmark must not hold
+# the GPU indefinitely.
+TimeoutStartSec=4h
+
+# A failed run is reported through Issues, not through systemd retries: a
+# retry loop on a busy GPU just produces more skipped rows.
+Restart=no

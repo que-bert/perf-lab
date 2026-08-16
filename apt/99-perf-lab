@@ -1,0 +1,22 @@
+// perf-lab: queue a benchmark run when the graphics stack changes.
+//
+// This hook QUEUES ONLY. It never benchmarks inline: mid-upgrade the drivers
+// are half-installed, so anything measured here measures nothing, and apt
+// would block for minutes while it happened. The drain timer picks the stamp
+// up within 15 minutes, which is what makes an upgrade-triggered run carry a
+// clean before/after pair instead of duplicating the nightly.
+//
+// The logic lives here, in a root-owned file, deliberately. Calling a script
+// out of a user-writable checkout from a root apt hook would turn write
+// access to that checkout into root code execution on every upgrade.
+//
+// Install with:
+//   sudo install -d -o $USER -g $USER -m 755 /var/lib/perf-lab
+//   sudo install -m 644 apt/99-perf-lab /etc/apt/apt.conf.d/99-perf-lab
+//
+// Removing /var/lib/perf-lab disables the hook: it writes nothing if the
+// directory is absent.
+
+DPkg::Post-Invoke {
+    "if [ -d /var/lib/perf-lab ]; then tail -n 200 /var/log/dpkg.log | grep -E ' (upgrade|install) [^ ]*(amdgpu|mesa|rocm|linux-image|libdrm)' | awk '{print $4}' | sort -u >> /var/lib/perf-lab/queued 2>/dev/null; fi; true";
+};
