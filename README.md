@@ -63,9 +63,11 @@ harness/install.sh --uninstall
 Three triggers:
 
 - **nightly** at 03:00 — the routine sweep.
-- **drain** every 15 minutes — runs only if an apt upgrade queued one. Draining on the
-  nightly instead would give the post-upgrade run the same before/after pair the
-  nightly already has, which is no information at all.
+- **drain** hourly — runs only if an apt upgrade queued one, and costs 16 ms when
+  nothing is. Its purpose is attribution rather than speed: draining on the nightly
+  instead would give the post-upgrade run the same before/after pair the nightly
+  already has, which is no information at all. An hourly drain brackets the upgrade
+  within the same morning; the nightly catches the regression either way.
 - **heartbeat** at 09:00 — files an Issue for a sustained breach, a failed push, or no
   successful run in 72 hours. That last one matters most: a tripwire that quietly
   stopped running looks exactly like one reporting good news.

@@ -2,12 +2,15 @@
 Description=perf-lab apt-queue drain
 
 [Timer]
-# unattended-upgrades lands around 06:00; draining only on the nightly would
+# unattended-upgrades lands around 06:00. Draining only on the nightly would
 # give a post-upgrade run the same before/after pair the nightly already has,
-# which is to say no information at all. Fifteen minutes makes the upgrade and
-# the measurement adjacent.
+# which is to say no information at all -- so the queue does need its own
+# timer. But the value here is attribution, not latency: an hourly drain still
+# brackets the upgrade within the same morning, hours before the next nightly,
+# at a quarter of the wake-ups. Detection was never the reason for a short
+# interval; the nightly catches a regression within a day regardless.
 OnBootSec=10m
-OnUnitActiveSec=15m
+OnUnitActiveSec=1h
 Unit=perf-lab@drain.service
 
 [Install]
