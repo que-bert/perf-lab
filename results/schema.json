@@ -621,8 +621,16 @@
             "number",
             "null"
           ]
+        },
+        "vram_used_mib_before": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
         }
-      }
+      },
+      "description": "Covariates recorded so drift is explainable after the fact. vram_used_mib_before is the contention check: a card that was not idle when the run started did not measure what the row claims."
     }
   }
 }

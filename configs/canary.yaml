@@ -5,9 +5,19 @@
 # number moves. An 8-13x flash-attention fallback is visible at 2048 tokens, so a
 # canary costs seconds rather than the minutes a long-context run takes.
 #
-# Baselines measured 2026-08-15 on gfx1201 (AI PRO R9700) with llama.cpp b10082
-# (fb0e6b621), ROCm 7.2.53211, Mesa 26.0.3-1ubuntu1, kernel 7.0.0-29-generic,
-# using Qwen3.8-27B-Q6_K.
+# Bands re-derived 2026-08-16 under tag rebase-20260816T052925Z, 5 reps each, on an
+# idle card (57 MiB in use). expect_pp2048 is the median; sd_pct is a ROBUST spread
+# (MAD-scaled), because the centre is a median and sizing the band with a
+# non-robust sd let one contaminated rep inflate slow-q4_1's band to 46%.
+# tolerance_pct = max(10, 3*sd_pct); the 10% floor binds on every canary, since
+# measured spread on an idle card is 0.02-1.6%, not the ~7% the design assumed.
+#
+# UNEXPLAINED: slow-q4_1 and slow-mixed measure ~70% FASTER than the 2026-08-15
+# baselines with a byte-identical fingerprint (same llama.cpp fb0e6b621, Mesa
+# 26.0.3-1ubuntu1, kernel 7.0.0-29-generic, ROCm 7.2.53211, same model sha256).
+# See FINDINGS.md. The 2026-08-15 numbers were single readings taken while ollama
+# was resident on this card; these are medians of 5 on an idle one. Do not treat
+# the old values as refuted until a run with env covariates reproduces the gap.
 #
 # Model path comes from $PERF_LAB_MODEL — never committed, this repo is public.
 
@@ -23,45 +33,58 @@ canaries:
     ctk: q4_0
     ctv: q4_0
     prompt_tokens: 2048
-    expect_pp2048: 710.84
-    tolerance_pct: 10
+    expect_pp2048: 705.62
+    sd_pct: 0.67
+    tolerance_pct: 10.0
     note: >
       The alarm this repo exists for. q4_0/q4_0 is the shipped config and sits on the
-      optimized flash-attention path. If this falls toward ~85 t/s we have lost kernel
-      support and every long-context prefill just got 8x slower, while decode looks fine.
+      optimized flash-attention path. If this falls toward the fallback speeds below we
+      have lost kernel support and every long-context prefill just got several times
+      slower, while decode looks fine.
 
   fast-q8:
     ctk: q8_0
     ctv: q8_0
     prompt_tokens: 2048
-    expect_pp2048: 684.02
-    tolerance_pct: 10
-    note: The other supported type. Second fast path; a fallback here is equally serious.
+    expect_pp2048: 704.0
+    sd_pct: 0.02
+    tolerance_pct: 10.0
+    note: >
+      The other supported type. Second fast path; a fallback here is equally serious.
+      The tightest canary on the board — 0.02% spread over 5 reps.
 
   slow-q5_1:
     ctk: q8_0
     ctv: q5_1
     prompt_tokens: 2048
-    expect_pp2048: 54.96
-    tolerance_pct: 10
+    expect_pp2048: 59.49
+    sd_pct: 1.55
+    tolerance_pct: 10.0
     note: >
       Known-unsupported. Expected to be slow. If this ever gets FAST, upstream added
       q5_1 kernel support and a previously rejected operating point is worth retesting.
+      The one slow-path canary that did NOT move on 2026-08-16.
 
   slow-q4_1:
     ctk: q4_1
     ctv: q4_1
     prompt_tokens: 2048
-    expect_pp2048: 83.19
-    tolerance_pct: 10
-    note: Known-unsupported, matched pair. Confirms matching K/V is not what matters.
+    expect_pp2048: 150.74
+    sd_pct: 0.91
+    tolerance_pct: 10.0
+    note: >
+      Known-unsupported, matched pair. Confirms matching K/V is not what matters.
+      Was 89.92 on 2026-08-15; measured 150.74 on 2026-08-16 with an identical
+      fingerprint — unexplained, see FINDINGS.md.
 
   slow-mixed:
     ctk: q8_0
     ctv: q4_0
     prompt_tokens: 2048
-    expect_pp2048: 83.85
-    tolerance_pct: 10
+    expect_pp2048: 157.21
+    sd_pct: 0.87
+    tolerance_pct: 10.0
     note: >
       Both types individually fast, mixed pair slow. This is the trap that nearly
-      shipped: decode is normal, only prefill collapses.
+      shipped: decode is normal, only prefill collapses. Was 91.17 on 2026-08-15;
+      measured 157.21 on 2026-08-16 — unexplained, see FINDINGS.md.

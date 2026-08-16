@@ -64,6 +64,59 @@ def probe(uid: str):
     return json.loads(out.stdout)
 
 
+def card_for(pci):
+    """DRM card directory for a PCI address. Never by index -- this machine
+    reports the target as rocm-smi GPU[1] and DRM card0."""
+    for card in sorted(pathlib.Path("/sys/class/drm").glob("card[0-9]*")):
+        try:
+            uevent = (card / "device" / "uevent").read_text()
+        except OSError:
+            continue
+        for line in uevent.splitlines():
+            if line.startswith("PCI_SLOT_NAME=") and line.split("=", 1)[1].lower() == pci:
+                return card
+    return None
+
+
+def env_probe(pci):
+    """Covariates that explain drift after the fact.
+
+    The design called for these so that a shift is visible rather than
+    mysterious; without them a 70% move on two canaries with an identical
+    fingerprint has no explanation available. vram_used_mib_before is the
+    contention check: a card that was not idle when measurement started did
+    not measure what the row claims.
+    """
+    env = {"gpu_temp_c": None, "gpu_clock_mhz": None, "loadavg": None,
+           "vram_used_mib_before": None}
+    try:
+        env["loadavg"] = round(os.getloadavg()[0], 2)
+    except OSError:
+        pass
+    card = card_for(pci)
+    if card is None:
+        return env
+    try:
+        used = int((card / "device" / "mem_info_vram_used").read_text())
+        env["vram_used_mib_before"] = used // (1 << 20)
+    except (OSError, ValueError):
+        pass
+    for hwmon in (card / "device" / "hwmon").glob("hwmon*"):
+        try:
+            env["gpu_temp_c"] = int((hwmon / "temp1_input").read_text()) / 1000.0
+            break
+        except (OSError, ValueError):
+            continue
+    try:
+        for line in (card / "device" / "pp_dpm_sclk").read_text().splitlines():
+            if line.strip().endswith("*"):          # the active DPM state
+                env["gpu_clock_mhz"] = int(re.search(r"(\d+)Mhz", line, re.I).group(1))
+                break
+    except (OSError, ValueError, AttributeError):
+        pass
+    return env
+
+
 def run_bench(bindir, model, c, defaults):
     """Run llama-bench once; return (pp, tg) parsed from its markdown table."""
     cmd = [str(bindir / "llama-bench"), "-m", str(model),
@@ -132,6 +185,7 @@ def main():
                 "np": 1, "prompt_tokens": c["prompt_tokens"]},
         "m": {"unit": "tok/s"},
         "ok": {"token_identical": None, "corpus_sha": None},
+        "env": env_probe(fp["gpu"]["pci"]),
     }
     if a.tag:
         row["tag"] = a.tag
