@@ -50,6 +50,19 @@ c=copy.deepcopy(GOOD); c["fp"]["build"]["binary_sha256"]="deadbeef"
 cases.append(("malformed binary_sha256", c, False))
 c=copy.deepcopy(GOOD); c["fp"]["build"]["binary_sha256"]=None
 cases.append(("null build identity (pre-stage-3 rows)", c, True))
+# A quality row measures perplexity, not throughput. The live-row rule demands a
+# prefill metric so a tg-only row cannot hide a kernel regression; that rule has
+# nothing to say about a ppl row, and rejected every one until it was told so.
+c=copy.deepcopy(GOOD); c["m"]={"ppl":3.0456,"ppl_stderr":0.063,"rep":1,
+                               "cold_prefill":True,"unit":"ppl"}
+c["cfg"]["spec"]=None; c["cfg"]["n_max"]=None   # perplexity is measured with speculation off
+cases.append(("quality row carrying only ppl", c, True))
+# ...and a quality row must not claim speculation was on without an acceptance.
+c=copy.deepcopy(GOOD); c["m"]={"ppl":3.0456,"rep":1,"cold_prefill":True,"unit":"ppl"}
+cases.append(("ppl row claiming spec on, no acceptance", c, False))
+c=copy.deepcopy(GOOD); c["m"]={"tg":46.15,"mtp_acceptance":0.77,"rep":1,
+                               "cold_prefill":True,"unit":"tok/s"}
+cases.append(("tg-only live row still rejected", c, False))
 p=pathlib.Path(".scratch/t.jsonl")
 fails=0
 for name,row,should_pass in cases:

@@ -59,6 +59,22 @@ tracked:
     role: candidate
     note: Shallower draft. Cheaper per step, lower acceptance ceiling.
 
+  kv-q8:
+    ctx: 262144
+    ctk: q8_0
+    ctv: q8_0
+    spec: draft-mtp
+    n_max: 4
+    n_predict: 256
+    role: candidate
+    note: >
+      The other supported KV type, matched pair. Lossy relative to nothing --
+      it is q4_0 that is the aggressive choice -- so this is the reference the
+      shipped config's quality is judged against. Costs roughly twice the KV
+      memory, which at 262K is what made q4_0 attractive in the first place.
+      Never sweep between this and q4_0 on speed alone: they do not produce the
+      same answers, and the divergence is not a tie-break.
+
   mtp-n6:
     ctx: 262144
     ctk: q4_0

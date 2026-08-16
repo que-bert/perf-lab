@@ -140,6 +140,16 @@
                     "type": "number"
                   }
                 }
+              },
+              {
+                "required": [
+                  "ppl"
+                ],
+                "properties": {
+                  "ppl": {
+                    "type": "number"
+                  }
+                }
               }
             ],
             "properties": {
@@ -150,7 +160,8 @@
               "cold_prefill": {
                 "type": "boolean"
               }
-            }
+            },
+            "$comment": "A live row must record prefill, not just decode -- a tg-only row is blind to the kernel-fallback regression this repo exists to catch. A quality row is not a throughput row at all, so ppl satisfies it instead."
           },
           "cfg": {
             "required": [

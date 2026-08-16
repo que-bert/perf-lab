@@ -73,14 +73,20 @@ def points(base_cfg, axes):
     return out
 
 
-def probe_config(bindir, model, cfg, defaults, prompts, n_predict, reps):
-    """One model load: throughput reps, then the verification prompts."""
+def probe_config(bindir, model, cfg, defaults, prompts, n_predict, reps,
+                 throughput_tokens):
+    """One model load: throughput reps, then the verification prompts.
+
+    Throughput is measured over `throughput_tokens`, not over the short
+    verification generation. At ~100 tokens the fixed cost of starting a
+    response dominates tok/s and the same config measures 18% apart run to
+    run, which is wide enough to swamp every difference worth finding.
+    """
     proc, port, stop = emit_row.start_server(bindir, model, cfg, defaults)
     try:
         timings = []
         for _ in range(reps):
-            r = emit_row.complete(port, prompts[0],
-                                  cfg.get("n_predict", defaults.get("n_gen", 64)))
+            r = emit_row.complete(port, prompts[0], throughput_tokens)
             timings.append(r.get("timings", {}))
         gens = []
         for p in prompts:
@@ -157,7 +163,10 @@ def main():
     ap.add_argument("--prompts", default=os.environ.get(
         "PERF_LAB_PROMPT", str(pathlib.Path.home() / ".perf-lab/prompts/default.txt")))
     ap.add_argument("--n-predict", type=int, default=96)
-    ap.add_argument("--reps", type=int, default=1)
+    ap.add_argument("--reps", type=int, default=3)
+    ap.add_argument("--throughput-tokens", type=int, default=512,
+                    help="tokens generated per throughput rep; short "
+                         "generations are dominated by start-up cost")
     ap.add_argument("--tie-ratio", type=float, default=1.2)
     ap.add_argument("--ledger", default="")
     ap.add_argument("--tag", default="")
@@ -194,7 +203,7 @@ def main():
 
     print(f"### baseline ({a.base})", file=sys.stderr)
     base = probe_config(bindir, model, base_cfg, defaults, prompts,
-                        a.n_predict, a.reps)
+                        a.n_predict, a.reps, a.throughput_tokens)
 
     # Verification reference. It must be non-speculative: llama-server returns
     # no top_logprobs for accepted draft tokens, so comparing two speculative
@@ -206,7 +215,7 @@ def main():
         ref_cfg["n_max"] = None
         print("### verification reference (spec off)", file=sys.stderr)
         ref = probe_config(bindir, model, ref_cfg, defaults, prompts,
-                           a.n_predict, 1)
+                           a.n_predict, 1, a.throughput_tokens)
     else:
         ref = base
 
@@ -241,7 +250,7 @@ def main():
     for label, delta, cfg in plan:
         print(f"### {label}", file=sys.stderr)
         res = probe_config(bindir, model, cfg, defaults, prompts,
-                           a.n_predict, a.reps)
+                           a.n_predict, a.reps, a.throughput_tokens)
         verdict, _ = classify(ref["gens"], res["gens"], a.tie_ratio)
         record(label, cfg, res, verdict)
         print(f"    tg={res['tg']} acceptance={res['acceptance']} -> {verdict}",

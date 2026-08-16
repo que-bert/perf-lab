@@ -137,6 +137,31 @@ harness/verify.py configs/tracked.yaml baseline no-spec --n-predict 96
 *(These rows cite a reproduction command rather than a run_id: `verify.py` does not yet
 append to the ledger. It should.)*
 
+## q4_0 KV costs no measurable perplexity against q8_0 — at 4K context
+
+Measured 2026-08-16 with `harness/quality.py` (`llama-perplexity`, 24 chunks,
+ctx 4096, held-out corpus `f79059082bb3…`, Qwen3.8-27B-Q6_K):
+
+| KV cache | perplexity | run_id |
+|---|---|---|
+| `q4_0` / `q4_0` | 3.0456 ± 0.06309 | `r-5519990a` |
+| `q8_0` / `q8_0` | 3.0420 ± 0.06299 | `r-c6d395ac` |
+
+The gap is **+0.118%, or 0.06 standard errors** — indistinguishable. On this
+corpus and at this context length, halving the KV cache costs nothing readable.
+
+**This does not clear `q4_0` for the shipped config.** The measurement is at
+ctx 4096; the config that matters runs at 262144, and quantization error
+accumulates with depth. The existing note that "wide aggregation over scattered
+values fails at long context regardless of cache type" is untouched by this.
+What it does establish is that the loss is not gross: `q4_0` is not damaging
+the model in a way that shows up immediately, which is a different and weaker
+claim than "q4_0 is safe at 262K".
+
+Perplexity is also a weak proxy for the failure modes that matter at long
+context — retrieval of a specific fact from deep in the window is not what a
+next-token likelihood average measures.
+
 ## Spread on an idle card is under 2%, not 7%
 
 Robust (MAD-scaled) spread over 5 reps, tag `rebase-20260816T052925Z`:
