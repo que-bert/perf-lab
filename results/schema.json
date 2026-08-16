@@ -23,14 +23,24 @@
       "pattern": "^r-[0-9a-f]{6,}$"
     },
     "kind": {
+      "$comment": "apt = queued by a driver/kernel upgrade. A live measurement like nightly/manual, so every kind-gated rule below must list it too.",
       "enum": [
         "nightly",
         "manual",
+        "apt",
         "backfill",
         "skipped"
       ]
     },
     "tag": {
+      "$comment": "Batch identifier. run_id is unique per row, so tag is the only thing grouping a night's rows into one run.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "key": {
+      "$comment": "Which config produced this row (e.g. fast-q4). Without it a row can only be matched to its band by shape, which collides as soon as two configs share one.",
       "type": [
         "string",
         "null"
@@ -94,7 +104,8 @@
           "kind": {
             "enum": [
               "nightly",
-              "manual"
+              "manual",
+              "apt"
             ]
           }
         },
@@ -164,7 +175,8 @@
               "kind": {
                 "enum": [
                   "nightly",
-                  "manual"
+                  "manual",
+                  "apt"
                 ]
               }
             },

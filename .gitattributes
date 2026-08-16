@@ -1,0 +1,4 @@
+# The ledger is append-only and two triggers can write it on the same day (the
+# nightly timer and an apt-queued run). Without a union merge those appends
+# conflict on the last line and a rebase-retry loop drops measured rows.
+results/ledger.jsonl merge=union

@@ -124,6 +124,7 @@ def main():
         "run_id": "r-" + hashlib.sha1(
             f"{time.time()}{a.key}{a.rep}".encode()).hexdigest()[:8],
         "kind": a.kind,
+        "key": a.key,
         "fp": fp,
         "cfg": {"ctx": c["prompt_tokens"] + defaults["n_gen"],
                 "ctk": c["ctk"], "ctv": c["ctv"], "fa": str(defaults["fa"]),

@@ -26,6 +26,13 @@ c["m"]={"pp2048":710.84,"rep":1,"cold_prefill":True}
 cases.append(("canary row: spec off, no acceptance", c, True))
 c=copy.deepcopy(GOOD); del c["m"]["mtp_acceptance"]
 cases.append(("spec ON but acceptance missing", c, False))
+# apt rows are live measurements: every kind-gated rule must treat them like nightly.
+c=copy.deepcopy(GOOD); c["kind"]="apt"; cases.append(("apt row", c, True))
+c=copy.deepcopy(GOOD); c["kind"]="apt"; del c["m"]["rep"]
+cases.append(("apt row missing rep", c, False))
+c=copy.deepcopy(GOOD); c["kind"]="apt"; del c["m"]["mtp_acceptance"]
+cases.append(("apt row, spec ON, acceptance missing", c, False))
+c=copy.deepcopy(GOOD); c["kind"]="nightly-ish"; cases.append(("unknown kind", c, False))
 p=pathlib.Path(".scratch/t.jsonl")
 fails=0
 for name,row,should_pass in cases:
