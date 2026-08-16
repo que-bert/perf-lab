@@ -2,3 +2,7 @@
 *.gguf
 *.log
 __pycache__/
+
+# Session handoffs are narrative and judgment, not re-derivable fact, and this
+# repo is public. They stay on disk for /unwrap; they are never published.
+docs/handoffs/
