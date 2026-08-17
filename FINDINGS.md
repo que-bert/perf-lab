@@ -57,10 +57,61 @@ implemented them — 0 of 86 rows had any. That is precisely why this cannot be
 settled from the data on hand. `emit_row.py` now records GPU temperature, clock,
 1-minute load average, and VRAM in use before the run starts.
 
-Leading hypothesis, untested: the 2026-08-15 readings were taken while ollama's
+Leading hypothesis was that the 2026-08-15 readings were taken while ollama's
 `llama-server` was resident on this card, which was independently confirmed on
-2026-08-16. Kernel selection for the fallback paths may depend on free VRAM.
-Testing it means re-measuring `slow-q4_1` with a deliberate VRAM occupant present.
+2026-08-16, and that kernel selection for the fallback paths depends on free VRAM.
+
+**Tested 2026-08-16 and REFUTED.** Tag `occupant-6g`, 3 reps per canary, with a
+deliberate occupant — `gemma-4-E4B-it-Q4_K_M` served at ctx 131072, pinned to the
+target card with `HIP_VISIBLE_DEVICES`, holding 5583 MiB (`env.vram_used_mib_before`
+on every row confirms it). The occupant was the only other KFD process on the card.
+
+| canary | 2026-08-15 | clean 2026-08-16 | occupied (5583 MiB) | vs clean |
+|---|---|---|---|---|
+| fast-q4 | 724.22 | 705.62 | 704.11 | −0.2% |
+| fast-q8 | 704.91 | 704.00 | 702.10 | −0.3% |
+| slow-q5_1 | 59.34 | 59.49 | **52.82** | **−11.2%** |
+| slow-q4_1 | 89.92 | 150.74 | 150.51 | −0.2% |
+| slow-mixed | 91.17 | 157.21 | 146.29 | −6.9% |
+
+`slow-q4_1` is the config the hypothesis was built to explain, and it did not move:
+150.51 against 150.74 clean, where reproducing 2026-08-15 required ≈89.9. Occupancy
+of 5.6 GB does not switch the fallback paths.
+
+What occupancy *does* do is add noise to the slow paths, and it does so on the wrong
+canary. `slow-q5_1` — the one canary that did **not** move between the two days — is
+the only one to breach its band here, and its three reps spread 44.03–57.16, a 30%
+range against 1.55% on an idle card. `slow-mixed` moved −6.9% with a similar spread.
+Both fast canaries held to within 0.3%. So the slow paths are simply more sensitive
+to a busy card, which is the opposite shape from a selective +70% step on exactly two
+configs.
+
+The unattended nightly the next morning confirms both halves of that reading.
+`nightly-20260817T100335Z`, idle card (`vram_used_mib_before` 57 on every row):
+
+| canary | expect | nightly 08-17 | delta |
+|---|---|---|---|
+| fast-q4 | 705.62 | 707.63 | +0.28% |
+| fast-q8 | 704.00 | 703.69 | −0.04% |
+| slow-q5_1 | 59.49 | 60.54 | +1.77% |
+| slow-q4_1 | 150.74 | 155.22 | +2.97% |
+| slow-mixed | 157.21 | 158.03 | +0.52% |
+
+`slow-q5_1` came back to 60.54 with reps spanning 60.0–60.8, so its −11.2% under
+occupancy was contention and nothing else. And `slow-q4_1`/`slow-mixed` held their
+high values on a fifth independent idle-card batch across two days. The 2026-08-15
+readings of ≈90 are now the lone outlier in the series, which shifts suspicion from
+the stack toward how those particular readings were taken.
+
+Caveats: one occupancy level, n=3. A threshold effect at some larger footprint is not
+excluded, and ollama's actual 2026-08-15 footprint was never recorded. But the
+straightforward version of this hypothesis is dead, and the shift is still unexplained.
+
+Note for whoever runs a contended batch next: `check.py` has no notion of a tainted
+run. It read `occupant-6g` as the latest batch and returned `slow-q5_1` as
+`breach: true, verdict: "slow"`. It did not escalate only because `sustained` requires
+two consecutive breaching runs, and the next clean nightly cleared it to `ok`. Tag such
+batches, and do not let one stand as the most recent run going into a nightly.
 
 ## Speculative decoding is not output-identical here
 
