@@ -428,3 +428,35 @@ prompt, 96 tokens; the corpus at `$PERF_LAB_PROMPT` holds a single prompt.
 above printed their numbers and then refused to write, with `emit_row: could not determine
 llama.cpp build SHA from any binary in ~/llama.cpp/b10472-vulkan`. If serving moves to
 Vulkan, `emit_row.py`'s fingerprint probe needs to learn this build layout first.
+
+## Qwen3.8-27B is multimodal; the vision projector is a separate download
+
+Corrects an error made 2026-08-18. The main GGUF carries **zero vision tensors**, and
+that was read as "this model cannot do images". It only means the vision encoder is not
+in that file. The chat template in the same GGUF emits
+`<|vision_start|><|image_pad|><|vision_end|>` and `<|video_pad|>`, and
+`unsloth/Qwen3.8-27B-GGUF` publishes `mmproj-BF16.gguf` and `mmproj-F16.gguf`. Absence
+from the local directory is not absence upstream — check the source repo.
+
+`mmproj-F16.gguf` (885 MB) fetched to the model directory and verified on the b10472
+Vulkan build: the server logs `loaded multimodal model`, and it described a synthetic
+64x64 half-blue/half-yellow test image as "Blue on the left, yellow on the right." A
+1024x1024 image is accepted at 1085 prompt tokens.
+
+Full operating table, Qwen3.8-27B-Q6_K + `mmproj-F16`, R9700, `-fa on`, `--spec-type
+draft-mtp --spec-draft-n-max 4`, decode measured at `n_predict` 256-384:
+
+| K/V | ctx | VRAM (of 34.2 GB) | decode t/s | 1024x1024 image |
+|---|---|---|---|---|
+| `q8_0`/`q4_0` | 262144 | 33.6 GB (98%) | 52.55 | OK |
+| `q4_0`/`q4_0` | 262144 | 32.7 GB (96%) | 49.41 | not tested |
+| `q8_0`/`q4_0` | 131072 | 30.3 GB (89%) | ~52.8 | OK |
+| `q4_0`/`q4_0` | 131072 | 29.2 GB (85%) | 45.76 | not tested |
+
+`q8_0`K/`q4_0`V is faster than `q4_0`/`q4_0` at both context lengths, for about 1 GB
+more VRAM, and perplexity cannot separate them. The projector costs ~0.9 GB.
+
+**The headroom worry was overstated.** A 1024x1024 image processed cleanly at 98% VRAM
+with no measurable increase during encoding — VRAM read 33.6 GB before and after, and
+the server stayed up. The remaining argument for 131072 is not image safety but leaving
+~3.9 GB for anything else that wants the card.
