@@ -5,13 +5,22 @@ Dry-run only. What is NOT covered here is server-side dedupe -- one Issue then
 one comment -- because that needs a live token and a real repo. Treat it as
 unverified until it has run against GitHub once.
 """
+import atexit
 import json
 import pathlib
+import shutil
 import subprocess
 import sys
+import tempfile
 
 HERE = pathlib.Path(__file__).resolve().parent
-SCRATCH = HERE.parent / ".scratch"
+# A private tmpdir, NOT the repo's .scratch. These cases used to share that
+# directory with the running harness, so a genuine .scratch/push-failed marker
+# -- exactly the state alert.py exists to report -- made every case here emit a
+# publish-failure line and failed the three that assert silence.
+SCRATCH = pathlib.Path(tempfile.mkdtemp(prefix="perf-lab-test-alert-"))
+atexit.register(shutil.rmtree, SCRATCH, True)
+NO_MARKER = SCRATCH / "absent-push-failed"
 NOW = "2026-08-16T08:00:00Z"
 
 
@@ -28,9 +37,10 @@ def ledger(name, rows):
     return p
 
 
-def run(path):
+def run(path, push_marker=NO_MARKER):
     r = subprocess.run([sys.executable, str(HERE / "alert.py"), "--dry-run",
-                        "--ledger", str(path), "--now", NOW],
+                        "--ledger", str(path), "--now", NOW,
+                        "--push-marker", str(push_marker)],
                        capture_output=True, text=True)
     return r.stdout.strip()
 
@@ -75,5 +85,19 @@ fails += ok("insufficient data files nothing", "nothing to report" in out, out)
 out = run(ledger("empty", []))
 fails += ok("empty ledger reports never-ran",
             "staleness" in out and "never" in out.lower(), out)
+
+# The push-failure marker itself was never covered, which is why the isolation
+# bug stayed invisible until a real push failed. Both directions, explicitly.
+healthy = ledger("marker", [row("n-1", "fast-q4", 710, "2026-08-16T04:00:00Z"),
+                            row("n-2", "fast-q4", 708, "2026-08-16T06:00:00Z")])
+
+present = SCRATCH / "present-push-failed"
+present.write_text("nightly-20260817T100335Z: push failed after 2 attempts\n")
+out = run(healthy, present)
+fails += ok("push-failure marker is reported",
+            "push" in out and "cannot publish" in out, out)
+
+fails += ok("marker path is honoured, not the repo's own",
+            "nothing to report" in run(healthy, NO_MARKER), out)
 
 sys.exit(1 if fails else 0)

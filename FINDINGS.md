@@ -22,9 +22,9 @@ On gfx1201 with llama.cpp b10082, `pp2048` by cache type:
 path and run **8–13× slower at prefill**. Decode is unaffected, which is why short-prompt
 testing does not reveal it.
 
-> Two of these fallback numbers did not reproduce on 2026-08-16 — see
-> "Fallback speeds are not reproducible" below. The fast/fallback split is not in
-> doubt; its *size* is.
+> Two of these fallback numbers did not reproduce on 2026-08-16. That was a build
+> swap, resolved 2026-08-17 — see "RESOLVED" below. On the binary now in use the
+> separation is 7.8×, and these stage-1 values stand.
 
 ## Fallback speeds are not reproducible, and the fingerprint does not explain it
 
@@ -112,6 +112,44 @@ run. It read `occupant-6g` as the latest batch and returned `slow-q5_1` as
 `breach: true, verdict: "slow"`. It did not escalate only because `sustained` requires
 two consecutive breaching runs, and the next clean nightly cleared it to `ok`. Tag such
 batches, and do not let one stand as the most recent run going into a nightly.
+
+## RESOLVED 2026-08-17: the shift was a build swap, not the stack
+
+The two `llama-bench` binaries perf-lab has access to were run head to head on
+2026-08-17 — same model, same GPU, same args (`-p 2048 -n 64 -fa on -r 3 -ngl 99 -t 8`),
+pinned to the target card. Both report upstream `fb0e6b621`; they differ only in
+toolchain.
+
+| canary | 2026-08-15 recorded | prebuilt GCC 11.4 | 2026-08-16 recorded | local GCC 15.2 |
+|---|---|---|---|---|
+| fast-q4 | 724.22 | 723.37 ± 1.38 | 705.62 | 705.85 ± 1.63 |
+| slow-q5_1 | 59.34 | 60.84 ± 0.32 | 59.49 | 60.49 ± 0.34 |
+| slow-q4_1 | 89.92 | **89.95 ± 0.36** | 150.74 | **155.10 ± 1.20** |
+| slow-mixed | 91.17 | **92.02 ± 0.30** | 157.21 | **158.81 ± 0.54** |
+
+Every 2026-08-15 value reproduces on the prebuilt; every 2026-08-16 value reproduces on
+the local build. **The canary harness was switched from the ROCm prebuilt's `llama-bench`
+to the local GCC 15 build's between those two days**, and nothing recorded it, because
+`fp.build.binary_sha256` did not exist until stage 3 landed on 2026-08-16 and both builds
+report the same upstream sha. The ledger now shows the split plainly: every canary row
+tagged `nightly-20260817…` or `occupant-6g` carries `toolchain: GNU 15.2.0`, while the
+`ppl-cmp` rows — which go through `llama-server` — carry `GNU 11.4.0`.
+
+`slow-q5_1` is the control that makes this conclusive: it is the one canary that never
+moved between the two days, and it is also the one that measures the same on both builds
+(60.84 vs 60.49, 0.6% apart). The build swap only moves the kernels it generates
+differently, and `q5_1` is not one of them.
+
+So the differences are real codegen differences, not noise: the local GCC 15 build is
+2.5% **slower** on the optimized path and about **1.7× faster** on the `q4_1`/`q4_0`-V
+fallbacks.
+
+**This invalidates the current canary bands.** They were derived on the local build,
+but everything that actually serves — tracked configs, `quality.py`, `verify.py` — runs
+on the prebuilt. The tripwire is watching a binary production never executes, and the
+fast-vs-fallback separation it is calibrated against is 4.5× on the local build versus
+about 8× on the prebuilt. Re-derive the bands against whichever binary is chosen, and
+record `binary_sha256` on every row from now on.
 
 ## Speculative decoding is not output-identical here
 
@@ -251,3 +289,58 @@ Adding `ngram-simple` to `draft-mtp` lowers acceptance and throughput. On a copy
 ngram dropped it to 92.6% and took 25 s longer.
 - draft-mtp alone: acceptance 1.00000, wall 542.6s  (`r-49df4a7e`)
 - draft-mtp,ngram-simple: acceptance 0.92587, wall 567.7s  (`r-1a0394cc`)
+
+## The local GCC 15 build is broken, and Vulkan now beats ROCm at depth
+
+Reproduced 2026-08-17. `~/git/llama.cpp-b10082/build/bin` (local, GCC 15.2.0,
+`GGML_HIP=ON`, gfx1201) segfaults:
+
+| binary | gemma-4-E4B-it-Q4_K_M | Qwen3.8-27B-Q6_K |
+|---|---|---|
+| `llama-server` | SIGSEGV (`-ngl 0`, CPU) | SIGSEGV (GPU) |
+| `llama-cli` | SIGSEGV | not tested |
+| `llama-bench` | SIGSEGV | works |
+
+`llama-bench` on Qwen3.8-27B is the *only* combination that works, which is why
+stage 1 never noticed. The backtrace puts every crash in `ggml_cuda_op_scale`
+(`libggml-hip.so`) calling into `/opt/rocm-7.2.4/lib/libamdhip64.so.7`, reached from
+the warm-up `llama_decode`. `GGML_CUDA_DISABLE_GRAPHS=1` does not help. The ROCm
+prebuilt is the same commit `fb0e6b621` built with GCC 11.4.0 and does not crash, so
+this is the local toolchain, not upstream.
+
+**The rebuild blocker is fixed.** ROCm's `lld` failed on `libxml2.so.2` (this system
+ships `.so.16`). `libxml2.so.2.9.14` plus `libicuuc.so.74`/`libicudata.so.74` were
+copied out of the mesa/gaming snaps into `~/.local/rocm-compat/lib`; with that on
+`LD_LIBRARY_PATH`, `hipcc` compiles and links gfx1201 device code again. A from-source
+b10472 build now succeeds using ROCm's own clang 22 as host compiler.
+
+Three candidates measured on Qwen3.8-27B-Q6_K, R9700, `-p 2048 -n 64 -fa on -ngl 99
+-t 8 -r 3`:
+
+| build | pp2048 | tg64 | pp2048@d16384 | tg64@d16384 | q4_1/q4_1 pp2048 |
+|---|---|---|---|---|---|
+| b10472 Vulkan prebuilt | **894.06** | 17.36 | **674.82** | **19.14** | **891.06** |
+| b10082 ROCm prebuilt | 717.27 | **22.68** | 615.89 | 18.62 | 91.53 |
+| b10472 ROCm from source | 679.22 | 22.07 | 387.96 ±90.8 | 16.78 | 122.78 |
+
+Two conclusions. First, **Vulkan wins both prefill and decode at depth 16384**,
+reversing the 2026-07-22 choice of ROCm — upstream Vulkan has improved since b10082.
+ROCm still wins `tg64` at depth 0. Second, the from-source b10472 ROCm build is the
+worst of the three at depth and by far the noisiest, which independently re-confirms
+the existing b10082 pin.
+
+**Vulkan has no fallback cliff at all.** `q4_1/q4_1` measures 891.06 against
+`q4_0/q4_0`'s 894.06 — a 0.3% difference, where ROCm collapses 7.8×. The entire
+premise of the canary set, that KV type selects between a fast kernel and a fallback,
+is ROCm-specific. If serving moves to Vulkan, these five canaries stop measuring
+anything and the set needs redesigning. That is a decision, not a defect, and it is
+left open deliberately.
+
+`b10472-vulkan` is installed at `~/llama.cpp/b10472-vulkan` with its own
+`PROVENANCE.txt`, verified serving Qwen3.8-27B at ctx 262144 with `--spec-type
+draft-mtp --spec-draft-n-max 4` (draft acceptance 0.719) and serving gemma-4-E4B.
+
+`PERF_LAB_BIN` was switched from the broken local build to `~/llama.cpp/b10082-rocm`
+on 2026-08-18, so canaries and served configs finally run on one binary, and the bands
+were re-derived under tag `rebase-20260818T033927Z`. Fast-vs-fallback separation is
+now 7.8× (716.4 vs 91.45) rather than the 4.5× the GCC 15 build reported.

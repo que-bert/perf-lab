@@ -56,7 +56,7 @@ def newest_success(ledger):
     return newest
 
 
-def conditions(ledger, verdicts, stale_hours, now):
+def conditions(ledger, verdicts, stale_hours, now, push_marker=None):
     out = []
 
     newest = newest_success(ledger)
@@ -90,7 +90,11 @@ def conditions(ledger, verdicts, stale_hours, now):
                     f"perf-lab: {v['key']} {way} than its band "
                     f"({v['delta_pct']:+.1f}%)", body))
 
-    marker = ROOT / ".scratch" / "push-failed"
+    # Injectable so the tests never read the real repo's marker. It is live
+    # process state, not fixture state: a genuine push failure used to leak
+    # into every case here and fail the three that assert silence.
+    marker = (pathlib.Path(push_marker) if push_marker
+              else ROOT / ".scratch" / "push-failed")
     if marker.exists():
         out.append(("push", "perf-lab cannot publish its ledger",
                     "Measurements are on disk but the push failed:\n\n```\n"
@@ -122,6 +126,8 @@ def main():
     ap.add_argument("--stale-hours", type=float, default=72.0)
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--now", default="", help="override current time (tests)")
+    ap.add_argument("--push-marker", default="",
+                    help="override the push-failure marker path (tests)")
     a = ap.parse_args()
 
     now = (dt.datetime.strptime(a.now, "%Y-%m-%dT%H:%M:%SZ")
@@ -135,7 +141,8 @@ def main():
         sys.exit(f"alert: check.py failed:\n{check.stderr.strip()}")
     verdicts = json.loads(check.stdout)["verdicts"]
 
-    found = conditions(pathlib.Path(a.ledger), verdicts, a.stale_hours, now)
+    found = conditions(pathlib.Path(a.ledger), verdicts, a.stale_hours, now,
+                       a.push_marker or None)
     if not found:
         print("alert: nothing to report")
         return

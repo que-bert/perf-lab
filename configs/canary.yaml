@@ -5,20 +5,28 @@
 # number moves. An 8-13x flash-attention fallback is visible at 2048 tokens, so a
 # canary costs seconds rather than the minutes a long-context run takes.
 #
-# Bands re-derived 2026-08-16 under tag rebase-20260816T052925Z, 5 reps each, on an
-# idle card (57 MiB in use). expect_pp2048 is the median; sd_pct is a ROBUST spread
+# Bands re-derived 2026-08-18 under tag rebase-20260818T033927Z, 5 reps each, on an
+# idle card, AFTER PERF_LAB_BIN was switched to the ROCm prebuilt (~/llama.cpp/
+# b10082-rocm). The previous bands were measured with the local GCC 15.2 build,
+# which segfaults for llama-server/llama-cli and is no longer used anywhere.
+#
+# expect_pp2048 is the median; sd_pct is a ROBUST spread
 # (MAD-scaled), because the centre is a median and sizing the band with a
 # non-robust sd let one contaminated rep inflate slow-q4_1's band to 46%.
 # tolerance_pct = max(10, 3*sd_pct); the 10% floor binds on every canary, since
 # measured spread on an idle card is 0.02-1.6%, not the ~7% the design assumed.
 #
-# UNEXPLAINED: slow-q4_1 and slow-mixed measure ~70% FASTER than the 2026-08-15
-# baselines with a byte-identical fingerprint (same llama.cpp fb0e6b621, Mesa
-# 26.0.3-1ubuntu1, kernel 7.0.0-29-generic, ROCm 7.2.53211, same model sha256).
-# See FINDINGS.md. The VRAM-occupancy explanation -- that the 2026-08-15 readings
-# were taken while ollama was resident -- was TESTED 2026-08-16 (tag occupant-6g,
-# 5583 MiB occupant, 3 reps) and REFUTED: slow-q4_1 measured 150.51 under occupancy
-# against 150.74 idle, where the hypothesis needed ~89.9. Still unexplained.
+# RESOLVED 2026-08-17: the ~70% jump on slow-q4_1 and slow-mixed between 2026-08-15
+# and 2026-08-16 was a BUILD SWAP, not a stack change. Head-to-head on the same model
+# and GPU: slow-q4_1 measures 89.95 on the ROCm prebuilt's llama-bench (GCC 11.4) and
+# 155.10 on the local GCC 15.2 build; slow-mixed 92.02 vs 158.81. slow-q5_1 is the
+# control -- 60.84 vs 60.49, the one canary insensitive to the swap, which is exactly
+# why it never moved. Both builds report upstream fb0e6b621, and binary_sha256 did not
+# exist before stage 3, so nothing recorded the change. See FINDINGS.md.
+#
+# FIXED 2026-08-18: PERF_LAB_BIN now points at the same ROCm prebuilt that serves,
+# and the bands below were re-derived on it. Fast-vs-fallback separation is 7.8x
+# (716.4 vs 91.45), up from the 4.5x the GCC 15 build showed.
 #
 # Model path comes from $PERF_LAB_MODEL — never committed, this repo is public.
 
@@ -34,8 +42,8 @@ canaries:
     ctk: q4_0
     ctv: q4_0
     prompt_tokens: 2048
-    expect_pp2048: 705.62
-    sd_pct: 0.67
+    expect_pp2048: 716.4
+    sd_pct: 0.29
     tolerance_pct: 10.0
     note: >
       The alarm this repo exists for. q4_0/q4_0 is the shipped config and sits on the
@@ -47,8 +55,8 @@ canaries:
     ctk: q8_0
     ctv: q8_0
     prompt_tokens: 2048
-    expect_pp2048: 704.0
-    sd_pct: 0.02
+    expect_pp2048: 714.87
+    sd_pct: 0.03
     tolerance_pct: 10.0
     note: >
       The other supported type. Second fast path; a fallback here is equally serious.
@@ -58,34 +66,37 @@ canaries:
     ctk: q8_0
     ctv: q5_1
     prompt_tokens: 2048
-    expect_pp2048: 59.49
-    sd_pct: 1.55
+    expect_pp2048: 60.88
+    sd_pct: 0.32
     tolerance_pct: 10.0
     note: >
       Known-unsupported. Expected to be slow. If this ever gets FAST, upstream added
       q5_1 kernel support and a previously rejected operating point is worth retesting.
-      The one slow-path canary that did NOT move on 2026-08-16.
+      The one slow-path canary insensitive to the 2026-08-16 build swap, which is
+      exactly why it alone did not move.
 
   slow-q4_1:
     ctk: q4_1
     ctv: q4_1
     prompt_tokens: 2048
-    expect_pp2048: 150.74
-    sd_pct: 0.91
+    expect_pp2048: 91.45
+    sd_pct: 0.26
     tolerance_pct: 10.0
     note: >
       Known-unsupported, matched pair. Confirms matching K/V is not what matters.
-      Was 89.92 on 2026-08-15; measured 150.74 on 2026-08-16 with an identical
-      fingerprint — unexplained, see FINDINGS.md.
+      The 2026-08-16 value of 150.74 was the local GCC 15.2 build, not a stack
+      change; on the binary now in use this measures ~91.4, consistent with the
+      89.92 recorded on 2026-08-15. See FINDINGS.md.
 
   slow-mixed:
     ctk: q8_0
     ctv: q4_0
     prompt_tokens: 2048
-    expect_pp2048: 157.21
-    sd_pct: 0.87
+    expect_pp2048: 93.87
+    sd_pct: 0.51
     tolerance_pct: 10.0
     note: >
       Both types individually fast, mixed pair slow. This is the trap that nearly
-      shipped: decode is normal, only prefill collapses. Was 91.17 on 2026-08-15;
-      measured 157.21 on 2026-08-16 — unexplained, see FINDINGS.md.
+      shipped: decode is normal, only prefill collapses. The 157.21 of 2026-08-16
+      was the local GCC 15.2 build; on the binary now in use this measures ~93.9,
+      consistent with the 91.17 recorded on 2026-08-15. See FINDINGS.md.
