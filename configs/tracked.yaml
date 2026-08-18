@@ -87,3 +87,19 @@ tracked:
       Deeper draft. Backfilled data says acceptance collapses past n=4 (0.5000 at
       n_max 6, run r-ea640b54); this is the measurement that confirms it on the
       current stack rather than trusting a log from another day.
+
+  kv-mixed:
+    ctx: 262144
+    ctk: q8_0
+    ctv: q4_0
+    spec: draft-mtp
+    n_max: 4
+    n_predict: 256
+    role: candidate
+    note: >
+      q8_0 K with q4_0 V. On ROCm this is the mismatched-pair trap -- prefill
+      collapses ~7.8x while decode looks normal -- which is why it was never a
+      candidate before. On the b10472 Vulkan build there is no fallback cliff, so
+      it becomes the fastest option measured (50.9-53.3 t/s decode with MTP). It
+      buys K precision over the shipped q4_0/q4_0 at the cost of VRAM: 33.6 of
+      34.2 GB at ctx 262144, leaving no headroom for a second process.

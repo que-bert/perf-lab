@@ -379,3 +379,52 @@ half the decode rate (20-23 t/s); on ROCm the context will not allocate at all, 
 on a 3.1 GB recurrent-state buffer. The mismatched `q8_0`K/`q4_0`V pair — the prefill
 trap on ROCm — is the *fastest* option on Vulkan at 50.9-53.3 t/s, but it sits at
 33.6 of 34.2 GB, 98% of the card, with no headroom for a second process.
+
+## n_max 4 is the optimum, and q8_0K/q4_0V costs no measurable quality
+
+Swept `--spec-draft-n-max` on the b10472 Vulkan build, `q8_0` K / `q4_0` V, ctx 262144,
+`n_predict 512`, temperature 0, same prompt, 3 reps each:
+
+| n_max | decode t/s (3 reps) | median | acceptance | mean draft len |
+|---|---|---|---|---|
+| 2 | 42.64 / 45.50 / 45.32 | 45.32 | 0.720 | 2.44 |
+| 3 | 46.80 / 46.67 / 46.62 | 46.67 | 0.618 | 2.85 |
+| **4** | 49.05 / 52.55 / 52.46 | **52.46** | 0.661 | 3.64 |
+| 5 | 44.10 / 41.00 / 39.64 | 41.00 | 0.455 | 3.25 |
+| 6 | 40.63 / 73.16 / 35.02 | 40.63 | 0.369 | 3.21 |
+| 8 | 13.08 / 27.12 / 29.90 | 27.12 | 0.970 | 8.66 |
+
+**4 is the optimum**, 12% above n_max 3 and 28% above n_max 5. This closes the open
+question of whether `n_max=6` stays `material` once throughput used more tokens: it does
+not — 6 is 23% *worse* than 4, and the backfilled claim that acceptance collapses past 4
+holds (0.661 at n=4 against 0.369 at n=6).
+
+Two anomalies not to read past. n_max 6 produced a 73.16 rep against 40.63 and 35.02 —
+a 2× spread that no other setting showed. And n_max 8 reports the *highest* acceptance
+on the board, 0.970 at mean draft length 8.66, while delivering the *lowest* throughput,
+27.12. High acceptance with low throughput means the draft is costing more than it saves;
+the acceptance statistic alone is not a proxy for speed and should never be tuned on.
+
+Perplexity, held-out corpus, ctx 4096, 32 chunks, measured on the Vulkan build:
+
+| config | K/V | ppl | stderr |
+|---|---|---|---|
+| baseline | `q4_0`/`q4_0` | 3.0459 | 0.06321 |
+| kv-q8 | `q8_0`/`q8_0` | 3.0486 | 0.06328 |
+| kv-mixed | `q8_0`/`q4_0` | 3.0498 | 0.06328 |
+
+All three sit within 0.004 of each other against a stderr of 0.063 — about 0.06 standard
+errors apart, indistinguishable. The nominally *most* precise cache (`q8_0`/`q8_0`) scores
+nominally worse than the least, which is the clearest possible sign that the spread is
+noise. **The same ctx-4096 caveat as before applies and is the real open gap**: the config
+serves at 262144, where quantization error accumulates and perplexity is a weak proxy.
+
+`verify.py kv-mixed no-spec --n-predict 96` returned `token_identical: true`,
+`equivalent: true`, zero divergences — speculation at n_max 4 changed nothing at all here,
+stronger than the ROCm result where it diverged at token 57 on a near-tie. Limitation: one
+prompt, 96 tokens; the corpus at `$PERF_LAB_PROMPT` holds a single prompt.
+
+**Gap: perf-lab cannot record rows from the Vulkan build.** All three perplexity runs
+above printed their numbers and then refused to write, with `emit_row: could not determine
+llama.cpp build SHA from any binary in ~/llama.cpp/b10472-vulkan`. If serving moves to
+Vulkan, `emit_row.py`'s fingerprint probe needs to learn this build layout first.
