@@ -344,3 +344,38 @@ draft-mtp --spec-draft-n-max 4` (draft acceptance 0.719) and serving gemma-4-E4B
 on 2026-08-18, so canaries and served configs finally run on one binary, and the bands
 were re-derived under tag `rebase-20260818T033927Z`. Fast-vs-fallback separation is
 now 7.8× (716.4 vs 91.45) rather than the 4.5× the GCC 15 build reported.
+
+## Decode with MTP: the number that actually decides the build
+
+`llama-bench` has no speculative-decoding flags, so every `tg64` figure above is
+*unspeculated* and not comparable to the 46.15 t/s the shipped config was found at.
+Measured through `llama-server` instead, ctx 262144, `-fa on`, `--spec-type draft-mtp
+--spec-draft-n-max 4`, `n_predict 256`, temperature 0, identical prompt, 2 reps:
+
+| build | K/V | decode t/s | acceptance | VRAM |
+|---|---|---|---|---|
+| b10472 Vulkan | `q8_0`/`q4_0` | **50.88 / 53.25** | 0.665 | 33.6 GB |
+| b10472 Vulkan | `q4_0`/`q4_0` | **48.64 / 51.19** | 0.640 | 31.8 GB |
+| b10472 Vulkan | `q4_0`/`q4_0` (2nd) | 50.68 / 44.25 | 0.503 | 31.8 GB |
+| b10082 ROCm | `q4_0`/`q4_0` | 36.57 / 36.85 | 0.527 | — |
+| b10472 Vulkan | `q8_0`/`q8_0` | 22.86 / 20.46 | 0.503 | — |
+| b10082 ROCm | `q8_0`/`q8_0` | **fails to load** | — | OOM |
+
+Three things follow.
+
+**Vulkan is ~35% faster than ROCm on the workload that matters.** 48-51 t/s against
+36.6-36.9 on the same prompt. This is the decisive comparison, and it agrees with the
+depth-16384 `llama-bench` result rather than the depth-0 one — unspeculated `tg64` at
+depth 0 was the single measurement that favoured ROCm, and it is the least
+representative of how the model is actually served.
+
+**Decode rate with speculation is not a fixed number.** Draft acceptance ranged
+0.503-0.665 across runs at temperature 0, because acceptance depends on the content
+generated, and decode scales with it. Observed spread on the same config was 44.25 to
+51.19 t/s. Quote this as a range, not a point.
+
+**`q8_0` KV is not a viable operating point at 262144.** On Vulkan it costs more than
+half the decode rate (20-23 t/s); on ROCm the context will not allocate at all, failing
+on a 3.1 GB recurrent-state buffer. The mismatched `q8_0`K/`q4_0`V pair — the prefill
+trap on ROCm — is the *fastest* option on Vulkan at 50.9-53.3 t/s, but it sits at
+33.6 of 34.2 GB, 98% of the card, with no headroom for a second process.
