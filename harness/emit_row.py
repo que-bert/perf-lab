@@ -47,20 +47,37 @@ def build_identity(bindir: pathlib.Path, tool: str):
     The tool binaries here are ~18 KB launcher shims -- the code lives in
     <tool>-impl.so and the ggml backends -- so hashing the named binary alone
     would miss a rebuilt backend entirely.
+
+    Every `libggml*.so` is hashed, not only the version-suffixed ones. The
+    compute backend carries no version suffix -- `libggml-hip.so` on ROCm,
+    `libggml-vulkan.so` on Vulkan -- so the earlier `libggml*.so.[0-9]*` glob
+    matched only libggml.so and libggml-base.so and left the kernels this repo
+    exists to watch outside the fingerprint. A backend-only swap was invisible.
+
+    Symlink aliases collapse to one entry. libggml.so, libggml.so.0 and
+    libggml.so.0.20.1 are one inode; counting each made the digest depend on
+    how many aliases a packager happened to ship rather than on the code.
+
+    Widening the glob and de-aliasing both change binary_sha256 for the same
+    physical build: the ROCm prebuilt moved 9f1f4f95… -> 3167c12e… without a
+    byte of it changing. Rows either side of 2026-08-23 are NOT
+    digest-comparable, and that discontinuity is a harness change rather than
+    the build swap this field exists to flag. See FINDINGS.md.
     """
     wanted = [bindir / tool, bindir / f"lib{tool}-impl.so"]
-    wanted += sorted(bindir.glob("libggml*.so.[0-9]*"))
-    digest = hashlib.sha256()
-    seen = 0
+    wanted += sorted(bindir.glob("libggml*.so*"))
+    by_inode = {}
     for path in wanted:
         if not path.exists():
             continue
         real = path.resolve()
-        digest.update(real.name.encode())
-        digest.update(sha256_cached(real).encode())
-        seen += 1
-    if not seen:
+        by_inode.setdefault(real, real.name)
+    if not by_inode:
         return None, None
+    digest = hashlib.sha256()
+    for real in sorted(by_inode):
+        digest.update(by_inode[real].encode())
+        digest.update(sha256_cached(real).encode())
 
     toolchain = None
     env = dict(os.environ, LD_LIBRARY_PATH=str(bindir))
@@ -77,6 +94,31 @@ def build_identity(bindir: pathlib.Path, tool: str):
     return digest.hexdigest(), toolchain
 
 
+# Upstream changed its --version banner between b10082 and b10472, and the
+# harness refused every Vulkan row for five days because of it:
+#
+#   b10082:  version: 10082 (fb0e6b621)
+#   b10472:  version: 0.1.1-dev (build 10472, commit 60eeeb608)
+#
+# Both forms are accepted. A banner matching neither must still abort rather
+# than fall back to a guess -- a row whose fingerprint names the wrong commit
+# is worse than no row, because nothing downstream can tell it is wrong.
+VERSION_BANNERS = (
+    re.compile(r"^version:\s*\d+\s*\(([0-9a-f]{7,40})\)", re.M),
+    re.compile(r"^version:.*?\bcommit\s+([0-9a-f]{7,40})\b", re.M),
+)
+
+
+def parse_version_sha(blob: str):
+    """Upstream commit from a --version banner, or None. Pure, so the banner
+    formats can be tested without a build on disk."""
+    for pattern in VERSION_BANNERS:
+        m = pattern.search(blob)
+        if m:
+            return m.group(1)
+    return None
+
+
 def llamacpp_sha(bindir: pathlib.Path):
     """`version: 10082 (fb0e6b621)` -> fb0e6b621.
 
@@ -90,16 +132,45 @@ def llamacpp_sha(bindir: pathlib.Path):
             continue
         out = subprocess.run([str(path), "--version"], capture_output=True,
                              text=True, env=env, timeout=60)
-        m = re.search(r"^version:\s*\d+\s*\(([0-9a-f]{7,40})\)",
-                      out.stdout + out.stderr, re.M)
-        if m:
-            return m.group(1)
+        sha = parse_version_sha(out.stdout + out.stderr)
+        if sha:
+            return sha
     sys.exit("emit_row: could not determine llama.cpp build SHA from any binary in "
              f"{bindir} — refusing to write a row with an unknown fingerprint")
 
 
-def probe(uid: str):
-    out = subprocess.run([str(HERE / "probe.sh"), "--gpu-uid", uid],
+def backend_for(bindir: pathlib.Path):
+    """Which compute backend this build actually ships.
+
+    probe.sh has always accepted --backend and always defaulted to `rocm`, and
+    nothing ever passed it. So the first Vulkan fingerprint came out stamped
+    `backend: rocm`, beside a hipconfig version with no bearing on the run.
+    This repo exists to say WHICH layer moved a number; a row naming the wrong
+    stack sends the next reader to the wrong layer. `rocm` and `mesa` are both
+    still recorded -- `backend` is what says which of them is load-bearing for
+    that row.
+
+    Read from the build, not from a flag: the backend .so is what the binary
+    will load, and it cannot be forgotten on a command line.
+    """
+    vulkan = (bindir / "libggml-vulkan.so").exists()
+    hip = (bindir / "libggml-hip.so").exists()
+    if vulkan and hip:
+        # Not a case either prebuilt on this machine produces. Which one runs
+        # depends on the device selected at runtime, so it cannot be read off
+        # the directory -- and guessing here is how a row comes to lie.
+        sys.exit(f"emit_row: {bindir} ships both a Vulkan and a HIP backend; "
+                 "cannot determine which produced the row")
+    if vulkan:
+        return "vulkan"
+    if hip:
+        return "rocm"
+    return "cpu"
+
+
+def probe(uid: str, backend: str):
+    out = subprocess.run([str(HERE / "probe.sh"), "--gpu-uid", uid,
+                          "--backend", backend],
                          capture_output=True, text=True)
     if out.returncode != 0:
         sys.exit(f"emit_row: probe failed: {out.stderr.strip()}")
@@ -206,7 +277,7 @@ def fingerprint(gpu_uid, model: pathlib.Path, bindir: pathlib.Path, tool: str):
     """Every axis that could explain a number. Shared with sweep.py so there is
     one implementation -- a fingerprint assembled twice is a fingerprint that
     disagrees with itself."""
-    fp = probe(gpu_uid)
+    fp = probe(gpu_uid, backend_for(bindir))
     fp["llamacpp_sha"] = llamacpp_sha(bindir)
     fp["patches"] = []
     binsha, toolchain = build_identity(bindir, tool)

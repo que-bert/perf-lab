@@ -460,3 +460,71 @@ more VRAM, and perplexity cannot separate them. The projector costs ~0.9 GB.
 with no measurable increase during encoding — VRAM read 33.6 GB before and after, and
 the server stayed up. The remaining argument for 131072 is not image safety but leaving
 ~3.9 GB for anything else that wants the card.
+
+## 2026-08-23: the fingerprint never covered the compute backend
+
+Teaching `emit_row.py` to fingerprint the Vulkan build turned up three defects, only
+the first of which was known. All three are fixed; `harness/test_emit_row.py` holds a
+case for each, and each case was confirmed to fail against the pre-fix code.
+
+**1. The `--version` banner changed shape and the parser did not.** Upstream moved from
+`version: 10082 (fb0e6b621)` to `version: 0.1.1-dev (build 10472, commit 60eeeb608)`
+between the two builds on this machine. The regex matched only the first form, so
+`emit_row` aborted with *could not determine llama.cpp build SHA* on every Vulkan run.
+That is why the b10472 numbers in this file were never in the ledger — the refusal was
+correct behaviour on an unreadable banner, but the banner was readable and the parser
+was not looking for it. Both forms are now accepted; anything else still aborts.
+
+**2. The compute backend was outside the digest — on both builds, always.**
+`fp.build.binary_sha256` globbed `libggml*.so.[0-9]*`, which matches `libggml.so` and
+`libggml-base.so` and nothing else. The backend carries no version suffix:
+
+```
+libggml-hip.so       (b10082-rocm)      never hashed
+libggml-vulkan.so    (b10472-vulkan)    never hashed
+```
+
+So the one file implementing the kernels this repo exists to watch was not in the
+fingerprint. A backend-only rebuild — swap `libggml-hip.so`, leave everything else —
+would have produced an identical digest and an unexplained throughput move, which is
+precisely the failure of 2026-08-15 that `binary_sha256` was added to prevent. The glob
+is now `libggml*.so*`, and symlink aliases collapse to one entry so the digest depends
+on the code rather than on how many aliases the packager shipped.
+
+**This moves the digest for builds that did not change.** Same ROCm prebuilt, same
+bytes:
+
+| | `binary_sha256` |
+|---|---|
+| rows through `nightly-20260822T181827Z` | `9f1f4f952a3aa6c8aa95bd5a756fc2d527a08216e5a4b754020149b06f2d9663` |
+| rows from 2026-08-23 | `3167c12ef7691864194c13008a02adc708d2d144f0623a2996caa05710021eda` |
+
+**That discontinuity is a harness change, not a build swap.** Rows either side of
+2026-08-23 are not digest-comparable. Nothing reads the field programmatically —
+`check.py` bands on canary key, not fingerprint — so nothing breaks, but a human
+diffing the ledger across that date will see the field this repo uses to flag build
+swaps change without one, and should not chase it.
+
+**3. Every row claimed `backend: rocm`, including the Vulkan ones.** `probe.sh` has
+always taken `--backend` and always defaulted to `rocm`; `emit_row` never passed it.
+The first Vulkan fingerprint therefore came out labelled ROCm, with a `hipconfig`
+version beside it that had nothing to do with the run — on a build that runs on RADV
+and whose performance moves with **Mesa**. A ledger whose whole purpose is saying which
+layer moved a number was about to name the wrong layer. The backend is now read from
+the build directory rather than assumed, and a directory shipping both backends is
+refused rather than guessed at.
+
+Verified 2026-08-23, both builds, through the real `emit_row` path:
+
+| bindir | backend | commit | toolchain |
+|---|---|---|---|
+| `~/llama.cpp/b10472-vulkan` | `vulkan` | `60eeeb608` | GNU 11.4.0 |
+| `~/llama.cpp/b10082-rocm` | `rocm` | `fb0e6b621` | GNU 11.4.0 |
+
+A Vulkan row passes `validate.py` — `backend: vulkan` was already in the schema enum
+from stage 3; nothing had ever emitted it.
+
+**Still not measured:** no Vulkan row has been written to the ledger yet. The harness
+can now produce one, which is a different claim from having one. The bands in
+`configs/canary.yaml` remain ROCm-derived, and the canaries stay a ROCm-only watch —
+see the note there.

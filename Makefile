@@ -26,6 +26,7 @@ test:
 	@python3 harness/test_check.py
 	@python3 harness/test_alert.py
 	@python3 harness/test_sweep.py
+	@python3 harness/test_emit_row.py
 
 check:
 	@python3 harness/check.py --ledger $(LEDGER)

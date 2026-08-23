@@ -28,6 +28,25 @@
 # and the bands below were re-derived on it. Fast-vs-fallback separation is 7.8x
 # (716.4 vs 91.45), up from the 4.5x the GCC 15 build showed.
 #
+# 2026-08-23: THESE CANARIES ARE A ROCm-ONLY WATCH, and that is now a narrower
+# claim than it sounds. Four of the five probe the flash-attention fallback
+# cliff, which Vulkan does not have — on b10472-vulkan, q4_1 KV measures 891
+# against q4_0's 894, so slow-q4_1, slow-mixed and slow-q5_1 would be probing
+# nothing there. Keeping them ROCm-derived is the right call for what they
+# were built to detect.
+#
+# The gap that leaves: Mimir now serves on b10472-vulkan (~/.mimir/bin/
+# llama-server points at it), so the tripwire no longer watches the build that
+# production runs, and a Mesa upgrade that hurt Vulkan would not show up here.
+# That is the same shape of error as 2026-08-17, when the bands were derived on
+# a binary nothing executed — see FINDINGS.md.
+#
+# Closing it needs a Vulkan canary sensitive to something Vulkan can lose
+# (prefill at depth, most likely), and the harness cannot express that yet:
+# PERF_LAB_BIN is one global bindir, so a canary set cannot span two builds.
+# emit_row can fingerprint and label a Vulkan row correctly as of 2026-08-23;
+# nothing yet decides which build a given canary should run on. OPEN.
+#
 # Model path comes from $PERF_LAB_MODEL — never committed, this repo is public.
 
 defaults:
