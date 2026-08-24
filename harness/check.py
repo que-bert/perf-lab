@@ -16,6 +16,11 @@ Two rules earn their keep:
   Fewer than two comparable runs is "insufficient", never "ok". A fresh ledger
   must not read as a healthy one.
 
+Every verdict carries `as_of` and `runs_since`, because a verdict is only as
+current as the newest run that actually contained that canary. On 2026-08-22
+the busy-card guard skipped four of five, and this file reported all five "ok"
+with no hint that four of those numbers were three days old.
+
   check.py [--ledger L] [--config C]
 """
 import argparse
@@ -65,25 +70,31 @@ def evaluate(runs, bands):
     for key, band in bands.items():
         expect = band["expect_pp2048"]
         tol = band.get("tolerance_pct", 10)
-        seen = [(tag, statistics.median([v for v, _ in ks[key]]),
+        seen = [(i, tag, ts, statistics.median([v for v, _ in ks[key]]),
                  [rid for _, rid in ks[key]])
-                for tag, _, ks in runs if key in ks]
+                for i, (tag, ts, ks) in enumerate(runs) if key in ks]
 
         if not seen:
             verdicts.append({"key": key, "median_pp2048": None, "expect": expect,
                              "delta_pct": None, "breach": False,
                              "sustained": False, "verdict": "insufficient",
+                             "as_of": None, "runs_since": len(runs),
                              "run_ids": []})
             continue
 
-        tag, med, run_ids = seen[-1]
+        idx, tag, as_of, med, run_ids = seen[-1]
+        # How many whole runs have happened since this canary last produced a
+        # number. A verdict says nothing about the runs it was absent from, and
+        # on 2026-08-22 four canaries skipped on the busy-card guard while this
+        # file went on reporting them "ok" from three-day-old data.
+        runs_since = len(runs) - 1 - idx
         delta = 100.0 * (med - expect) / expect
         breach = abs(delta) > tol
         dirn = direction(med, expect)
 
         sustained = False
         if breach and len(seen) >= 2:
-            _, prev_med, _ = seen[-2]
+            prev_med = seen[-2][3]
             prev_delta = 100.0 * (prev_med - expect) / expect
             sustained = (abs(prev_delta) > tol
                          and direction(prev_med, expect) == dirn)
@@ -96,7 +107,8 @@ def evaluate(runs, bands):
         verdicts.append({
             "key": key, "median_pp2048": round(med, 2), "expect": expect,
             "delta_pct": round(delta, 2), "breach": breach,
-            "sustained": sustained, "verdict": verdict, "run_ids": run_ids,
+            "sustained": sustained, "verdict": verdict,
+            "as_of": as_of, "runs_since": runs_since, "run_ids": run_ids,
         })
     return verdicts
 

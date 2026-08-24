@@ -68,9 +68,13 @@ Three triggers:
   instead would give the post-upgrade run the same before/after pair the nightly
   already has, which is no information at all. An hourly drain brackets the upgrade
   within the same morning; the nightly catches the regression either way.
-- **heartbeat** at 09:00 — files an Issue for a sustained breach, a failed push, or no
-  successful run in 72 hours. That last one matters most: a tripwire that quietly
-  stopped running looks exactly like one reporting good news.
+- **heartbeat** at 09:00 — files an Issue for a sustained breach, a failed push, no
+  successful run in 72 hours, or a single canary silent for 72 hours while the others
+  still run. The last two matter most: a tripwire that quietly stopped running looks
+  exactly like one reporting good news. The per-canary case is that same failure one
+  level down — any one canary still reporting keeps the ledger fresh, so four can go
+  dark unnoticed while `check.py` reports their stale verdicts as passing ones. Every
+  verdict now carries `as_of` and `runs_since` so that is visible without an Issue.
 
 A breach must hold the same direction for two consecutive runs before it is reported.
 Single-run breaches are noise; on an idle card the measured spread is 0.02–1.6%, but a

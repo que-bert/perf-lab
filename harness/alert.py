@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
 """Turn check.py verdicts into GitHub Issues, without becoming noise.
 
-Three things deserve an Issue, and the third is the one that makes the other
-two trustworthy:
+Four things deserve an Issue, and the last two are what make the first two
+trustworthy:
 
   a canary breaching its band in the same direction two runs running
   a push that could not land, so measurements exist but nobody else can see them
   no successful run in 72 hours
+  one canary silent for 72 hours while the others still run
 
-That last one is the whole point of a heartbeat. A tripwire that quietly
-stopped running looks exactly like a tripwire reporting good news, and without
-it the healthy-green repo is indistinguishable from the dead one.
+The heartbeat is the whole point. A tripwire that quietly stopped running looks
+exactly like a tripwire reporting good news, and without it the healthy-green
+repo is indistinguishable from the dead one.
+
+Per-canary coverage is the same failure one level down, and the global
+heartbeat cannot see it: any single canary still reporting keeps the ledger
+fresh. On 2026-08-22 the busy-card guard skipped four of five and check.py went
+on calling all five "ok" from three-day-old numbers.
 
 Deliberately silent on: single-run breaches (noise at this stack's spread),
 "insufficient" verdicts (not enough data is not a fault), and upstream patch
@@ -60,18 +66,52 @@ def conditions(ledger, verdicts, stale_hours, now, push_marker=None):
     out = []
 
     newest = newest_success(ledger)
-    if newest is None:
+    dark = newest is None
+    if dark:
         out.append(("staleness", "perf-lab has never recorded a successful run",
                     "No row in the ledger is a completed measurement. The "
                     "harness has not produced data since it was installed."))
     else:
         age = (now - newest).total_seconds() / 3600.0
         if age > stale_hours:
+            dark = True
             out.append(("staleness",
                         f"perf-lab has not run successfully in {age:.0f}h",
                         f"Newest successful measurement: {newest:%Y-%m-%d %H:%M}Z "
                         f"({age:.1f}h ago), past the {stale_hours}h heartbeat. "
                         "The tripwire is not watching anything right now."))
+
+    # Per-canary coverage. The heartbeat above watches the ledger as a whole,
+    # so a single canary that still runs keeps it quiet while the rest go dark.
+    # That is not hypothetical: on 2026-08-22 the busy-card guard skipped four
+    # of five, the ledger stayed fresh on the fifth, and check.py went on
+    # reporting all five "ok" from numbers three days old. A stale verdict is
+    # worse than a missing one, because it reads as a passing one.
+    #
+    # Silent when the whole lab is already dark -- repeating it once per canary
+    # is noise -- and silent on "insufficient", which is not a fault.
+    if not dark:
+        for v in verdicts:
+            if v.get("as_of") is None or v["verdict"] == "insufficient":
+                continue
+            seen_at = dt.datetime.strptime(v["as_of"], "%Y-%m-%dT%H:%M:%SZ").replace(
+                tzinfo=dt.timezone.utc)
+            age = (now - seen_at).total_seconds() / 3600.0
+            if age <= stale_hours:
+                continue
+            missed = v.get("runs_since", 0)
+            out.append((
+                f"coverage/{v['key']}",
+                f"perf-lab: {v['key']} has not measured in {age:.0f}h",
+                f"`{v['key']}` last produced a number at "
+                f"{seen_at:%Y-%m-%d %H:%M}Z ({age:.1f}h ago), past the "
+                f"{stale_hours}h heartbeat, and has been absent from the last "
+                f"{missed} run(s). Other canaries are still running, so the "
+                "heartbeat is quiet and this one's verdict "
+                f"(`{v['verdict']}`, {v['delta_pct']:+.1f}%) is being reported "
+                "from stale data.\n\nUsual cause: the busy-card guard skipped "
+                "it because something else held VRAM on the target GPU. Check "
+                "the `skipped` rows' `reason` field."))
 
     for v in verdicts:
         if not v.get("sustained"):

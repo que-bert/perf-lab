@@ -528,3 +528,26 @@ from stage 3; nothing had ever emitted it.
 can now produce one, which is a different claim from having one. The bands in
 `configs/canary.yaml` remain ROCm-derived, and the canaries stay a ROCm-only watch —
 see the note there.
+
+## 2026-08-23: a stale verdict read as a passing one
+
+The `nightly-20260822T181827Z` batch measured `fast-q4` and skipped the other four on
+the busy-card guard — 760 MiB in use on the target, against a 500 MiB guard. The skips
+are honestly recorded, each with its `reason`. What was not honest was the readout:
+`make check` reported **all five `ok`**, four of them from `nightly-20260821T190014Z`,
+with nothing in the output saying so.
+
+The heartbeat could not catch it either. `alert.py` asked whether *the ledger* had a
+successful run in 72 hours, and it did — `fast-q4` alone kept it fresh. Four canaries
+could have stayed dark indefinitely behind one that still ran.
+
+Two changes. `check.py` now emits `as_of` and `runs_since` on every verdict, so a
+verdict states how current it is. `alert.py` gained a fourth condition, `coverage/<key>`,
+for a canary silent past the heartbeat window while others still run — suppressed when
+the whole lab is dark, since one dead tripwire should not file five Issues, and silent
+on a single missed run, which happens on any busy evening.
+
+The guard itself was right, and is not changed. On 2026-08-23 the occupant was an
+`ollama` llama-server (PID 732103) holding 726 MB on the R9700 — a real occupant, and
+refusing to measure around it is the correct behaviour. The defect was never the skip.
+It was reporting a three-day-old number as today's.

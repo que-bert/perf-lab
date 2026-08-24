@@ -100,4 +100,36 @@ fails += ok("push-failure marker is reported",
 fails += ok("marker path is honoured, not the repo's own",
             "nothing to report" in run(healthy, NO_MARKER), out)
 
+# Per-canary coverage. One canary still running keeps the global heartbeat
+# fresh, so the ledger looks alive while another canary has been dark for days
+# and check.py keeps reporting its stale verdict as a passing one. This is the
+# 2026-08-22 busy-card-guard case, where four of five skipped.
+out = run(ledger("dark-canary", [
+    row("n-1", "fast-q4", 710, "2026-08-11T00:00:00Z"),
+    row("n-1", "slow-q4_1", 91, "2026-08-11T00:00:00Z"),
+    row("n-2", "fast-q4", 712, "2026-08-12T00:00:00Z"),
+    row("n-2", "slow-q4_1", 91, "2026-08-12T00:00:00Z"),
+    row("n-3", "fast-q4", 711, "2026-08-16T04:00:00Z"),
+    row("n-4", "fast-q4", 709, "2026-08-16T06:00:00Z"),
+]))
+fails += ok("one dark canary is reported while the ledger looks fresh",
+            "coverage/slow-q4_1" in out and "staleness" not in out, out)
+
+# ...but a canary that merely missed last night is not an Issue. Nightlies skip
+# for ordinary reasons and a one-run gap fires on every busy evening.
+out = run(ledger("missed-once", [
+    row("n-1", "fast-q4", 710, "2026-08-15T06:00:00Z"),
+    row("n-1", "slow-q4_1", 91, "2026-08-15T06:00:00Z"),
+    row("n-2", "fast-q4", 709, "2026-08-16T06:00:00Z"),
+]))
+fails += ok("a single missed run is not a coverage issue",
+            "nothing to report" in out, out)
+
+# When nothing has run at all, the global heartbeat says so once. Repeating it
+# per canary would turn one dead tripwire into five Issues.
+out = run(ledger("all-dark", [row("n-1", "fast-q4", 710, "2026-08-11T00:00:00Z"),
+                              row("n-2", "fast-q4", 708, "2026-08-12T00:00:00Z")]))
+fails += ok("whole-lab silence does not also file per-canary coverage",
+            "staleness" in out and "coverage/" not in out, out)
+
 sys.exit(1 if fails else 0)
