@@ -42,10 +42,20 @@
 # a binary nothing executed — see FINDINGS.md.
 #
 # Closing it needs a Vulkan canary sensitive to something Vulkan can lose
-# (prefill at depth, most likely), and the harness cannot express that yet:
-# PERF_LAB_BIN is one global bindir, so a canary set cannot span two builds.
-# emit_row can fingerprint and label a Vulkan row correctly as of 2026-08-23;
-# nothing yet decides which build a given canary should run on. OPEN.
+# (prefill at depth, most likely), and the harness cannot express that yet, for
+# two separate reasons:
+#
+#   1. PERF_LAB_BIN is one global bindir, so a canary set cannot span two
+#      builds. emit_row can fingerprint and label a Vulkan row correctly as of
+#      2026-08-23; nothing yet decides which build a canary should run on.
+#   2. bench.sh and bench_server.sh pin the GPU with ROCR_VISIBLE_DEVICES,
+#      which the Vulkan backend ignores. An unpinned Vulkan run lands on device
+#      0 — the 16 GB 9060 XT — while the row's fingerprint names the R9700.
+#      Both scripts now REFUSE a Vulkan bindir outright rather than emit a row
+#      that lies about its GPU. Lifting that refusal needs a uid -> Vulkan
+#      index mapping (`llama-server --list-devices` is the likely source).
+#
+# OPEN.
 #
 # Model path comes from $PERF_LAB_MODEL — never committed, this repo is public.
 

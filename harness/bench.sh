@@ -37,6 +37,20 @@ done
 BENCH="$PERF_LAB_BIN/llama-bench"
 [[ -x "$BENCH" ]] || { echo "bench.sh: $BENCH not executable" >&2; exit 3; }
 
+# A Vulkan build cannot be pinned the way this script pins: ROCR_VISIBLE_DEVICES
+# below is ROCm's variable and the Vulkan backend ignores it. The run would land
+# on Vulkan device 0 -- the 16 GB 9060 XT on this host -- while the row's
+# fingerprint names whichever card probe.sh was asked about. That is a row that
+# lies about which GPU produced it, which is the one thing this ledger must
+# never contain. Vulkan needs GGML_VK_VISIBLE_DEVICES and a uid -> Vulkan-index
+# mapping; neither exists yet. See the OPEN note in configs/canary.yaml.
+if [[ -e "$PERF_LAB_BIN/libggml-vulkan.so" ]]; then
+  echo "bench.sh: $PERF_LAB_BIN is a Vulkan build, which this script cannot pin" >&2
+  echo "bench.sh: to a specific GPU. Refusing rather than measuring an unknown" >&2
+  echo "bench.sh: card. See the OPEN note in configs/canary.yaml." >&2
+  exit 3
+fi
+
 # --- guard: refuse to measure a GPU somebody else is using -------------------
 PCI="$("$HERE/probe.sh" --gpu-uid "$PERF_LAB_GPU_UID" | python3 -c 'import json,sys;print(json.load(sys.stdin)["gpu"]["pci"])')"
 CARD="$(for c in /sys/class/drm/card[0-9]*; do
