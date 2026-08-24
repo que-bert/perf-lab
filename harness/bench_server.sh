@@ -43,17 +43,10 @@ done
 [[ -x "$PERF_LAB_SERVER_BIN/llama-server" ]] || {
   echo "bench_server.sh: no llama-server in $PERF_LAB_SERVER_BIN" >&2; exit 3; }
 
-# Same refusal as bench.sh, and likelier to bite here: Vulkan was adopted for
-# SERVING on 2026-08-17, so this is the variable most likely to be pointed at
-# ~/llama.cpp/b10472-vulkan. ROCR_VISIBLE_DEVICES below cannot pin a Vulkan
-# device, and an unpinned run lands on Vulkan device 0 -- the 16 GB card --
-# while the row claims the R9700. See the OPEN note in configs/canary.yaml.
-if [[ -e "$PERF_LAB_SERVER_BIN/libggml-vulkan.so" ]]; then
-  echo "bench_server.sh: $PERF_LAB_SERVER_BIN is a Vulkan build, which this" >&2
-  echo "bench_server.sh: script cannot pin to a specific GPU. Refusing rather" >&2
-  echo "bench_server.sh: than measuring an unknown card." >&2
-  exit 3
-fi
+# Same backend-dependent pinning as bench.sh, and it matters more here: Vulkan
+# was adopted for SERVING on 2026-08-17, so PERF_LAB_SERVER_BIN is exactly the
+# variable someone points at ~/llama.cpp/b10472-vulkan.
+if [[ -e "$PERF_LAB_SERVER_BIN/libggml-vulkan.so" ]]; then BACKEND=vulkan; else BACKEND=rocm; fi
 
 # --- guard: refuse to measure a GPU somebody else is using -------------------
 PCI="$("$HERE/probe.sh" --gpu-uid "$PERF_LAB_GPU_UID" | python3 -c 'import json,sys;print(json.load(sys.stdin)["gpu"]["pci"])')"
@@ -76,12 +69,19 @@ if (( USED_MIB > GUARD_MIB )); then
   exit 0
 fi
 
-IDX="$("$HERE/probe.sh" --gpu-uid "$PERF_LAB_GPU_UID" --emit-index)"
+if [[ "$BACKEND" == vulkan ]]; then
+  GFX="$("$HERE/probe.sh" --gpu-uid "$PERF_LAB_GPU_UID" \
+         | python3 -c 'import json,sys;print(json.load(sys.stdin)["gpu"]["gfx"])')"
+  PIN=(GGML_VK_VISIBLE_DEVICES="$(python3 "$HERE/vulkan_index.py" \
+                                   --bin "$PERF_LAB_SERVER_BIN" --gfx "$GFX")")
+else
+  PIN=(ROCR_VISIBLE_DEVICES="$("$HERE/probe.sh" --gpu-uid "$PERF_LAB_GPU_UID" --emit-index)")
+fi
 N="${REPS:-$(python3 -c "import yaml;print(yaml.safe_load(open('$CFG'))['defaults'].get('reps',1))")}"
 
 for (( rep=1; rep<=N; rep++ )); do
   RAW="$(mktemp)"
-  if ! ROCR_VISIBLE_DEVICES="$IDX" \
+  if ! env "${PIN[@]}" \
        python3 "$HERE/emit_row.py" --config "$CFG" --key "$KEY" --kind "$KIND" \
          --rep "$rep" --tag "$TAG" --mode server --tool llama-server \
          --gpu-uid "$PERF_LAB_GPU_UID" --model "$PERF_LAB_MODEL" \

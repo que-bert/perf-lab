@@ -102,4 +102,34 @@ v = verdict_for([row(N1, "fast-q4", 710, T1)], "slow-q5_1")
 fails += ok("never-measured canary -> insufficient",
             v["verdict"] == "insufficient" and v["median_pp2048"] is None)
 
+
+# The bands are ROCm-derived, so a Vulkan row is a different population rather
+# than a noisy sample of this one -- b10472 Vulkan measures fast-q4 near 894
+# against ROCm's ~717, and has no flash-attention fallback cliff at all. Scored
+# against a ROCm band that reads as a 25% breach meaning only that two
+# different things were measured.
+def brow(tag, key, pp, ts, backend):
+    r = row(tag, key, pp, ts)
+    r["fp"] = {"build": {"backend": backend}}
+    return r
+
+
+mixed = [brow(N1, "fast-q4", 710, T1, "rocm"),
+         brow(N2, "fast-q4", 712, T2, "rocm"),
+         brow(N3, "fast-q4", 894, T3, "vulkan")]
+p = pathlib.Path(".scratch/t-check-backend.jsonl")
+p.parent.mkdir(exist_ok=True)
+p.write_text("".join(json.dumps(r) + "\n" for r in mixed))
+
+v = next(x for x in check.evaluate(check.load_runs(p, "rocm"), BANDS)
+         if x["key"] == "fast-q4")
+fails += ok("a vulkan row is not scored against a rocm band",
+            v["verdict"] == "ok" and v["median_pp2048"] == 712)
+
+# The same ledger without the filter, to show the case is not vacuous.
+v = next(x for x in check.evaluate(check.load_runs(p, None), BANDS)
+         if x["key"] == "fast-q4")
+fails += ok("...and unfiltered it would have read as a breach",
+            v["breach"] and v["median_pp2048"] == 894)
+
 sys.exit(1 if fails else 0)

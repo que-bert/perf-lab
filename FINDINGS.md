@@ -551,3 +551,60 @@ The guard itself was right, and is not changed. On 2026-08-23 the occupant was a
 `ollama` llama-server (PID 732103) holding 726 MB on the R9700 — a real occupant, and
 refusing to measure around it is the correct behaviour. The defect was never the skip.
 It was reporting a three-day-old number as today's.
+
+## 2026-08-24: Vulkan has no fallback cliff — measured here, not quoted
+
+The first Vulkan rows in the ledger, tag `vulkan-b10472-20260824`, `~/llama.cpp/
+b10472-vulkan` on the R9700. Until today this claim rested on that build's
+`PROVENANCE.txt`; it is now in the ledger with a fingerprint.
+
+| canary | K/V | ROCm band | Vulkan median | ratio | reps |
+|---|---|---|---|---|---|
+| fast-q4 | `q4_0`/`q4_0` | 716.40 | 896.31 | 1.25× | 4 |
+| fast-q8 | `q8_0`/`q8_0` | 714.87 | 905.16 | 1.27× | 3 |
+| slow-q5_1 | `q5_1`/`q5_1` | 60.88 | 894.37 | **14.69×** | 3 |
+| slow-q4_1 | `q4_1`/`q4_1` | 91.45 | 894.64 | **9.78×** | 3 |
+| slow-mixed | `q8_0`/`q4_0` | 93.87 | 898.00 | **9.57×** | 3 |
+
+**Every KV cache type measures between 892.7 and 908.5 t/s — a 1.8% spread.** The
+fast-versus-fallback separation this repo was built to watch is 7.83× on ROCm and
+**0.94× on Vulkan**, which is to say it does not exist. `q5_1`, `q4_1` and mismatched
+K/V are not slow paths on this backend; they are the same path.
+
+So three of the five canaries probe nothing on Vulkan, and the operator question from
+2026-08-22 is settled with data rather than inference: the canary set stays a ROCm-only
+watch. Closing the gap that leaves — nothing watches the build that actually serves —
+needs a Vulkan canary sensitive to something Vulkan can lose, which is prefill at depth,
+not KV cache type.
+
+**Two harness changes made these rows possible, and safe:**
+
+`bench.sh` and `bench_server.sh` now pin by backend. Both previously used only
+`ROCR_VISIBLE_DEVICES`, which the Vulkan backend ignores, so a Vulkan run would have
+landed on device 0 while the row's fingerprint named the R9700. `harness/vulkan_index.py`
+maps a gfx target onto the Vulkan index, refusing when that is not exactly one device.
+It has to be resolved, never assumed — two cards enumerate three ways here and no two
+agree:
+
+```
+rocm-smi   GPU[0] = 9060 XT    GPU[1] = R9700
+DRM        card0  = R9700      card1  = 9060 XT
+Vulkan     Vulkan0 = 9060 XT   Vulkan1 = R9700
+```
+
+Verified directly: under `GGML_VK_VISIBLE_DEVICES=1` the process enumerates exactly one
+device, `Vulkan0: AMD Radeon AI PRO R9700`. Unpinned it would have picked the 16 GB
+9060 XT.
+
+`check.py` now scores only rows whose `fp.build.backend` matches the band's, declared as
+`backend: rocm` in `canary.yaml`'s defaults. Without it these 15 rows would have read as
+a sustained 25%–1370% breach across the board, and the tripwire would have been reporting
+a regression that is really two different backends in one column. Confirmed on the real
+ledger: all five ROCm verdicts are unchanged with the Vulkan rows present.
+
+**Caveats.** `fast-q4`'s first rep — 839.53 t/s, `tg` 24.47 — was measured on a cold card
+(31 °C, 385 MHz) and is the only reading in the set that disagrees with its neighbours;
+the three warm reps land at 894–902 with the rest. It is left in the ledger rather than
+removed. Decode sat at ~19.6 t/s on every config here, which does not match the 17.36
+that `PROVENANCE.txt` reports for this build at `tg64`; the difference is unexplained and
+these canaries are calibrated on prefill, not decode.

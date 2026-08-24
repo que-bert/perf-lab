@@ -37,11 +37,19 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 LIVE_KINDS = {"nightly", "manual", "apt"}
 
 
-def load_runs(ledger):
+def load_runs(ledger, backend=None):
     """-> [(tag, earliest_ts, {key: [(pp2048, run_id), ...]})] oldest first.
 
     Grouped by tag because run_id is unique per row: it identifies a rep, not a
     batch. Untagged rows cannot be attributed to a run and are dropped.
+
+    Rows from another backend are dropped too. The bands in canary.yaml were
+    derived on the ROCm prebuilt, and Vulkan is a different population, not a
+    noisier sample of the same one -- b10472 Vulkan measures ~894 t/s on
+    fast-q4 against ROCm's ~717, and has no flash-attention fallback cliff at
+    all, so three of the five canaries probe nothing there. Comparing a Vulkan
+    row against a ROCm band produces a 25% "breach" that means only that two
+    different things were measured.
     """
     runs = {}
     for line in ledger.read_text().splitlines():
@@ -50,6 +58,8 @@ def load_runs(ledger):
         row = json.loads(line)
         tag, key = row.get("tag"), row.get("key")
         if not tag or not key or row.get("kind") not in LIVE_KINDS:
+            continue
+        if backend and row.get("fp", {}).get("build", {}).get("backend") != backend:
             continue
         m = row.get("m", {})
         if m.get("pp2048") is None or m.get("cold_prefill") is False:
@@ -122,7 +132,7 @@ def main():
     import yaml
     doc = yaml.safe_load(open(a.config))
     bands = {k: v for k, v in doc["canaries"].items() if "expect_pp2048" in v}
-    runs = load_runs(pathlib.Path(a.ledger))
+    runs = load_runs(pathlib.Path(a.ledger), doc["defaults"].get("backend"))
     verdicts = evaluate(runs, bands)
 
     json.dump({"runs": [{"tag": t, "ts": ts, "keys": sorted(ks)}

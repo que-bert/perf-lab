@@ -37,19 +37,14 @@ done
 BENCH="$PERF_LAB_BIN/llama-bench"
 [[ -x "$BENCH" ]] || { echo "bench.sh: $BENCH not executable" >&2; exit 3; }
 
-# A Vulkan build cannot be pinned the way this script pins: ROCR_VISIBLE_DEVICES
-# below is ROCm's variable and the Vulkan backend ignores it. The run would land
-# on Vulkan device 0 -- the 16 GB 9060 XT on this host -- while the row's
-# fingerprint names whichever card probe.sh was asked about. That is a row that
-# lies about which GPU produced it, which is the one thing this ledger must
-# never contain. Vulkan needs GGML_VK_VISIBLE_DEVICES and a uid -> Vulkan-index
-# mapping; neither exists yet. See the OPEN note in configs/canary.yaml.
-if [[ -e "$PERF_LAB_BIN/libggml-vulkan.so" ]]; then
-  echo "bench.sh: $PERF_LAB_BIN is a Vulkan build, which this script cannot pin" >&2
-  echo "bench.sh: to a specific GPU. Refusing rather than measuring an unknown" >&2
-  echo "bench.sh: card. See the OPEN note in configs/canary.yaml." >&2
-  exit 3
-fi
+# Which backend this build ships decides how the target GPU gets pinned, and
+# the two variables are not interchangeable: ROCR_VISIBLE_DEVICES indexes
+# ROCm's enumeration and GGML_VK_VISIBLE_DEVICES indexes Vulkan's, which is a
+# third ordering agreeing with neither rocm-smi nor DRM. Setting the wrong one
+# is silent -- the backend ignores it, falls back to device 0 (the 16 GB card
+# here), and the row's fingerprint still names whichever GPU probe.sh was asked
+# about. That is a row lying about which card produced it.
+if [[ -e "$PERF_LAB_BIN/libggml-vulkan.so" ]]; then BACKEND=vulkan; else BACKEND=rocm; fi
 
 # --- guard: refuse to measure a GPU somebody else is using -------------------
 PCI="$("$HERE/probe.sh" --gpu-uid "$PERF_LAB_GPU_UID" | python3 -c 'import json,sys;print(json.load(sys.stdin)["gpu"]["pci"])')"
@@ -75,13 +70,22 @@ if (( USED_MIB > GUARD_MIB )); then
 fi
 
 # --- run ---------------------------------------------------------------------
-IDX="$("$HERE/probe.sh" --gpu-uid "$PERF_LAB_GPU_UID" --emit-index)"
+# Resolve the target to whatever index its backend uses. Never a literal: see
+# vulkan_index.py for why three enumerations of two cards is not a joke.
+if [[ "$BACKEND" == vulkan ]]; then
+  GFX="$("$HERE/probe.sh" --gpu-uid "$PERF_LAB_GPU_UID" \
+         | python3 -c 'import json,sys;print(json.load(sys.stdin)["gpu"]["gfx"])')"
+  PIN=(GGML_VK_VISIBLE_DEVICES="$(python3 "$HERE/vulkan_index.py" \
+                                   --bin "$PERF_LAB_BIN" --gfx "$GFX")")
+else
+  PIN=(ROCR_VISIBLE_DEVICES="$("$HERE/probe.sh" --gpu-uid "$PERF_LAB_GPU_UID" --emit-index)")
+fi
 N="${REPS:-$(python3 -c "import yaml,sys;print(yaml.safe_load(open('$CFG'))['defaults'].get('reps',1))")}"
 
 for (( rep=1; rep<=N; rep++ )); do
   RAW="$(mktemp)"
   # fresh process per rep — see header
-  if ! ROCR_VISIBLE_DEVICES="$IDX" LD_LIBRARY_PATH="$PERF_LAB_BIN" \
+  if ! env "${PIN[@]}" LD_LIBRARY_PATH="$PERF_LAB_BIN" \
        python3 "$HERE/emit_row.py" --config "$CFG" --key "$KEY" --kind "$KIND" \
          --rep "$rep" --tag "$TAG" --gpu-uid "$PERF_LAB_GPU_UID" \
          --model "$PERF_LAB_MODEL" --bin "$PERF_LAB_BIN" --run > "$RAW"; then

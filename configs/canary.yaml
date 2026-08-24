@@ -60,6 +60,11 @@
 # Model path comes from $PERF_LAB_MODEL — never committed, this repo is public.
 
 defaults:
+  # The bands below were measured on the ROCm prebuilt, so check.py evaluates
+  # only ROCm rows against them. A Vulkan row in the same ledger is a different
+  # population, not a noisy sample of this one: fast-q4 measures ~894 there
+  # against ~717 here, which would read as a 25% breach and mean nothing.
+  backend: rocm
   n_gen: 64
   threads: 8
   ngl: 99

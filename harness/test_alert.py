@@ -24,9 +24,13 @@ NO_MARKER = SCRATCH / "absent-push-failed"
 NOW = "2026-08-16T08:00:00Z"
 
 
-def row(tag, key, pp, ts, rep=1, kind="nightly"):
+def row(tag, key, pp, ts, rep=1, kind="nightly", backend="rocm"):
+    # The fingerprint is not decoration here. check.py scores only rows whose
+    # backend matches the band's, so a fixture without one is silently dropped
+    # and every case in this file passes by measuring nothing.
     return {"ts": ts, "run_id": f"r-{abs(hash((tag, key, rep))):08x}"[:10],
             "kind": kind, "tag": tag, "key": key,
+            "fp": {"build": {"backend": backend}},
             "m": {"pp2048": pp, "rep": rep, "cold_prefill": True}}
 
 
