@@ -608,3 +608,64 @@ the three warm reps land at 894–902 with the rest. It is left in the ledger ra
 removed. Decode sat at ~19.6 t/s on every config here, which does not match the 17.36
 that `PROVENANCE.txt` reports for this build at `tg64`; the difference is unexplained and
 these canaries are calibrated on prefill, not decode.
+
+## 2026-09-09: b10883 is 4-5% faster at prefill, and q4_0 V costs nothing measurable
+
+Two questions, one session: has upstream improved in the 411 builds since b10472, and
+is `q8_0`/`q4_0` KV really as good as `q8_0`/`q8_0`.
+
+**Prefill: yes, 4-5%.** b10883 (91f6a6cf3, the official Vulkan prebuilt, downloaded the
+day it was published) against b10472, Qwen3.8-27B-Q6_K on the R9700, `-p 2048`, 3 reps,
+medians:
+
+| KV | b10472 | b10883 | delta |
+|---|---|---|---|
+| `q8_0`/`q8_0` | 879.89 | 915.47 | **+4.0%** |
+| `q8_0`/`q4_0` | 874.36 | 921.40 | **+5.4%** |
+
+Both were measured back to back with an ollama embedding server resident on the card
+(~750 MiB), which could not be evicted without root. The contention is controlled for
+rather than ignored: b10472 measured 904.27 / 900.28 on a clean card earlier the same
+day, so the occupant costs 2.7–2.9% — and **b10883 contended still beats b10472 clean**,
+which puts the win outside the noise the occupant introduces.
+
+**Decode: not resolved, do not quote it.** `tg64` moved 18.45 → 18.71 and 17.72 → 23.90,
+but decode scattered from 13.5 to 24.77 t/s *within* a single build on this same day.
+Three reps cannot separate a real change from that spread.
+
+**Quality: same outcomes, different text.** `harness/kv_quality.py`, ctx 32768, both KV
+configs, speculation off, temperature 0:
+
+| | `q8_0`/`q8_0` | `q8_0`/`q4_0` |
+|---|---|---|
+| needle recall (9 probes, 4k/18k/31k tokens × 10/50/90% depth) | 9/9 | 9/9 |
+| code tasks passing their asserts (6 tasks, executed) | 6/6 | 6/6 |
+| outputs byte-identical between the two configs | — | **2/6** |
+
+So the honest answer to "is `q8_0`/`q4_0` exactly the same" is **no, and it does not
+matter here.** Four of six code generations differ in wording — the first divergence on
+`roman` is "converts integers from 1 to 3999 **into** Roman numerals" against "**to**
+Roman numerals", 81 characters in. That is the KV arithmetic changing, exactly as
+`quality.py` predicted it would; strict token identity was never going to hold. Every
+divergent generation still passed every assert, and no recall probe disagreed.
+
+**Two caveats on the recall numbers.** The needle counts as found if it appears anywhere
+in the output, including inside the `<think>` block — and on the deepest probe (31k
+tokens, 90% depth) *both* configs retrieved the passphrase and then declined to repeat
+it, so both score a hit on a visible refusal. That is model behaviour, identical across
+configs, not a KV effect. And an earlier pass at ctx 65536 scored two false MISSes purely
+because the answer budget was 32 tokens and the reasoning block ran past it; the probe
+now allows 384, which is why that pass was discarded rather than reported.
+
+**`q8_0`/`q8_0` has no room to be the serving config.** At ctx 65536 it filled the card
+to 32,375 MiB of 32,768 (98.8%) and prefill collapsed from ~280 to 88 t/s under the
+memory pressure — not thermal, the card was at 65 °C and full boost clock. The
+comparison above runs at 32768 because that is where both configs have headroom. At the
+262144 the shipped config actually serves, `q8_0`/`q8_0` does not fit at all: `q8_0`/
+`q4_0` was already 33.6 GB of 34.2 there. The choice of `q4_0` for V is not a quality
+compromise being tolerated, it is the only one of the two that runs.
+
+**Not measured, and it is what adoption needs:** prefill at depth. The 2048-token canary
+is silent about 16k or 32k depth, which is the axis on which b10472 beat b10082 and the
+axis a serving build is chosen on. b10883 is installed at `~/llama.cpp/b10883-vulkan`
+and **not adopted**; `~/.mimir/bin/llama-server` still points at b10472.
