@@ -791,16 +791,30 @@ i.e. the same hybrid SSM+attention family as Qwen3.8-27B, MTP head included.
 | Q8_0 | 9.10 | **3706.25 ± 5.48** | 61.15 ± 0.03 | **3043.25 ± 9.46** | 57.08 ± 0.18 | no |
 | BF16 | 17.13 | 2267.37 ± 18.34 | 35.14 ± 0.11 | 2027.51 ± 10.30 | 33.63 ± 0.20 | n/a |
 
-**Q6_K is anomalous on this card and should not be trusted from this run.** Two results
-run backwards: its `tg64` (59.13) is *below* Q8_0's (61.15) despite carrying 23% fewer
-bytes, and its `tg64 @ d16384` (68.35) is *above* its own `tg64 @ d0` (59.13), where
-depth should only cost decode. A re-check at 5 reps is pending. If it holds, the reading
-is that the Vulkan Q6_K dequant kernel — not memory bandwidth — is the limit here, which
-would matter for the 27B, since the 27B ships Q6_K.
+**The Q6_K `tg64 @ d0` figure of 59.13 above is an artifact — disregard it.** It read
+*below* Q8_0 (61.15) on 23% fewer bytes, and below its own `tg64 @ d16384` (68.35), both
+backwards. Re-measured decode-only (`-p 0 -n 64 -d 0,16384 -r 5`):
 
-**Q4_K_M is the clear operating point for this model**: fastest decode by 47% over Q8_0,
-and the only quant here whose depth behaviour is orderly. Q8_0 wins prefill, which is
-consistent with it having the simplest unpack path.
+| quant | tg64 | tg64 @ d16384 |
+|---|---|---|
+| Q6_K | **74.18 ± 0.11** | 68.17 ± 0.22 |
+| Q8_0 | 61.22 ± 0.06 | 57.54 ± 0.11 |
+
+74.18, not 59.13, and the tight ±0.11 on five reps says the re-check is the sound
+reading. Q6_K@d16384 reproduced (68.17 against 68.35), so **only the `tg64 @ d0` cell
+was wrong.** The difference between the runs is that the first interleaved `-p 2048`
+prefill passes and the re-check did not; the artifact appeared on the second model in
+that sequence. Cause not established — suspect clock or warm-up state carried over from
+the preceding prefill run. **Do not interleave prefill and decode tests when the decode
+number matters.**
+
+**The "slow Vulkan Q6_K kernel" reading is refuted**, and with it the worry about the
+27B shipping Q6_K. Corrected Ornith decode is monotonic in file size, as it should be:
+Q4_K_M 90.02 > Q6_K 74.18 > Q8_0 61.22 > BF16 35.14.
+
+**Q4_K_M is still the fastest operating point for this model** — 21% over Q6_K on decode
+at a third less size — but the margin over Q6_K is far narrower than the first pass
+implied. Q8_0 wins prefill, consistent with having the simplest unpack path.
 
 **MiniCPM5-2B** — plain `llama` arch, 42 blocks, ctx 131072, **no MTP**, and **no
 importance matrix on any of the three files, Q4_K_M included.**
