@@ -657,15 +657,171 @@ configs, not a KV effect. And an earlier pass at ctx 65536 scored two false MISS
 because the answer budget was 32 tokens and the reasoning block ran past it; the probe
 now allows 384, which is why that pass was discarded rather than reported.
 
-**`q8_0`/`q8_0` has no room to be the serving config.** At ctx 65536 it filled the card
-to 32,375 MiB of 32,768 (98.8%) and prefill collapsed from ~280 to 88 t/s under the
-memory pressure — not thermal, the card was at 65 °C and full boost clock. The
-comparison above runs at 32768 because that is where both configs have headroom. At the
-262144 the shipped config actually serves, `q8_0`/`q8_0` does not fit at all: `q8_0`/
-`q4_0` was already 33.6 GB of 34.2 there. The choice of `q4_0` for V is not a quality
-compromise being tolerated, it is the only one of the two that runs.
+**RETRACTED 2026-09-09: `q8_0`/`q8_0` at ctx 65536 does not fill the card.** This
+paragraph previously claimed it reached "32,375 MiB of 32,768 (98.8%)" with prefill
+collapsing from ~280 to 88 t/s under memory pressure. That is wrong by about 9 GB.
+Re-measured on b10472, ctx 65536, `-fa on`, pinned with `GGML_VK_VISIBLE_DEVICES=1`,
+model loaded and idle:
 
-**Not measured, and it is what adoption needs:** prefill at depth. The 2048-token canary
-is silent about 16k or 32k depth, which is the axis on which b10472 beat b10082 and the
-axis a serving build is chosen on. b10883 is installed at `~/llama.cpp/b10883-vulkan`
-and **not adopted**; `~/.mimir/bin/llama-server` still points at b10472.
+| K/V | VRAM used | of 34.2 GB |
+|---|---|---|
+| `q8_0`/`q8_0` | 24.45 GB (23,320 MiB) | **71.5%** |
+| `q8_0`/`q4_0` | 24.12 GB (23,004 MiB) | 70.5% |
+
+Raising V from `q4_0` to `q8_0` costs **316 MiB** at this context. There is 9.76 GB of
+headroom, not 400 MiB, and a 316 MiB delta cannot produce a 3x prefill collapse — so
+whatever caused that slowdown was not V-cache memory pressure. Both servers reported
+`n_slots = 4, n_ctx_slot = 65536, kv_unified = 'true'`, so the context is shared across
+slots rather than multiplied, which is not the explanation either.
+
+Two notes on why the original number was wrong. It quoted the card as 32,768 MiB when
+`rocm-smi` reports the R9700 at 32,624 MiB, so it was not read off this card's real
+total. And `harness/emit_row.py:325` builds the server environment as `os.environ` plus
+`LD_LIBRARY_PATH` only — it never sets `GGML_VK_VISIBLE_DEVICES`, so that observation was
+taken unpinned, which is exactly the enumeration hazard this repo's trap list warns
+about. Unpinned enumeration is a **hypothesis, not a confirmed cause.**
+
+Nothing on disk could have caught this: the ledger records only `env.vram_used_mib_before`
+and `results/kv-quality-32768-20260909.json` records no VRAM at all. The figure was a live
+observation typed into prose. **The 262144 VRAM figures above are a separate measurement**
+(with `mmproj` loaded and speculation on) and are not retracted here.
+
+Consequently the `kv_quality.py` comparison's restriction to ctx 32768 had no measured
+basis, and `q8_0`/`q8_0` is not ruled out as a serving config on VRAM grounds at 65536.
+Whether it fits at 262144 is a separate question and is measured below.
+
+## 2026-09-09: prefill at depth — b10883 does not earn adoption
+
+The gap named above. Both builds, idle pinned card, `llama-bench -p 2048 -n 64
+-d 0,16384 -fa on -ngl 99 -t 8 -r 3`:
+
+| test | b10883 (`91f6a6cf3`) | b10472 (`60eeeb608`) | winner |
+|---|---|---|---|
+| pp2048 @ d0 | 861.05 ± 30.99 | **899.33 ± 1.16** | b10472 +4.4% |
+| pp2048 @ d16384 | **800.17 ± 0.27** | 772.90 ± 3.23 | b10883 +3.5% |
+| tg64 @ d0 | 18.86 ± 0.31 | **19.71 ± 0.00** | b10472 +4.5% |
+| tg64 @ d16384 | 18.88 ± 0.03 | **19.03 ± 0.03** | b10472 +0.8% |
+
+b10883 wins one of four, by 3.5%, and loses the other three. **Not adopted**;
+`~/.mimir/bin/llama-server` still points at b10472.
+
+Two limits on this table. The depth-0 prefill spread on b10883 is ±30.99 against
+b10472's ±1.16, so that 4.4% loss sits inside b10883's own noise and should not be
+quoted as a result. More importantly `llama-bench` used its **default f16 KV cache**,
+not the `q8_0`/`q4_0` that actually ships — so this compares builds, not the operating
+point. The earlier "+4.0% / +5.4% prefill" canary figures were taken at depth 0 on
+quantized KV; at f16 depth 0 the sign flips. Those results are not in conflict, they
+are different cache types. **The depth comparison at `q8_0`/`q4_0` remains unmeasured.**
+
+## 2026-09-09: MTP is real at Q6_K, and it costs 3.3 GB of context, not a head file
+
+Question asked: is Qwen3.8-27B-Q6_K actually using multi-token prediction, or does it
+need a separate 1-2 GB MTP head alongside it? Answer: it is using it, the head is
+already inside the Q6_K file, and it is tiny — but **enabling MTP is not free**, for a
+reason unrelated to the head.
+
+**The head ships in the model file.** `qwen35.nextn_predict_layers = 1`, and the
+tensors are present at block 64:
+
+| tensor | dims | type | bytes |
+|---|---|---|---|
+| `blk.64.nextn.eh_proj.weight` | 10240 x 5120 | Q8_0 | 55,705,600 |
+| `blk.64.nextn.enorm.weight` | 5120 | F32 | 20,480 |
+| `blk.64.nextn.hnorm.weight` | 5120 | F32 | 20,480 |
+| `blk.64.nextn.shared_head_norm.weight` | 5120 | F32 | 20,480 |
+
+**53.2 MiB total**, and `shared_head_norm` means it reuses the output head rather than
+carrying a copy. There is no separate MTP file to fetch and none is wanted.
+
+**It is genuinely engaged.** b10472, ctx 262144, `q8_0`/`q4_0`, `-fa on`, pinned card.
+With `--spec-type draft-mtp --spec-draft-n-max 4` the server logs
+`common_speculative_init_result: creating MTP draft context against the target model`
+naming the Q6_K file itself — no draft model — and reports draft acceptance
+**0.625 (182/291, mean len 3.49)** and **0.665 (185/278, mean len 3.64)**. Run with
+speculation off, the same build logs `model has unused tensor blk.64.nextn.eh_proj.weight
+(size = 55705600 bytes) -- ignoring`. That pair is the proof: the tensors are in the
+file, and they are loaded only when the MTP draft type is asked for.
+
+**What it buys, measured on the same prompt, `n_predict` 256, temperature 0:**
+
+| config | decode t/s (2 reps) | VRAM | headroom |
+|---|---|---|---|
+| `--spec-type draft-mtp --spec-draft-n-max 4` | **48.87 / 52.18** | 33.56 GB (98.1%) | 0.65 GB |
+| speculation off | 24.08 / 23.09 | 30.30 GB (88.6%) | 3.91 GB |
+
+**MTP roughly doubles decode — 2.1x** — and that is the whole reason the served config
+is worth its VRAM.
+
+**The cost is the draft context, not the weights.** Turning MTP on moved VRAM by
+**3.26 GB** while the head weights are 53 MiB. The difference is the second KV/compute
+context llama.cpp allocates for the draft pass at ctx 262144. So the instinct that MTP
+costs "an extra 1-2 GB" was directionally right and wrong about the mechanism: nothing
+extra to download, ~3.3 GB extra to run at full context.
+
+**Full context still fits at `q8_0`/`q4_0`, and the speeds still hold.** 33.56 GB of
+34.21 GB at 262144 with speculation on, matching the 33.6 GB recorded earlier — the
+262144 figures in this file are confirmed, not retracted. Decode 48.87-52.29 t/s sits
+inside the previously recorded 44.25-53.25 t/s range, and acceptance 0.625-0.665 inside
+the recorded 0.503-0.719. **Nothing has drifted.** Headroom is 0.65 GB, so this config
+still has no room for a second process on the card.
+
+**The vision projector is not resident at load.** Adding `--mmproj mmproj-F16.gguf`
+measured 33.556 GB against 33.562 GB without it — a 6 MB *decrease*, i.e. no change.
+`mmproj-F16.gguf` is a CLIP vision encoder (`general.architecture = 'clip'`,
+`clip.projector_type = 'qwen3vl_merger'`, 461M params, 927 MB on disk) and has nothing
+to do with MTP. The "~0.9 GB projector cost" recorded earlier is **not paid at load
+time**; whether it allocates when an image is actually processed was not tested here.
+
+Not measurable from this run: the `/completion` prefill figures (45-81 t/s) were taken
+on a ~20-token prompt, where the number is dominated by request overhead. Prefill
+belongs to `llama-bench`, and those figures are in the depth table above.
+
+## 2026-09-09: Ornith-1.5-9B and MiniCPM5-2B, every quant on hand
+
+b10472 Vulkan, R9700 pinned, `llama-bench -p 2048 -n 64 -d 0,16384 -fa on -ngl 99
+-t 8 -r 3`. Both families live on `/mnt/8724062a…/models/`.
+
+**Ornith-1.5-9B** — `qwen35` arch, 33 blocks, ctx 262144, `nextn_predict_layers = 1`,
+i.e. the same hybrid SSM+attention family as Qwen3.8-27B, MTP head included.
+
+| quant | GiB | pp2048 | tg64 | pp2048 @ d16384 | tg64 @ d16384 | imatrix |
+|---|---|---|---|---|---|---|
+| Q4_K_M | 5.37 | 3523.97 ± 1.13 | **90.02 ± 0.35** | 2910.78 ± 14.94 | **81.35 ± 0.26** | yes |
+| Q6_K | 7.03 | 3081.93 ± 1.65 | 59.13 ± 0.06 | 2596.84 ± 8.54 | 68.35 ± 0.15 | yes |
+| Q8_0 | 9.10 | **3706.25 ± 5.48** | 61.15 ± 0.03 | **3043.25 ± 9.46** | 57.08 ± 0.18 | no |
+| BF16 | 17.13 | 2267.37 ± 18.34 | 35.14 ± 0.11 | 2027.51 ± 10.30 | 33.63 ± 0.20 | n/a |
+
+**Q6_K is anomalous on this card and should not be trusted from this run.** Two results
+run backwards: its `tg64` (59.13) is *below* Q8_0's (61.15) despite carrying 23% fewer
+bytes, and its `tg64 @ d16384` (68.35) is *above* its own `tg64 @ d0` (59.13), where
+depth should only cost decode. A re-check at 5 reps is pending. If it holds, the reading
+is that the Vulkan Q6_K dequant kernel — not memory bandwidth — is the limit here, which
+would matter for the 27B, since the 27B ships Q6_K.
+
+**Q4_K_M is the clear operating point for this model**: fastest decode by 47% over Q8_0,
+and the only quant here whose depth behaviour is orderly. Q8_0 wins prefill, which is
+consistent with it having the simplest unpack path.
+
+**MiniCPM5-2B** — plain `llama` arch, 42 blocks, ctx 131072, **no MTP**, and **no
+importance matrix on any of the three files, Q4_K_M included.**
+
+| quant | GiB | pp2048 | tg64 | pp2048 @ d16384 | tg64 @ d16384 |
+|---|---|---|---|---|---|
+| Q4_K_M | 1.45 | 11187.76 ± 142.29 | **236.25 ± 0.02** | 3905.69 ± 2.71 | **163.59 ± 4.95** |
+| Q8_0 | 2.49 | 11315.93 ± 100.04 | 169.36 ± 0.73 | 3971.14 ± 9.80 | 140.55 ± 0.80 |
+| F16 | 4.69 | 11047.87 ± 22.12 | 109.27 ± 1.01 | 3978.83 ± 8.11 | 97.18 ± 0.28 |
+
+This family behaves textbook, and is the control that makes the Ornith Q6_K reading
+suspicious. Decode falls monotonically with file size (236 → 169 → 109 t/s) while
+prefill is flat within 2.4% across all three (≈11,000 t/s) — decode is bandwidth-bound,
+prefill is compute-bound, exactly as expected. Prefill drops ~65% from d0 to d16384
+(11,188 → 3,906) on all three alike, which is attention cost, not a quant effect.
+
+Bytes-per-second is not constant, though: 343 / 422 / 512 GiB·t/s across Q4_K_M / Q8_0 /
+F16. The simpler the unpack, the more of the bandwidth actually gets used, so a 4-bit
+quant does not convert its full byte saving into decode.
+
+**No quality measurement was taken on either family** — these are speed and footprint
+only. Which of these to finetune from is a separate question and not answerable from
+this table: neither family's quants are finetuning inputs, and this llama.cpp build
+ships no finetune or LoRA tooling at all.

@@ -18,6 +18,20 @@ import time
 HERE = pathlib.Path(__file__).resolve().parent
 
 
+def _bin_env(bindir: pathlib.Path):
+    """Environment for every llama.cpp subprocess: the build's own libs, pinned card.
+
+    Without GGML_VK_VISIBLE_DEVICES the Vulkan backend enumerates every device,
+    so which card a run lands on is not reproducible. An unpinned server is the
+    leading suspect for the "q8_0/q8_0 fills the card at ctx 65536" measurement
+    retracted in FINDINGS on 2026-09-09. Caller can still override by exporting
+    it; setdefault does not stomp a deliberate choice.
+    """
+    env = dict(os.environ, LD_LIBRARY_PATH=str(bindir))
+    env.setdefault("GGML_VK_VISIBLE_DEVICES", "1")
+    return env
+
+
 def sha256_cached(path: pathlib.Path):
     """Hash a multi-GB model once, keyed on (size, mtime). Re-hashing per run costs minutes."""
     cache = HERE.parent / ".scratch" / "model-sha.json"
@@ -80,7 +94,7 @@ def build_identity(bindir: pathlib.Path, tool: str):
         digest.update(sha256_cached(real).encode())
 
     toolchain = None
-    env = dict(os.environ, LD_LIBRARY_PATH=str(bindir))
+    env = _bin_env(bindir)
     for exe in (tool, "llama-cli", "llama-bench"):
         path = bindir / exe
         if not path.exists():
@@ -125,7 +139,7 @@ def llamacpp_sha(bindir: pathlib.Path):
     llama-bench --version prints only backend-init noise and no version line, so ask
     llama-server. Both binaries come from the same build directory.
     """
-    env = dict(os.environ, LD_LIBRARY_PATH=str(bindir))
+    env = _bin_env(bindir)
     for exe in ("llama-server", "llama-cli", "llama-bench"):
         path = bindir / exe
         if not path.exists():
@@ -250,7 +264,7 @@ def run_bench(bindir, model, c, defaults):
            "-p", str(c["prompt_tokens"]), "-n", str(defaults["n_gen"]),
            "-fa", str(defaults["fa"]), "-r", "1",
            "-ngl", str(defaults["ngl"]), "-t", str(defaults["threads"])]
-    env = dict(os.environ, LD_LIBRARY_PATH=str(bindir))
+    env = _bin_env(bindir)
     r = subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=1800)
     if r.returncode != 0:
         sys.exit(f"emit_row: llama-bench exit {r.returncode}\n{r.stderr[-800:]}")
@@ -322,7 +336,7 @@ def start_server(bindir, model, c, defaults):
         if c.get("n_max"):
             cmd += ["--spec-draft-n-max", str(c["n_max"])]
 
-    env = dict(os.environ, LD_LIBRARY_PATH=str(bindir))
+    env = _bin_env(bindir)
     log = tempfile.NamedTemporaryFile("w+", suffix=".log", delete=False)
     proc = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT, env=env)
 
