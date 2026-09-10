@@ -142,25 +142,38 @@ MATH_TASKS = [
 NUM = re.compile(r"-?\d[\d,]*(?:\.\d+)?")
 
 
-def run_math(port, log, budget):
+def run_math(port, log, budget, only=None):
     out = []
     for name, prompt, want in MATH_TASKS:
+        if only and name not in only:
+            continue
         r = emit_row.complete(port, prompt, budget)
         said = strip_think(r.get("content") or "")
+        truncated = r.get("stop_type") == "limit"
         nums = [n.replace(",", "") for n in NUM.findall(said)]
-        # last number in the post-reasoning text: models restate the answer
+        # Last number, because a finished answer ends on its result. This is
+        # only sound if the answer FINISHED: these models lead with
+        # "**Answer:** 408", then work through it and correct themselves, so a
+        # response cut mid-explanation ends on an intermediate value. On
+        # 2026-09-10 that scored MiniCPM-Q8 0/8 when it had in fact computed
+        # the first answer correctly -- a scorer artifact, not a model failure.
+        # A cut-off answer is unscoreable, so record it as such rather than
+        # counting it wrong.
         got = None
         if nums:
             try:
                 got = float(nums[-1])
             except ValueError:
                 got = None
-        ok = got is not None and abs(got - want) < 1e-6
+        if truncated:
+            ok = None
+            verdict = "TRUNC"
+        else:
+            ok = got is not None and abs(got - want) < 1e-6
+            verdict = "PASS" if ok else "FAIL"
         out.append({"task": name, "want": want, "got": got, "passes": ok,
-                    "said": said[:200],
-                    "truncated": r.get("stop_type") == "limit"})
-        log(f"    math     {name:<10} {'PASS' if ok else 'FAIL'}"
-            f"  want={want} got={got}")
+                    "said": said[:300], "truncated": truncated})
+        log(f"    math     {name:<10} {verdict:<5} want={want} got={got}")
     return out
 
 
@@ -346,6 +359,17 @@ def main():
                     help="n_predict; reasoning models need room before the answer")
     ap.add_argument("--suites", default="code,math,instruct,extract,recall")
     ap.add_argument("--out", default="")
+    # Loading a model inside a supervised task gets that task killed on this box
+    # while page cache fills, even with tens of GB free. Start the server as a
+    # systemd --user unit and point this at its port; the client is cheap and
+    # restartable, and the model stays warm if the client dies.
+    # Long client runs get killed too while a model is resident, so the suite
+    # has to be splittable into short calls. Names come from MATH_TASKS.
+    ap.add_argument("--tasks", default="",
+                    help="comma-separated math task names to run; empty = all")
+    ap.add_argument("--port", type=int, default=None,
+                    help="drive an already-running llama-server instead of "
+                         "starting one")
     a = ap.parse_args()
 
     import os
@@ -356,17 +380,22 @@ def main():
     def log(m):
         print(m, file=sys.stderr, flush=True)
 
-    cfg = {"ctx": a.ctx, "ctk": "q8_0", "ctv": "q4_0",
-           "spec": None, "n_max": None}
-    defaults = {"fa": "on", "ngl": 99, "threads": 8}
-    log(f"  starting llama-server  {model.name}  ctx={a.ctx}")
-    proc, port, stop = emit_row.start_server(bindir, model, cfg, defaults)
+    if a.port is not None:
+        log(f"  using running llama-server on port {a.port}  ({model.name})")
+        port, stop = a.port, lambda: None
+    else:
+        cfg = {"ctx": a.ctx, "ctk": "q8_0", "ctv": "q4_0",
+               "spec": None, "n_max": None}
+        defaults = {"fa": "on", "ngl": 99, "threads": 8}
+        log(f"  starting llama-server  {model.name}  ctx={a.ctx}")
+        proc, port, stop = emit_row.start_server(bindir, model, cfg, defaults)
     results = {}
     try:
         if "code" in suites:
             results["code"] = run_code(port, log, a.budget)
         if "math" in suites:
-            results["math"] = run_math(port, log, a.budget)
+            only = {t.strip() for t in a.tasks.split(",") if t.strip()}
+            results["math"] = run_math(port, log, a.budget, only or None)
         if "instruct" in suites:
             results["instruct"] = run_instruct(port, log, a.budget)
         if "extract" in suites:

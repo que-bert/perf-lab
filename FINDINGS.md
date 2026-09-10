@@ -919,3 +919,90 @@ nohup` did **not** escape it. What works:
 Copying the model with plain `cp` is itself enough to trigger the kill (it died
 at 12.9 of 22.9 GB). Use a copier that `fdatasync`es and `posix_fadvise`s
 `DONTNEED` over each written range; that sustained 427 MB/s with cache flat.
+
+## 2026-09-10: `--spec-draft-n-max` — 4 is not the optimum on this prompt
+
+b10472, ctx 262144, `q8_0`/`q4_0`, MTP on, one prompt, `n_predict` 256,
+temperature 0, 3 reps per setting, each a fresh systemd unit on an idle card.
+
+| n-max | decode t/s (3 reps) | draft acceptance | VRAM |
+|---|---|---|---|
+| off | 24.44 / 24.39 / 24.36 | — | — |
+| 2 | **45.24 / 45.11 / 45.22** | **0.710** | 33.30 GB |
+| **3** | **45.45 / 45.46 / 45.44** | 0.593 | 33.60 GB |
+| 4 (served) | 40.63 / 41.90 / 42.32 | 0.440–0.469 | 33.51 GB |
+| 5 | 34.17 / 35.65 / 38.65 | 0.367–0.423 | 33.81 GB |
+| 7 | 13.63 / 31.05 / 14.34 | 0.299–0.865 | 33.77 GB |
+
+**n-max 3 beats the served setting of 4 by ~9%** (45.45 vs ~41.6) with far
+tighter reps (±0.01 against ±0.85). Acceptance falls monotonically with depth —
+0.71, 0.59, 0.45, 0.37, 0.30 — so deeper drafts are simply rejected and their
+verification is wasted. n-max 7 is unusable: three identical reps spanned
+13.63–31.05 t/s, and its acceptance swung 0.299–0.865.
+
+**This contradicts the 2026-08 sweep in this file, which found 4 optimal at
+52.46 t/s.** Different prompt, and acceptance depends on generated content, so
+neither run is wrong — which is the point: **n-max is workload-dependent and
+must be swept on real traffic, not chosen once.** Do not change the served
+config on this table alone. It also makes upstream advice to push n-max to 7–12
+for adaptive MTP look poorly matched to this model.
+
+Speculation off costs more than half the decode rate (24.4 vs 45.4), consistent
+with the 2.1x recorded 2026-09-09.
+
+## 2026-09-10: mmproj works at full context and costs ~nothing at inference
+
+ctx 262144, `q8_0`/`q4_0`, MTP on, `--mmproj mmproj-F16.gguf`, clean R9700:
+
+| stage | VRAM | headroom |
+|---|---|---|
+| after load | 33.51 GB (98.0%) | 0.70 GB |
+| after describing a 1024x1024 PNG | 33.51 GB (98.0%) | 0.69 GB |
+
+**Image processing moved VRAM by +6 MB.** The projector is not a deferred
+allocation waiting to exhaust the 0.7 GB of headroom — it is not paid at load
+and not paid at inference. The server survived, and the description was exact:
+*"Top-left: red; top-right: blue; bottom-left: yellow; bottom-right: green. A
+horizontal black bar runs across the middle."* — 5/5 on a synthetic image.
+
+Removing the ollama server first was unnecessary: it occupies **GPU[0]**
+(~3.0 GB), not the R9700, which sat at 744 MB before load. The traps entry
+saying ollama squats on the R9700 did not hold on this date.
+
+**No YaRN.** The GGUF declares `qwen35.context_length = 262144` and
+`rope.freq_base = 10000000.0` with **no `rope.scaling.*` keys**, and llama.cpp
+logs no rope-scaling line at load. 262144 is the native trained window, so there
+is no short-context quality penalty being paid for the long one and no reason to
+split short/long serving instances.
+
+## 2026-09-10: what Ornith-1.5-9B and MiniCPM5-2B are good at
+
+`harness/model_eval.py`, ctx 65536, speculation off, temperature 0, budget 768.
+Scored programmatically: code is EXECUTED against asserts, formats are parsed.
+
+| suite | ornith-q6k | ornith-q4km | minicpm-q8 | minicpm-q4km |
+|---|---|---|---|---|
+| extract (5 facts, distractor-laden passage) | **5/5** | **5/5** | **5/5** | **5/5** |
+| recall (needle at 8k/35k/59k tokens) | **3/3** | **3/3** | **3/3** | **3/3** |
+| code (executed) | 2/6 | 1/6 | 4/6 | 2/6 |
+| instruct (strict format) | 2/6 | 3/6 | 1/6 | 1/6 |
+
+**Both are good at reading, not at obeying.** Extraction is perfect across all
+four files, including near-miss distractors, and long-context recall is perfect
+to ~59k tokens even on the 2.6B. Strict output-format compliance is where both
+fail — "exactly three lines", "exactly five words", ALL-CAPS — which is the
+risk if either is scripted against. MiniCPM Q8_0 is the better coder here (4/6),
+and notably beats Ornith Q6_K despite being a third the size.
+
+**Math is NOT measured, and the reason is a finding.** Ornith-1.5-9B does not
+terminate on simple arithmetic: at `n_predict` 8192 it was still generating on
+`crates` (17x24-38), `trip` and `discount`, producing no final answer. At 2048
+its truncated text happened to end on the right value on 6 of 8 problems; at
+8192 the same problems ended on 2.0 and 18.0. The reasoning block wanders, so a
+truncated read is unreliable in both directions and none of it is scoreable.
+Practical consequence: **Ornith needs a reasoning-budget cap or a no-think mode
+before it is usable for short-answer work.** Scorer history is in the commit log;
+truncated items now record `passes: None` rather than counting as failures.
+
+Not measured anywhere here: prose quality, helpfulness, tone. Those need a
+judge, and a small model judging small models measures the judge.
