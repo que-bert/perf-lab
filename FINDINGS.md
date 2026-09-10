@@ -839,3 +839,83 @@ quant does not convert its full byte saving into decode.
 only. Which of these to finetune from is a separate question and not answerable from
 this table: neither family's quants are finetuning inputs, and this llama.cpp build
 ships no finetune or LoRA tooling at all.
+
+## 2026-09-10: KV quality at 240k tokens — and a hit the caller never sees
+
+The gap that mattered: every prior recall number was taken at ctx 32768 with
+probes topping out at 31k tokens, against a config that serves at 262144.
+Re-run at the real context. b10472 Vulkan, ctx 262144, speculation off,
+temperature 0, needle at 10/50/90% depth on three haystack sizes.
+`results/kv-quality-262144-20260910.json`.
+
+| measure | `q8_0`/`q8_0` | `q8_0`/`q4_0` |
+|---|---|---|
+| recall, needle anywhere in output | **9/9** | **9/9** |
+| recall, needle in the visible answer | **9/9** | **8/9** |
+| code tasks passing their asserts | 6/6 | 6/6 |
+| outputs byte-identical | — | 4/6 |
+
+Probe sizes were 70,807 / 176,715 / 239,475 prompt tokens — the last is the
+240k-token regime the shipped config actually operates in, measured for the
+first time.
+
+**Retrieval is intact at 240k on both configs.** Nine of nine, no disagreement,
+at every depth. On the evidence here `q8_0`/`q4_0` costs nothing in retrieval
+at eight times the context previously tested.
+
+**But the two configs diverged once, in a way the hit count hides.** At 239,475
+tokens, depth 10%, needle `PUMICE-ORACLE-62`:
+
+- `q8_0`/`q8_0` answered `PUMICE-ORACLE-62`.
+- `q8_0`/`q4_0` retrieved it inside `<think>` — quoting the planted line
+  verbatim — then reasoned that it was *"an injected instruction"* in the
+  middle of the document and refused: *"I don't have access to any…"*.
+
+Both score a hit under "needle appears anywhere", which is why the raw counts
+read 9/9 against 9/9 with zero disagreements. The caller of the second config
+got a refusal. **This is the first measured case where the two KV configs
+differ in user-visible behaviour**, and it is a behaviour difference, not a
+retrieval failure — the passphrase was found both times.
+
+`run_recall` now records `visible_hit` alongside `hit`, and `compare()` reports
+`recall_visible_*`, `recall_visible_disagreements` and
+`recall_retrieved_not_answered`. `compare()` recomputes the field from stored
+text for result files written before it existed, so older runs re-score without
+being re-run. The 2026-09-09 entry above already flagged this exact ambiguity as
+a caveat; it has now changed a result, so it is measured rather than noted.
+
+**What this does NOT establish.** n=1. Whether the refusal is a KV effect, or
+the model landing on either side of an injection judgement it was always close
+to, is not separable from a single probe at temperature 0. Do not quote this as
+"`q4_0` V causes refusals". The reproducible facts are: retrieval held 9/9 at
+240k on both, and one visible-answer divergence occurred at the deepest rung.
+
+Byte-identical output rose to 4/6 here from 2/6 at ctx 32768. Task-dependent,
+n=1 per task, not a trend.
+
+## 2026-09-10: two infrastructure facts that cost most of a session
+
+**`q8_0`/`q8_0` fits at 262144 on Vulkan.** It loaded and served the full probe
+set at 30.18-32.40 GB of 34.21. The earlier claim that it "does not fit at all"
+at 262144 generalised a **ROCm** failure on a 3.1 GB recurrent-state buffer into
+a statement about the card. Retracted.
+
+**A model load cannot live inside a supervised task on this box.** Five runs
+were killed for "low memory" while reading the 22.9 GB model — at the last one,
+`free` reported **25 GB available, 11 GB free, no process above 460 MB RSS**.
+Nothing was starved; the supervisor watches how fast free memory falls as page
+cache fills, and page cache from an mmap'd model is fully reclaimable. `setsid
+nohup` did **not** escape it. What works:
+
+- Stage the model on NVMe (`~/models-fast`, sha256-verified against the source).
+  Load time fell from ~13 minutes to **15 seconds**.
+- Start `llama-server` as a transient `systemd --user` unit
+  (`systemd-run --user --unit=perflab-srv-<port> --collect`). Owned by the user
+  manager, not the task's process tree — which is why the ollama server survived
+  every kill that took ours.
+- Drive it over HTTP: `kv_quality.py --port N` skips spawning a server. If the
+  client is killed the model stays warm and the retry costs seconds.
+
+Copying the model with plain `cp` is itself enough to trigger the kill (it died
+at 12.9 of 22.9 GB). Use a copier that `fdatasync`es and `posix_fadvise`s
+`DONTNEED` over each written range; that sustained 427 MB/s with cache flat.

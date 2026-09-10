@@ -38,6 +38,7 @@ import json
 import pathlib
 import random
 import re
+import urllib.error
 import subprocess
 import sys
 import tempfile
@@ -139,14 +140,38 @@ def run_recall(port, corpus, lengths, depths, log):
             # the harness running out of room, not the model failing to
             # retrieve. A recall probe that cannot tell those apart measures
             # nothing.
-            r = emit_row.complete(port, prompt, 384)
+            # A prompt that overflows n_ctx comes back as HTTP 400, and letting
+            # that propagate throws away every probe already completed -- on
+            # 2026-09-09 it destroyed ~40 minutes of a 262144 run on the seventh
+            # of nine probes. Record the refusal and keep going; a skipped probe
+            # is not a MISS and must not be scored as one.
+            try:
+                r = emit_row.complete(port, prompt, 384)
+            except urllib.error.HTTPError as e:
+                body = e.read(400).decode("utf-8", "replace")
+                out.append({"target_chars": tchars, "depth": depth,
+                            "needle": secret, "skipped": f"HTTP {e.code}",
+                            "detail": body, "hit": None,
+                            "seconds": round(time.time() - t0, 1)})
+                log(f"    recall {'?':>7} tok  depth {depth:>4.0%}  "
+                    f"SKIP  HTTP {e.code} -- prompt likely exceeds n_ctx")
+                continue
             txt = (r.get("content") or "").strip()
             n = r.get("timings", {}).get("prompt_n")
             hit = secret.lower() in txt.lower()
             said = THINK.sub("", txt).strip() or txt
+            # `hit` counts the needle anywhere, reasoning block included, which
+            # is right for "did retrieval work". It is NOT the same question as
+            # "did the user get the answer": on 2026-09-10 at 239,475 tokens
+            # q8_0/q4_0 quoted the passphrase in <think>, decided the planted
+            # line was an injected instruction, and refused in the visible
+            # reply -- scoring a HIT the caller would never have seen. Track
+            # both so a refusal cannot hide inside a hit count.
+            visible = secret.lower() in said.lower()
             out.append({"target_chars": tchars, "prompt_tokens": n,
                         "depth": depth, "needle": secret, "answer": txt[:400],
                         "after_think": said[:120], "hit": hit,
+                        "visible_hit": visible,
                         "truncated": r.get("stop_type") == "limit",
                         "seconds": round(time.time() - t0, 1)})
             log(f"    recall {n or '?':>7} tok  depth {depth:>4.0%}  "
@@ -186,7 +211,22 @@ def exec_check(code, asserts):
         pathlib.Path(path).unlink(missing_ok=True)
 
 
-def measure(bindir, model, ctx, ctk, ctv, corpus, lengths, depths, log):
+def measure(bindir, model, ctx, ctk, ctv, corpus, lengths, depths, log,
+            port=None):
+    """Probe one KV config. With `port`, drive a server someone else started.
+
+    Loading this model pulls 22.9 GB into page cache fast enough that a
+    supervisor watching free memory kills the process doing it, even with 25 GB
+    still available -- that ended four runs on 2026-09-09/10. Detaching the
+    server and pointing this at its port keeps the expensive, fragile part out
+    of the killable job, and leaves it warm if the client does die.
+    """
+    if port is not None:
+        log(f"  using running llama-server on port {port}  "
+            f"(assumed ctk={ctk} ctv={ctv} ctx={ctx})")
+        return {"recall": run_recall(port, corpus, lengths, depths, log),
+                "codegen": run_codegen(port, log)}
+
     cfg = {"ctx": ctx, "ctk": ctk, "ctv": ctv, "spec": None, "n_max": None}
     defaults = {"fa": "on", "ngl": 99, "threads": 8}
     log(f"  starting llama-server  ctk={ctk} ctv={ctv} ctx={ctx}")
@@ -208,7 +248,35 @@ def main():
                     help="haystack sizes in CHARACTERS, not tokens")
     ap.add_argument("--depths", default="0.1,0.5,0.9")
     ap.add_argument("--out", default="")
+    # Each arm is a separate 22.9 GB server load, and on a 30 GB box running both
+    # back to back in one process got the run killed for memory pressure on
+    # 2026-09-09 -- after the first arm had already finished, whose results are
+    # only serialised at the very end and so were lost with it. Running one arm
+    # per invocation lets each result reach disk before the next load starts.
+    ap.add_argument("--kv", default="q8_0/q8_0,q8_0/q4_0",
+                    help="comma-separated K/V pairs to measure, e.g. 'q8_0/q4_0'")
+    ap.add_argument("--merge", default="",
+                    help="comma-separated per-arm JSON files to combine and compare")
+    ap.add_argument("--port", type=int, default=None,
+                    help="drive an already-running llama-server on this port "
+                         "instead of starting one; only valid with a single --kv")
     a = ap.parse_args()
+
+    if a.merge:
+        results = {}
+        for p in a.merge.split(","):
+            results.update(json.loads(pathlib.Path(p).read_text())["results"])
+        first = json.loads(pathlib.Path(a.merge.split(",")[0]).read_text())
+        report = {"bin": first["bin"], "ctx": first["ctx"],
+                  "model": first["model"], "results": results,
+                  "comparison": compare(results)}
+        text = json.dumps(report, indent=2)
+        if a.out:
+            pathlib.Path(a.out).write_text(text)
+            print(f"wrote {a.out}", file=sys.stderr)
+        else:
+            print(text)
+        return
 
     import os
     model = pathlib.Path(a.model or os.environ["PERF_LAB_MODEL"])
@@ -222,15 +290,24 @@ def main():
     def log(m):
         print(m, file=sys.stderr, flush=True)
 
+    keys = [s.strip() for s in a.kv.split(",") if s.strip()]
+    if a.port is not None and len(keys) != 1:
+        sys.exit("--port drives one already-running server, so pass exactly "
+                 f"one --kv pair (got {len(keys)})")
+
     results = {}
-    for ctk, ctv in (("q8_0", "q8_0"), ("q8_0", "q4_0")):
-        key = f"{ctk}/{ctv}"
+    for key in keys:
+        ctk, ctv = key.split("/")
         log(f"=== {key} ===")
         results[key] = measure(bindir, model, a.ctx, ctk, ctv, corpus,
-                               lengths, depths, log)
+                               lengths, depths, log, port=a.port)
 
+    # compare() needs both arms; with one it is meaningless, so omit it rather
+    # than emit a half-populated block that reads like a result.
+    both = {"q8_0/q8_0", "q8_0/q4_0"} <= set(results)
     report = {"bin": str(bindir), "ctx": a.ctx, "model": model.stem,
-              "results": results, "comparison": compare(results)}
+              "results": results,
+              "comparison": compare(results) if both else None}
     text = json.dumps(report, indent=2)
     if a.out:
         pathlib.Path(a.out).write_text(text)
@@ -241,10 +318,25 @@ def main():
 
 def compare(results):
     a, b = results["q8_0/q8_0"], results["q8_0/q4_0"]
+    # A probe either config skipped (prompt over n_ctx) is not scoreable and is
+    # excluded from the counts rather than counted as a MISS -- a skip carries no
+    # information about retrieval. skipped_probes keeps it visible.
+    pairs = list(zip(a["recall"], b["recall"]))
+    skipped = [{"target_chars": x["target_chars"], "depth": x["depth"],
+                "q8q8": x.get("skipped"), "q8q4": y.get("skipped")}
+               for x, y in pairs if x.get("skipped") or y.get("skipped")]
+    def _visible(r):
+        # older result files predate the field; recompute from stored text
+        if "visible_hit" in r:
+            return r["visible_hit"]
+        return r["needle"].lower() in (r.get("after_think") or "").lower()
+
     rec = [{"prompt_tokens": x["prompt_tokens"], "depth": x["depth"],
             "q8q8": x["hit"], "q8q4": y["hit"],
+            "q8q8_visible": _visible(x), "q8q4_visible": _visible(y),
             "truncated": bool(x.get("truncated") or y.get("truncated"))}
-           for x, y in zip(a["recall"], b["recall"])]
+           for x, y in pairs
+           if not (x.get("skipped") or y.get("skipped"))]
     code = [{"task": x["task"], "q8q8": x["passes"], "q8q4": y["passes"],
              "identical": x["text"] == y["text"]}
             for x, y in zip(a["codegen"], b["codegen"])]
@@ -252,7 +344,18 @@ def compare(results):
         "recall_hits_q8q8": sum(x["q8q8"] for x in rec),
         "recall_hits_q8q4": sum(x["q8q4"] for x in rec),
         "recall_probes": len(rec),
+        "recall_skipped": len(skipped),
+        "skipped_probes": skipped,
+        "recall_visible_q8q8": sum(x["q8q8_visible"] for x in rec),
+        "recall_visible_q8q4": sum(x["q8q4_visible"] for x in rec),
         "recall_disagreements": [x for x in rec if x["q8q8"] != x["q8q4"]],
+        # retrieved it but did not say it -- a hit the caller never sees
+        "recall_retrieved_not_answered": [
+            x for x in rec
+            if (x["q8q8"] and not x["q8q8_visible"])
+            or (x["q8q4"] and not x["q8q4_visible"])],
+        "recall_visible_disagreements": [
+            x for x in rec if x["q8q8_visible"] != x["q8q4_visible"]],
         "codegen_pass_q8q8": sum(x["q8q8"] for x in code),
         "codegen_pass_q8q4": sum(x["q8q4"] for x in code),
         "codegen_tasks": len(code),
