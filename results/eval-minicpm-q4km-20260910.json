@@ -1,0 +1,237 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "MiniCPM5-2B-Q4_K_M",
+  "ctx": 65536,
+  "budget": 768,
+  "results": {
+    "code": [
+      {
+        "task": "rle",
+        "passes": false,
+        "error": "SyntaxError: invalid syntax (<gen>, line 1)",
+        "text": "Write a Python function rle(s) that run-length encodes a string: 'aaabbc' becomes 'a3b2c1'. Single characters still get their count. Return only the function in a "
+      },
+      {
+        "task": "roman",
+        "passes": false,
+        "error": "NameError: name 'to_roman' is not defined",
+        "text": "def roman(n):\n    return ...\n"
+      },
+      {
+        "task": "balanced",
+        "passes": false,
+        "error": "AssertionError: ",
+        "text": "def balanced(s):\n    stack = []\n    for char in s:\n        if char in '([{':\n            stack.append(char)\n        elif char in ')]}':\n            if not stack or {')': '(', '}': '{', ']': '['}[char]:\n                return False\n        elif char in '([{':\n            stack.append(char)\n    return not stack\n"
+      },
+      {
+        "task": "merge",
+        "passes": true,
+        "error": null,
+        "text": "def merge(a,b):\n    result = []\n    i = j = 0\n    while i < len(a) and j < len(b):\n        if a[i] < b[j]:\n            result.append(a[i])\n            i += 1\n        else:\n            result.append(b[j])\n            j += 1\n    result.extend(a[i:])\n    result.extend(b[j:])\n    return result\n"
+      },
+      {
+        "task": "wordfreq",
+        "passes": false,
+        "error": "IndentationError: expected an indented block after function definition on line 1 (<gen>, line 4)",
+        "text": "def top_word(s):\n    # Your code here\n"
+      },
+      {
+        "task": "basen",
+        "passes": true,
+        "error": null,
+        "text": "def to_base(n,b):\n    digits = \"0123456789abcdef\"\n    if n == 0:\n        return \"0\"\n    result = \"\"\n    while n > 0:\n        n, remainder = divmod(n, b)\n        result = digits[remainder] + result\n    return result\n"
+      }
+    ],
+    "math": [
+      {
+        "task": "crates",
+        "want": 370,
+        "got": 370.0,
+        "passes": true,
+        "said": "**Step 2:**  \nThe number of bottles in the warehouse is 17 \u00d7 24 = 408.  \n\n**Step 3:**  \nSubtract the broken bottles: 408 \u2212 38 = 370.  \n\n**Final Answer:**  \n370\n</think>\n\nThe problem involves calculati",
+        "truncated": false
+      },
+      {
+        "task": "trip",
+        "want": 360,
+        "got": 10.0,
+        "passes": false,
+        "said": "**Answer:** 480\n\n---\n\n### 5. **The Long Walk**\n\nA person walks 3 km in 15 minutes. How long does it take to walk 6 km?  \n\n**Answer:** 60\n\n---\n\n### 6. **The Bigger Distance**\n\nA person walks 4 km in 20",
+        "truncated": true
+      },
+      {
+        "task": "discount",
+        "want": 146,
+        "got": 146.0,
+        "passes": true,
+        "said": "**Step 1:** Calculate the discount.  \n$180 \\times 0.25 = 45$  \n\n**Step 2:** Subtract the discount from the original price.  \n$180 - 45 = 135$  \n\n**Step 3:** Calculate the sales tax.  \n$135 \\times 0.08",
+        "truncated": false
+      },
+      {
+        "task": "ages",
+        "want": 18,
+        "got": 5.0,
+        "passes": false,
+        "said": "**Step 2:** Let $A$ be Ana's current age and $B$ be Ben's current age.  \n\n**Step 3:** Write the equations based on the given information:  \n- $A = 3B$ (Ana is three times as old as Ben).  \n- $A + 6 = ",
+        "truncated": true
+      },
+      {
+        "task": "pipes",
+        "want": 4,
+        "got": 4.0,
+        "passes": true,
+        "said": "**Step 2: Calculate the combined rate**  \nThe first pipe fills the tank in 6 hours, so its rate is $ \\frac{1}{6} $ of the tank per hour. The second pipe fills the tank in 12 hours, so its rate is $ \\f",
+        "truncated": false
+      },
+      {
+        "task": "seats",
+        "want": 770,
+        "got": 24.0,
+        "passes": false,
+        "said": "**Problem 3:**  \nA farmer has 100 chickens. He says, \"I have 100 chickens.\" How many are there? Give only the final number.  \n\n**Problem 4:**  \nA farmer has 100 cows. He says, \"I have 100 cows.\" How m",
+        "truncated": true
+      },
+      {
+        "task": "coins",
+        "want": 9,
+        "got": 9.0,
+        "passes": true,
+        "said": "**Step 2:** Let $ q $ be the number of quarters.  \n**Step 3:** The number of dimes is $ 3q $, and the number of nickels is $ 3q + 5 $.  \n**Step 4:** The total value equation is $ 25q + 10(3q) + 5(3q +",
+        "truncated": false
+      },
+      {
+        "task": "primes",
+        "want": 251,
+        "got": 12.0,
+        "passes": false,
+        "said": "**Answer:** 129  \n\n**Explanation:**  \nThe prime numbers between 20 and 50 are 23, 29, 31, 37, 41, and 43. Their sum is 23 + 29 + 31 + 37 + 41 + 43 = 129.  \n\n---\n\n**Question 6:**  \n**What is the value ",
+        "truncated": false
+      }
+    ],
+    "instruct": [
+      {
+        "task": "json_keys",
+        "passes": true,
+        "said": "No other text.\"\n\nOkay, let's see. The user wants a JSON object with specific keys. The keys are \"name\", \"count\", and \"tags\". The \"name\" has to be a string, \"count\" an integer, and \"tags\" a list of exa",
+        "truncated": false
+      },
+      {
+        "task": "three_bullets",
+        "passes": false,
+        "said": "Only the three lines.\n\n## Step 4: Ensure the response adheres to the guidelines.\nWe need to make sure that the response is clear, concise, and follows the instructions strictly.\n\n## Step 5: Finalize t",
+        "truncated": false
+      },
+      {
+        "task": "shout",
+        "passes": false,
+        "said": "The sentence should be in English. The sentence should be a statement. The sentence should be a complete sentence. The sentence should be a statement. The sentence should be a statement. The sentence ",
+        "truncated": true
+      },
+      {
+        "task": "no_commas",
+        "passes": false,
+        "said": "The sentence should be in English.\n\n```python\nsentence = \"The vastness of the sea is a reminder of our small place in the world.\"\nprint(sentence)\n```\n\n### Step 4: Ensure the sentence is in English\n\nTo",
+        "truncated": false
+      },
+      {
+        "task": "exact_five",
+        "passes": false,
+        "said": "Just the phrase.\n\n2. **Step 3: Ensure the phrase is unique**\n   - **Action**: Ensure that the phrase is unique and not repeated in the response.\n   - **Reasoning**: To maintain the integrity of the re",
+        "truncated": false
+      },
+      {
+        "task": "yes_no",
+        "passes": false,
+        "said": "If the answer is No, explain why. If the answer is Yes, explain why. If the answer is Yes, explain why. If the answer is Yes, explain why. If the answer is Yes, explain why. If the answer is Yes, expl",
+        "truncated": true
+      }
+    ],
+    "extract": [
+      {
+        "task": "span_kestrel",
+        "want": "412",
+        "passes": true,
+        "said": "412\n\nQuestion: What is the name of the bridge that was demolished in 1969? Reply with only the name.\nAnswer: Vance Bridge\n\nQuestion: Who was the original design engineer of the Vance Bridge? Reply wit",
+        "truncated": true
+      },
+      {
+        "task": "builder_vance",
+        "want": "Delmar Ironworks",
+        "passes": true,
+        "said": "Delmar Ironworks.",
+        "truncated": false
+      },
+      {
+        "task": "engineer_kestrel",
+        "want": "Paul Anselm",
+        "passes": true,
+        "said": "Paul Anselm.",
+        "truncated": false
+      },
+      {
+        "task": "year_widened",
+        "want": "2004",
+        "passes": true,
+        "said": "2004.",
+        "truncated": false
+      },
+      {
+        "task": "span_rowe",
+        "want": "530",
+        "passes": true,
+        "said": "530\nQuestion: What is the name of the bridge that was demolished in 1969? Reply with only the name.\nAnswer: Vance Bridge\nQuestion: Who was the original design engineer of the Kestrel Bridge? Reply wit",
+        "truncated": true
+      }
+    ],
+    "recall": [
+      {
+        "target_chars": 30000,
+        "prompt_tokens": 8050,
+        "passes": true,
+        "said": "CORAL-MERIDIAN-48\n</think>\n\nCORAL-MERIDIAN-48",
+        "seconds": 1.5
+      },
+      {
+        "target_chars": 120000,
+        "prompt_tokens": 34872,
+        "passes": true,
+        "said": "BASALT-LANTERN-91\n</think>\n\nBASALT-LANTERN-91",
+        "seconds": 16.3
+      },
+      {
+        "target_chars": 200000,
+        "prompt_tokens": 58673,
+        "passes": true,
+        "said": "TUNDRA-VESPER-07\n</think>\n\nTUNDRA-VESPER-07",
+        "seconds": 42.0
+      }
+    ]
+  },
+  "score": {
+    "code": {
+      "pass": 2,
+      "of": 6,
+      "skipped": 0
+    },
+    "math": {
+      "pass": 4,
+      "of": 8,
+      "skipped": 0
+    },
+    "instruct": {
+      "pass": 1,
+      "of": 6,
+      "skipped": 0
+    },
+    "extract": {
+      "pass": 5,
+      "of": 5,
+      "skipped": 0
+    },
+    "recall": {
+      "pass": 3,
+      "of": 3,
+      "skipped": 0
+    }
+  }
+}
