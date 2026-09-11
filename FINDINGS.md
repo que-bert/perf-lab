@@ -1410,5 +1410,11 @@ above shows; the config comment claims a causal role for settings that are not
 being read. `parallel` was *not* in the ignored list, so that key is live.
 
 The keys exist in `~/git/mimir` source, so the installed binary simply predates
-them. Nothing to fix in the config; the comment needs correcting, and until the
-binary is rebuilt the admission estimate is running on the rig-wide defaults.
+them. Until it is rebuilt the admission estimate runs on the rig-wide defaults.
+
+**Corrected in the config, not removed.** Both sites now say they are inert and
+name the build that ignores them, and the false causal claim is replaced with
+the measurement above — the model fits on its own, and what these keys will buy
+once mimir is rebuilt is a more accurate *admission estimate*, not a fit. They
+are left in place because they are correct for a newer binary and harmless to
+this one; deleting them would only mean rediscovering the values later.
