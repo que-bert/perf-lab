@@ -53,6 +53,36 @@ systemd/               timer units (installed into the user instance)
 apt/99-perf-lab        upgrade hook; queues a run, never runs one
 ```
 
+## Beyond the canaries
+
+The canary set answers "did the stack move". These answer questions it cannot,
+and none of them write to the ledger:
+
+```
+harness/gguf_meta.py     what is in this model file, without loading it
+harness/gguf_patch.py    rewrite one metadata key, tensor data untouched
+harness/serve_unit.sh    serve any model as a transient systemd --user unit
+harness/model_eval.py    what is this model good at, scored programmatically
+harness/eval_matrix.sh   one model, every prompt mode
+harness/eval_table.py    collate model_eval reports into one grid
+harness/throughput.py    aggregate tokens/s under concurrency
+harness/spec_sweep.py    draft depth x slot count, as a cross product
+```
+
+Three rules these encode, each of which cost a session to learn:
+
+- **A model load cannot live inside a supervised task on this box.** The
+  supervisor kills the task as page cache fills, with tens of GB free and
+  nothing starved; `setsid nohup` does not escape it. Every tool here that
+  needs a server goes through `serve_unit.sh`, which hands the process to the
+  user manager instead.
+- **Prompt mode is not a detail.** The same model scored 12/31 prompted raw and
+  31/31 through its own chat template. Any capability number has to record
+  which mode produced it, so `model_eval.py` does.
+- **Single-stream decode and aggregate throughput move in opposite
+  directions.** `throughput.py` reports both, because reporting either alone
+  recommends the wrong `--parallel`.
+
 ## Automation
 
 ```

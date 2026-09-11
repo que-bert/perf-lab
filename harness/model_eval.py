@@ -37,6 +37,7 @@ import json
 import pathlib
 import re
 import sys
+import textwrap
 import time
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -45,11 +46,152 @@ emit_row = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(emit_row)
 
 THINK = re.compile(r"<think>.*?</think>", re.S)
+# A reasoning model prompted RAW emits a closing </think> with no opening tag,
+# because the opening tag is normally injected by the chat template rather than
+# generated. Measured 2026-09-10: every reasoning block in raw mode arrived this
+# way, so THINK alone stripped nothing and the whole scratchpad -- every
+# intermediate number in it -- was scored as the answer. Anything before an
+# unmatched </think> is reasoning.
+ORPHAN_THINK = re.compile(r"^.*?</think>", re.S)
 CODE_FENCE = re.compile(r"```(?:python)?\s*\n(.*?)```", re.S)
 
 
 def strip_think(t):
-    return THINK.sub("", t or "").strip()
+    t = THINK.sub("", t or "")
+    if "</think>" in t:
+        t = ORPHAN_THINK.sub("", t)
+    return t.strip()
+
+
+# --------------------------------------------------------------- backends
+# Everything below calls _complete(port, prompt, n_predict) and reads back
+# {content, stop_type, timings{prompt_n, predicted_per_second}}. That is
+# llama-server's own shape; the ollama backend adapts to it.
+#
+# The ollama path exists because some GGUFs only load there. ollama ships
+# model files that upstream llama.cpp refuses -- measured 2026-09-10 on
+# qwen3.5:9b (mrope sections 3 where llama.cpp wants 4) and gemma4:e4b/e2b
+# (2131 tensors declared, 720 built). Capability is a property of the weights,
+# so it is fair to measure those models under ollama; SPEED is not, because
+# the runtime, KV types and speculation all differ. Never put an ollama-backed
+# number in a speed table.
+_API = "llama"
+_OLLAMA_MODEL = None
+_CTX = 32768
+
+
+def _complete_llama(port, prompt, n_predict, extra=None):
+    return emit_row.complete(port, prompt, n_predict, extra)
+
+
+def _complete_ollama(port, prompt, n_predict, extra=None):
+    import urllib.request
+    body = {"model": _OLLAMA_MODEL, "prompt": prompt, "stream": False,
+            "raw": True,
+            # num_ctx must be sent explicitly: ollama otherwise serves its own
+            # default and the run silently measures a context the caller never
+            # asked for -- observed at 32768 against a requested 65536.
+            "options": {"temperature": 0, "num_predict": n_predict,
+                        "num_ctx": _CTX}}
+    req = urllib.request.Request(
+        f"http://127.0.0.1:{port}/api/generate",
+        data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=3600) as r:
+        d = json.load(r)
+    ns = d.get("eval_duration") or 0
+    return {
+        "content": d.get("response", ""),
+        # ollama says "length" where llama-server says "limit".
+        "stop_type": "limit" if d.get("done_reason") == "length" else "eos",
+        "timings": {
+            "prompt_n": d.get("prompt_eval_count"),
+            "predicted_n": d.get("eval_count"),
+            "predicted_per_second": (d.get("eval_count", 0) / (ns / 1e9))
+            if ns else None,
+        },
+    }
+
+
+def _chat_llama(port, prompt, n_predict, extra=None):
+    """Same prompt, but through the model's own chat template.
+
+    Worth a separate backend rather than a detail: an instruct-tuned model
+    prompted raw is being tested outside the format it was tuned in, and the
+    format suites are exactly where that shows. Which mode a table was taken
+    in therefore has to be recorded next to the score.
+    """
+    import urllib.request
+    body = {"messages": [{"role": "user", "content": prompt}],
+            "max_tokens": n_predict, "temperature": 0, "stream": False}
+    body.update(extra or {})
+    req = urllib.request.Request(
+        f"http://127.0.0.1:{port}/v1/chat/completions",
+        data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=3600) as r:
+        d = json.load(r)
+    ch = (d.get("choices") or [{}])[0]
+    u = d.get("usage") or {}
+    msg = ch.get("message") or {}
+    # Some templates split the reasoning block into its own field instead of
+    # leaving it inline; put it back so strip_think() sees a consistent shape.
+    content = msg.get("content") or ""
+    if msg.get("reasoning_content"):
+        content = f"<think>{msg['reasoning_content']}</think>" + content
+    return {"content": content,
+            "stop_type": "limit" if ch.get("finish_reason") == "length"
+            else "eos",
+            "timings": {"prompt_n": u.get("prompt_tokens"),
+                        "predicted_n": u.get("completion_tokens"),
+                        "predicted_per_second": None}}
+
+
+def _chat_ollama(port, prompt, n_predict, extra=None):
+    import urllib.request
+    body = {"model": _OLLAMA_MODEL, "prompt": prompt, "stream": False,
+            "options": {"temperature": 0, "num_predict": n_predict,
+                        "num_ctx": _CTX}}
+    body.update(extra or {})
+    req = urllib.request.Request(
+        f"http://127.0.0.1:{port}/api/generate",
+        data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=3600) as r:
+        d = json.load(r)
+    ns = d.get("eval_duration") or 0
+    content = d.get("response", "")
+    if d.get("thinking"):
+        content = f"<think>{d['thinking']}</think>" + content
+    return {"content": content,
+            "stop_type": "limit" if d.get("done_reason") == "length"
+            else "eos",
+            "timings": {"prompt_n": d.get("prompt_eval_count"),
+                        "predicted_n": d.get("eval_count"),
+                        "predicted_per_second": (
+                            d.get("eval_count", 0) / (ns / 1e9))
+                        if ns else None}}
+
+
+_BACKENDS = {("llama", False): _complete_llama, ("llama", True): _chat_llama,
+             ("ollama", False): _complete_ollama, ("ollama", True): _chat_ollama}
+_CHAT = False
+# Both families' chat templates take an enable_thinking switch. Turning it off
+# is the single largest lever on time-to-answer for a reasoning model -- it
+# removes the scratchpad rather than decoding it faster -- and it is the only
+# thing measured here that makes Ornith's short-answer tasks terminate at all.
+# Only reachable through the template, so it requires chat mode.
+_NO_THINK = False
+
+
+def _complete(port, prompt, n_predict, extra=None):
+    if _NO_THINK and _CHAT:
+        extra = dict(extra or {})
+        if _API == "ollama":
+            extra["think"] = False
+        else:
+            extra["chat_template_kwargs"] = {"enable_thinking": False}
+    return _BACKENDS[(_API, _CHAT)](port, prompt, n_predict, extra)
 
 
 # ---------------------------------------------------------------- code
@@ -95,10 +237,16 @@ CODE_TASKS = [
 def run_code(port, log, budget):
     out = []
     for name, prompt, asserts in CODE_TASKS:
-        r = emit_row.complete(port, prompt, budget)
+        r = _complete(port, prompt, budget)
         txt = r.get("content") or ""
         m = CODE_FENCE.search(txt)
         body = m.group(1) if m else strip_think(txt)
+        # A fence nested inside prose or a list arrives uniformly indented, and
+        # exec() then raises IndentationError on line 1. Scored as a failure
+        # that way, qwen3.5:9b read 1/6 on code it had in fact written
+        # correctly -- the indentation was the reviewer's problem, not the
+        # model's. dedent is a no-op on an unindented body.
+        body = textwrap.dedent(body)
         ok, err = False, None
         try:
             ns = {}
@@ -147,7 +295,7 @@ def run_math(port, log, budget, only=None):
     for name, prompt, want in MATH_TASKS:
         if only and name not in only:
             continue
-        r = emit_row.complete(port, prompt, budget)
+        r = _complete(port, prompt, budget)
         said = strip_think(r.get("content") or "")
         truncated = r.get("stop_type") == "limit"
         nums = [n.replace(",", "") for n in NUM.findall(said)]
@@ -249,7 +397,7 @@ INSTRUCT_TASKS = [
 def run_instruct(port, log, budget):
     out = []
     for name, prompt, check in INSTRUCT_TASKS:
-        r = emit_row.complete(port, prompt, budget)
+        r = _complete(port, prompt, budget)
         txt = r.get("content") or ""
         try:
             ok = bool(check(txt))
@@ -291,7 +439,7 @@ EXTRACT_TASKS = [
 def run_extract(port, log, budget):
     out = []
     for name, q, want in EXTRACT_TASKS:
-        r = emit_row.complete(port, PASSAGE + "\n\nQuestion: " + q + "\nAnswer:",
+        r = _complete(port, PASSAGE + "\n\nQuestion: " + q + "\nAnswer:",
                               budget)
         said = strip_think(r.get("content") or "")
         ok = want.lower() in said.lower()
@@ -299,6 +447,189 @@ def run_extract(port, log, budget):
                     "said": said[:200],
                     "truncated": r.get("stop_type") == "limit"})
         log(f"    extract  {name:<16} {'PASS' if ok else 'FAIL'}  {said[:40]!r}")
+    return out
+
+
+# ---------------------------------------------------------------- research
+# extract/ asks whether a model can find a fact that is written down. research/
+# asks the harder thing a research assistant is actually for: combine facts
+# that are written in different places, say where each came from, notice when
+# two sources disagree, and refuse to answer what the sources do not contain.
+#
+# The last of those is the one that decides whether a small model is usable
+# unsupervised. A model that answers every question confidently scores well on
+# extract and is dangerous here, so `abstain` and `conflict` are weighted the
+# same as the multi-hop items rather than treated as bonus tasks.
+#
+# All six are scored by parsing: a number, a name, or the presence of an
+# absence marker. Nothing is graded by reading the prose.
+RESEARCH_DOCS = """\
+[D1] Ardent Freight operates three depots: Marrow, Kell, and Vance. The Marrow
+depot opened in 2009 and is the oldest of the three.
+
+[D2] Depot throughput for 2024. Marrow handled 41,200 containers. Kell handled
+18,650 containers. Vance handled 27,150 containers.
+
+[D3] The Kell depot was closed for retooling from March to June 2024, and ran
+at reduced capacity for the remainder of the year.
+
+[D4] Ardent's per-container handling fee was 14 dollars in 2023. It rose to 17
+dollars in 2024.
+
+[D5] The regional average depot throughput for 2024 was 31,000 containers
+across all operators.
+
+[D6] A later audit restated the Vance depot's 2024 throughput as 26,400
+containers.
+"""
+
+# An absence marker. The model has to signal that the documents do not say,
+# rather than produce a year. Deliberately broad -- any honest phrasing counts;
+# what must not happen is a confident fabricated answer.
+ABSENT = re.compile(
+    r"\b(not (?:stated|given|specified|mentioned|provided|available|in the)"
+    r"|no(?:t any)? (?:information|mention|record|data)"
+    r"|does(?: not|n't) (?:say|state|mention|specify|provide|contain)"
+    r"|do(?: not|n't) (?:say|state|mention|specify|provide|contain)"
+    r"|cannot be determined|can(?:no|')t be determined"
+    r"|unknown|unspecified|insufficient information|unable to determine)\b",
+    re.I)
+
+YEARISH = re.compile(r"\b(19|20)\d{2}\b")
+
+
+def _nums(t):
+    return [n.replace(",", "") for n in NUM.findall(t or "")]
+
+
+def _has_num(t, want):
+    for n in _nums(t):
+        try:
+            if abs(float(n) - want) < 1e-6:
+                return True
+        except ValueError:
+            pass
+    return False
+
+
+def _first_num(t, want):
+    """The FIRST number, for items whose prompt says "give only the number".
+
+    Not _has_num: on 2026-09-10 a model answered 96,000 to the aggregate item,
+    then talked itself through the arithmetic and mentioned 87,000 on the way.
+    "Contains the right number somewhere" scored that a pass. What the caller
+    receives is the first number, so that is what is scored.
+    """
+    ns = _nums(t)
+    if not ns:
+        return False
+    try:
+        return abs(float(ns[0]) - want) < 1e-6
+    except ValueError:
+        return False
+
+
+def _chk_revenue(t):
+    # 41,200 containers x 17 dollars. Requires D2 and D4 together.
+    return _first_num(t, 700400)
+
+
+def _chk_above_avg(t):
+    # Only Marrow (41,200) clears the 31,000 regional average. Naming Kell or
+    # Vance is a false positive and fails, which is the point of the item.
+    low = t.lower()
+    return "marrow" in low and "kell" not in low and "vance" not in low
+
+
+def _chk_abstain(t):
+    # D1 gives Marrow's opening year and no other. A model that answers 2009
+    # has attached the one year present to the wrong depot.
+    return bool(ABSENT.search(t)) and not YEARISH.search(t)
+
+
+def _chk_conflict(t):
+    # Naming the wrong depot fails even when both Vance figures also appear:
+    # a model that answered "Kell" while quoting 27,150 and 26,400 passed the
+    # first version of this check, which made the item measure nothing.
+    low = t.lower()
+    return ("vance" in low and "kell" not in low
+            and _has_num(t, 27150) and _has_num(t, 26400))
+
+
+def _chk_cite(t):
+    return _has_num(t, 14) and re.search(r"\bd4\b", t, re.I) is not None
+
+
+def _chk_aggregate(t):
+    # 41,200 + 18,650 + 27,150
+    return _first_num(t, 87000)
+
+
+RESEARCH_TASKS = [
+    ("multihop_revenue",
+     "Using only the documents, what was Ardent's total 2024 handling-fee "
+     "revenue from the Marrow depot, in dollars? Give only the final number.",
+     _chk_revenue),
+    ("multihop_above_avg",
+     "Using only the documents, which Ardent depots handled more containers "
+     "in 2024 than the regional average? Reply with only the depot names, "
+     "comma separated.",
+     _chk_above_avg),
+    ("abstain_vance_year",
+     "Using only the documents, in which year did the Vance depot open? "
+     "If the documents do not say, reply exactly: NOT STATED.",
+     _chk_abstain),
+    ("conflict_vance",
+     "The documents disagree about one depot's 2024 throughput. Name that "
+     "depot and give both figures.",
+     _chk_conflict),
+    ("cite_fee_2023",
+     "What was the per-container handling fee in 2023, and which document "
+     "states it? Reply in the form <number>|<document id>, for example "
+     "12|D9.",
+     _chk_cite),
+    ("aggregate_throughput",
+     "Using the figures in document D2 only, what was the combined 2024 "
+     "throughput of all three depots? Give only the final number.",
+     _chk_aggregate),
+]
+
+
+def run_research(port, log, budget, complete=None):
+    complete = complete or _complete
+    out = []
+    for name, q, check in RESEARCH_TASKS:
+        prompt = (RESEARCH_DOCS + "\n\nAnswer using only the documents above. "
+                  "If they do not contain the answer, say so.\n\nQuestion: "
+                  + q + "\nAnswer:")
+        r = complete(port, prompt, budget)
+        raw = r.get("content") or ""
+        said = strip_think(raw)
+        truncated = r.get("stop_type") == "limit"
+
+        def run(text):
+            try:
+                return bool(check(text))
+            except Exception:
+                return False
+
+        # Two scores, the same split kv_quality.py draws for recall: `passes`
+        # is what the caller actually receives, `anywhere` also counts an
+        # answer that only ever appeared inside the reasoning block. A model
+        # that reasons its way to the right answer and then prints something
+        # else has not answered the question, but the gap between the two
+        # columns says whether the failure is knowledge or presentation.
+        ok, anywhere = run(said), run(raw)
+        # A cut-off answer is unscoreable in both directions -- the same
+        # reasoning as run_math. Record it rather than counting it wrong.
+        if truncated and not ok:
+            ok = None
+        out.append({"task": name, "passes": ok, "anywhere": anywhere,
+                    "said": said[:300], "raw_tail": raw[-200:],
+                    "truncated": truncated})
+        v = "TRUNC" if ok is None else ("PASS" if ok else "FAIL")
+        flag = "  (in reasoning only)" if anywhere and ok is not True else ""
+        log(f"    research {name:<20} {v:<5} {said[:46]!r}{flag}")
     return out
 
 
@@ -322,7 +653,7 @@ def run_recall(port, corpus, lengths, log, budget):
                   f"{where}? Reply with only the passphrase.\nAnswer:")
         t0 = time.time()
         try:
-            r = emit_row.complete(port, prompt, budget)
+            r = _complete(port, prompt, budget)
         except Exception as e:
             out.append({"target_chars": tchars, "skipped": str(e)[:120],
                         "passes": None})
@@ -357,8 +688,24 @@ def main():
                     help="CHARACTERS, comma separated; empty skips recall")
     ap.add_argument("--budget", type=int, default=768,
                     help="n_predict; reasoning models need room before the answer")
-    ap.add_argument("--suites", default="code,math,instruct,extract,recall")
+    ap.add_argument("--suites",
+                    default="code,math,instruct,extract,research,recall")
     ap.add_argument("--out", default="")
+    ap.add_argument("--api", choices=("llama", "ollama"), default="llama",
+                    help="ollama drives ollama's own runtime, for GGUFs "
+                         "upstream llama.cpp refuses to load. Capability "
+                         "only -- never speed.")
+    ap.add_argument("--ollama-model", default="",
+                    help="tag to send with --api ollama, e.g. gemma4:e4b")
+    ap.add_argument("--chat", action="store_true",
+                    help="prompt through the model's chat template instead "
+                         "of raw completion")
+    ap.add_argument("--no-think", action="store_true",
+                    help="ask the template to suppress the reasoning block; "
+                         "requires --chat")
+    ap.add_argument("--label", default="",
+                    help="name for this run in the report; defaults to the "
+                         "model file stem")
     # Loading a model inside a supervised task gets that task killed on this box
     # while page cache fills, even with tens of GB free. Start the server as a
     # systemd --user unit and point this at its port; the client is cheap and
@@ -373,6 +720,15 @@ def main():
     a = ap.parse_args()
 
     import os
+    global _API, _CHAT, _OLLAMA_MODEL, _NO_THINK
+    global _CTX
+    _API, _CHAT, _NO_THINK = a.api, a.chat, a.no_think
+    _CTX = a.ctx
+    _OLLAMA_MODEL = a.ollama_model or None
+    if a.api == "ollama" and not _OLLAMA_MODEL:
+        sys.exit("--api ollama needs --ollama-model")
+    if a.no_think and not a.chat:
+        sys.exit("--no-think only reaches the model through --chat")
     model = pathlib.Path(a.model)
     bindir = pathlib.Path(a.bin)
     suites = [s.strip() for s in a.suites.split(",") if s.strip()]
@@ -380,7 +736,10 @@ def main():
     def log(m):
         print(m, file=sys.stderr, flush=True)
 
-    if a.port is not None:
+    if a.api == "ollama":
+        port, stop = (a.port or 11434), lambda: None
+        log(f"  using ollama on port {port}  ({_OLLAMA_MODEL})")
+    elif a.port is not None:
         log(f"  using running llama-server on port {a.port}  ({model.name})")
         port, stop = a.port, lambda: None
     else:
@@ -400,6 +759,8 @@ def main():
             results["instruct"] = run_instruct(port, log, a.budget)
         if "extract" in suites:
             results["extract"] = run_extract(port, log, a.budget)
+        if "research" in suites:
+            results["research"] = run_research(port, log, a.budget)
         if "recall" in suites and a.recall_lengths:
             corpus = pathlib.Path(a.corpus or os.environ.get(
                 "PERF_LAB_HELDOUT",
@@ -410,7 +771,13 @@ def main():
     finally:
         stop()
 
-    report = {"bin": str(bindir), "model": model.stem, "ctx": a.ctx,
+    report = {"bin": str(bindir), "model": model.stem,
+              "label": a.label or model.stem, "ctx": a.ctx,
+              # Recorded because a score is not comparable across them: the
+              # runtime decides what loaded at all, and the prompt mode decides
+              # whether the model saw the format it was tuned in.
+              "api": a.api, "prompt_mode": "chat" if a.chat else "raw",
+              "thinking": not a.no_think,
               "budget": a.budget, "results": results,
               "score": {k: score(v) for k, v in results.items()}}
     text = json.dumps(report, indent=2)

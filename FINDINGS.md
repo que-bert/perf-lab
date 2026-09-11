@@ -1057,3 +1057,358 @@ Served config set in `~/.mimir/mimir.toml` accordingly (backup
 
 **Not measured**: the n-max sweep was run at the default 4 slots, so the optimum n-max
 *under `--parallel 1`* is unknown — 3 is carried over, not re-derived.
+
+## 2026-09-11: prompt mode moved capability scores further than the model did
+
+The 2026-09-10 table above concluded that Ornith-1.5-9B and MiniCPM5-2B are
+"good at reading, not at obeying" — code 2/6 and 1/6, strict-format compliance
+2/6 and 3/6 — and that Ornith "needs a reasoning-budget cap or a no-think mode
+before it is usable for short-answer work". **Both conclusions were artefacts of
+prompting the models raw.** They were measured through `/completion` with a bare
+prompt, outside the chat format the weights were tuned in.
+
+`model_eval.py` now records `prompt_mode`, and `eval_matrix.sh` runs all three:
+
+- `raw` — `/completion`, a bare prompt. What every table above was taken with.
+- `chat` — the model's own chat template.
+- `chat-nothink` — the template with `enable_thinking=false`.
+
+ctx 65536, temperature 0, budget 2048, speculation off. Five models, fifteen
+runs, `results/eval-*-{raw,chat,chat-nothink}-20260910.json` (the run started
+before midnight; the entry is dated by when it was written up).
+
+| model | mode | code | math | instruct | extract | research | total |
+|---|---|---|---|---|---|---|---|
+| gemma4-e2b | raw | 1/6 | 1/8 | 3/6 | 5/5 | 2/6 | 12/31 |
+| gemma4-e2b | **chat** | 6/6 | 8/8 | 6/6 | 5/5 | 6/6 | **31/31** |
+| gemma4-e2b | chat-nothink | 5/6 | 3/8 | 6/6 | 5/5 | 3/6 | 22/31 |
+| gemma4-e4b | raw | 5/6 | 3/8 | 4/6 | 5/5 | 3/6 | 20/31 |
+| gemma4-e4b | **chat** | 6/6 | 7/8 | 6/6 | 5/5 | 6/6 | **30/31** |
+| gemma4-e4b | chat-nothink | 6/6 | 3/8 | 6/6 | 5/5 | 4/6 | 24/31 |
+| minicpm-q8 | raw | 4/6 | 0/2* | 2/6 | 5/5 | 2/4* | 13/23 |
+| minicpm-q8 | **chat** | 3/6 | 8/8 | 5/6 | 5/5 | 6/6 | **27/31** |
+| minicpm-q8 | chat-nothink | 5/6 | 6/8 | 4/6 | 5/5 | 4/6 | 24/31 |
+| ornith-q6k | raw | 5/6 | 3/3* | 2/6 | 5/5 | 4/4* | 19/24 |
+| ornith-q6k | **chat** | 6/6 | 8/8 | 5/6 | 5/5 | 6/6 | **30/31** |
+| ornith-q6k | chat-nothink | 6/6 | 1/8 | 3/6 | 5/5 | 3/6 | 18/31 |
+| qwen35-9b | raw | 5/6 | 6/8 | 5/6 | 5/5 | 3/5* | 24/30 |
+| qwen35-9b | **chat** | 6/6 | 7/7* | 6/6 | 5/5 | 6/6 | **30/30** |
+| qwen35-9b | chat-nothink | 5/6 | 2/8 | 6/6 | 5/5 | 3/6 | 21/31 |
+
+`*` = the suite contained items cut off at the budget, which are recorded
+unscoreable rather than failed. gemma4 and qwen35 rows are through ollama's
+runtime (see the next entry); the others through llama-server on b10472. The
+qwen35-9b chat row is at budget 6144 rather than 2048: its reasoning block is
+long enough that a third of the suite was unscoreable at 2048, which is itself
+the cost of that model's verbosity.
+
+**The spread from prompt mode is 12→31 on one model. No pair of models differs
+by nearly that much within a mode.** Any capability number taken without
+recording its prompt mode is uninterpretable, which is why the field is now
+mandatory in the report.
+
+**Ornith terminates fine.** In chat mode it answered `17x24-38` correctly in
+**34 tokens**: `<think>17 crates × 24 bottles = 408 bottles / 408 - 38 = 370
+</think>370`. The 8192-token non-termination recorded on 2026-09-10 was raw
+prompting with no template-injected `<think>`; nothing about the model needed a
+budget cap. Math is now scoreable, and Ornith scores 8/8.
+
+**Reasoning is load-bearing, and `enable_thinking=false` is not free.** It is the
+largest lever on time-to-answer there is — it removes the scratchpad rather than
+decoding it faster — and it costs accuracy where the scratchpad was doing work.
+Math falls 8/8 → 1/8 on Ornith and 8/8 → 3/8 on gemma4-e2b. On the same
+arithmetic item Ornith answers 370 with thinking (34 tokens) and **456 without,
+in 4 tokens**. Format compliance is unaffected or better, so no-think is
+defensible for extraction and formatting work and indefensible for arithmetic.
+
+**Three scorer bugs were fixed to get these numbers.** Two had inflated scores
+and one had deflated them:
+
+- A reasoning model prompted raw emits a closing `</think>` with *no opening
+  tag*, because the opening tag is normally injected by the template. The
+  existing `THINK` regex requires both, so it stripped nothing and the entire
+  scratchpad was scored as the answer — every intermediate number in it counted.
+- "The right number appears somewhere in the answer" passed a model that
+  answered 96,000 and then talked itself to 87,000 on the way past. Numeric
+  items whose prompt says "give only the number" are now scored on the *first*
+  number.
+- A code fence nested inside prose arrives uniformly indented, and `exec()`
+  raises `IndentationError` on line 1. **That alone scored qwen3.5:9b 1/6 on
+  code it had written correctly**; `textwrap.dedent` fixes it, and the run above
+  is 6/6. Only two stored runs were affected, so the rest of the table did not
+  need re-measuring.
+
+Because the first two inflated and the third deflated, the corrected numbers do
+not move in one direction — the point is that none of the three were visible in
+a score, only in the stored text.
+
+**The suites saturate in chat mode and no longer discriminate there.** Four of
+five models score 27-31 of 31. These tasks now measure whether a model was
+prompted correctly, not which model is better; ranking these five needs a harder
+tier that does not exist yet.
+
+## 2026-09-11: three of the five models will not load in llama.cpp at all
+
+`gemma4:e4b`, `gemma4:e2b` and `qwen3.5:9b` exist here only as ollama blobs, and
+none of the three loads under upstream llama.cpp. Identical failures on the
+b10472 prebuilt, the b10883 prebuilt, and a b10902 built from master here, so
+these are **exporter divergences, not a version gap**:
+
+| model | failure |
+|---|---|
+| qwen3.5:9b | `key qwen35.rope.dimension_sections has wrong array length; expected 4, got 3` |
+| gemma4:e4b / e2b | `done_getting_tensors: wrong number of tensors; expected 2131, got 720` |
+
+`src/models/qwen35.cpp:6` reads the rope sections with a required length of 4;
+ollama writes three (`[11, 11, 10]`). `harness/gguf_patch.py` was written to
+rewrite exactly that key — header only, tensor data copied untouched, data
+section realigned so no tensor offset moves — and padding it to `[11,11,10,0]`
+does clear the check. **The next load then fails on `blk.0.ssm_dt.bias` not
+found**: ollama also names tensors differently. Two divergences deep with no
+reason to think there is not a third, patching was abandoned. The tool is kept;
+it does its job.
+
+For gemma4 the gap is structural rather than a typo. Upstream's `gemma4` arch
+builds 720 text tensors; the ollama file carries 2131 — text plus a vision
+tower, an audio tower (`mm.a.*`) and Gemma-3n-style per-layer embeddings
+(`per_layer_token_embd`, `per_layer_model_proj`) in one file, where upstream
+wants the multimodal half split into a separate mmproj.
+
+So those three are measured through **ollama's own runtime**, via a second
+backend in `model_eval.py`. That is fair for capability, which is a property of
+the weights, and is **never fair for speed** — different runtime, different KV
+types, different offload policy. No ollama-backed number appears in any speed
+table in this file.
+
+ollama also serves its own `num_ctx` unless told otherwise: a run asking for
+65536 was observed running at 32768 until `num_ctx` was passed explicitly.
+
+**What the headers say** (`harness/gguf_meta.py`, which reads a GGUF header
+without loading the model):
+
+- **qwen3.5:9b** — `qwen35`, 32 blocks, ctx 262144 native, and a **hybrid**: only
+  every fourth layer carries attention (`head_count_kv` is an array,
+  `[0,0,0,4,...]`), the rest are `blk.N.ssm_*`. It ships a **full MTP head**
+  (15 `mtp.*` tensors) and an in-file vision tower (`v.blk.N.*`). Named
+  `mtp.*` where Ornith names the same thing `blk.32.nextn.*`.
+- **gemma4:e4b / e2b** — 42 and 35 blocks, ctx 131072 native, **no MTP**, and
+  **no chat template in the GGUF** (ollama supplies it from its Modelfile,
+  which is why the chat-mode rows above exist for them at all). Both carry
+  vision *and* audio towers in-file. ollama resides only 3.9 GB of the 8.95 GiB
+  e4b file and 2.0 GB of the 6.67 GiB e2b file — the MatFormer slice, not the
+  whole file.
+- Ornith's MTP head is `blk.32.nextn.*`, and llama.cpp logs it as
+  `model has unused tensor ... ignoring` when `--spec-type draft-mtp` is absent.
+
+## 2026-09-11: the RX 9060 XT collapses on every weight type except Q4_K
+
+Measured because the second card looked 3.5x slower in a dual-GPU throughput
+run. It is not uniformly slower. `llama-bench -p 0/512 -n 64 -fa 1 -ngl 99 -t 8
+-r 3`, b10472 Vulkan, backend reported as Vulkan on both cards, decode t/s:
+
+| model | type | GiB | RX 9060 XT (gfx1200) | R9700 (gfx1201) | ratio |
+|---|---|---|---|---|---|
+| MiniCPM5-2B | Q4_K_M | 1.45 | 139.18 | 237.01 | **1.70x** |
+| Ornith-1.5-9B | Q4_K_M | 5.38 | 48.91 | 90.90 | **1.86x** |
+| MiniCPM5-2B | Q8_0 | 2.50 | 21.33 | 169.41 | **7.94x** |
+| Ornith-1.5-9B | Q6_K | 7.03 | 13.68 | 75.25 | **5.50x** |
+| MiniCPM5-2B | F16 | 4.69 | 19.07 | 108.52 | **5.69x** |
+
+**The ratio tracks the weight type, not the file size.** A 5.38 GiB Q4_K_M runs
+at 1.86x while a 2.50 GiB Q8_0 runs at 7.94x — less than half the bytes, four
+times the penalty. Size is ruled out, and so is CPU spill: both cards had room,
+`-ngl 99` was honoured, and llama-bench reported the Vulkan backend for every
+row. Error bars were ±0.5% or tighter throughout.
+
+Prefill shows the same split more weakly — Q4_K_M 6,642 vs 12,398 t/s (1.87x),
+F16 3,053 vs 8,064 (2.64x).
+
+**Cause not established.** 1.7-1.9x is about what the two cards' memory
+bandwidth predicts; the 5.5-7.9x on the other types is not, and whether it is a
+missing gfx1200 dequant kernel in RADV, a shader-compilation fallback, or
+something about the display card being contended has not been separated.
+
+**Operationally this is decided regardless of cause: put only Q4_K_M models on
+the RX 9060 XT.** A Q6_K or Q8_0 model placed there runs slower than it would on
+many CPUs, and nothing in the logs says so.
+
+## 2026-09-11: slots raise throughput and lower speed, and the answer depends which you are buying
+
+Every speed number in this file before today is single-stream. `harness/throughput.py`
+fires N concurrent requests and reports both halves: aggregate tokens/s across
+the batch, and the mean rate each individual request saw.
+
+Qwen3.8-27B-Q6_K, ctx 262144, `q8_0`/`q4_0`, MTP n-max 3, b10472, R9700 idle,
+128 tokens per request, 2 batches per cell.
+
+| slots | metric | c=1 | c=2 | c=4 | c=8 |
+|---|---|---|---|---|---|
+| `--parallel 1` | agg t/s | 42.67 | 46.80 | 44.28 | 43.16 |
+| | per-req t/s | 53.52 | 54.28 | 50.93 | 49.36 |
+| | p50 / p95 s | 3.11 / 3.11 | 5.38 / 5.55 | 8.35 / 12.34 | 13.70 / 24.75 |
+| `--parallel 2` | agg t/s | 44.65 | 52.73 | 51.91 | 50.91 |
+| | per-req t/s | 53.35 | 31.87 | 30.69 | 29.77 |
+| `--parallel 4` | agg t/s | 45.15 | 51.37 | **67.95** | 61.10 |
+| | per-req t/s | 53.80 | 30.88 | 21.73 | 18.69 |
+| | p50 / p95 s | 3.09 / 3.09 | 4.92 / 5.28 | 7.22 / 7.73 | 14.29 / 17.61 |
+
+**Four slots at four concurrent requests is 53% more aggregate throughput than
+one slot can reach** — 67.95 against 44.28 — and each of those requests runs at
+**21.73 t/s instead of 50.93**, 2.3x slower for the person waiting on it. That is
+the whole trade, and it is why the 2026-09-10 entry's "`--parallel 4` halves
+decode" and this entry's "`--parallel 4` wins" are both true: that entry measured
+one request, this one measures four.
+
+Three things fall out that were not obvious:
+
+- **`--parallel 1` does not lose throughput under load, it just queues.** Per-request
+  stays at 49-54 t/s all the way to c=8 while p95 climbs 3.11 → 24.75 s. Nothing
+  is being shared; the requests are simply serialised.
+- **Concurrency past the slot count is wasted.** c=8 on 4 slots is *worse* than
+  c=4 (61.10 vs 67.95): the extra four queue behind a batch that is now slower
+  per request. Match concurrency to slots.
+- **Slots cost VRAM, and the cost is real at 98% occupancy** — 32.08 / 32.22 /
+  33.44 GB for 1 / 2 / 4 slots. Draft acceptance was flat at 0.72 for c=1 in all
+  three and fell to 0.61-0.67 under batching.
+
+**For mimir's workload — one interactive caller at a time — `--parallel 1`
+remains right**, and it is worth 1.36 GB of headroom. A queue serving four
+callers should use 4.
+
+### Two cards add up, and neither slows the other
+
+Ornith-1.5-9B-Q6_K served on both cards at once, `--parallel 1`, MTP n-max 3:
+
+| | alone | both at once |
+|---|---|---|
+| R9700 (gpu 1) | 53.59 t/s | 53.75 t/s |
+| RX 9060 XT (gpu 0) | 14.92 t/s | 14.88 t/s |
+| **combined** | — | **68.63 t/s** |
+
+**No contention** — both within 0.4% of their solo rates, so PCIe and the host
+are not the bottleneck and a second card is genuinely additive. But it adds only
+**28%**, because this model is Q6_K and Q6_K is the type the 9060 XT collapses
+on (previous entry). A request routed to the second card takes 25 s where the
+first takes 7 s. Two cards are worth having; two *different* cards are worth
+routing by model type, not round-robin.
+
+## 2026-09-11: n-max 3 survives the re-derivation under `--parallel 1`
+
+The gap left open on 2026-09-10: n-max was swept at the default 4 slots, so its
+optimum under the `--parallel 1` that got shipped was unknown. Re-swept with
+`harness/spec_sweep.py`, which does the cross product so neither axis is ever
+again chosen against a stale value of the other. b10472, ctx 262144,
+`q8_0`/`q4_0`, `--parallel 1`, 3 reps, 256 tokens, fresh unit per cell.
+
+| n-max | mean t/s | reps | acceptance | VRAM |
+|---|---|---|---|---|
+| off | 24.14 | 23.91 / 24.27 / 24.24 | — | 29.83 |
+| 2 | 43.28 | 43.33 / 43.29 / 43.21 | 0.644 | 31.92 |
+| **3 (served)** | 44.13 | **44.15 / 44.11 / 44.12** | 0.549 | 32.08 |
+| 4 | 44.47 | 43.86 / 43.15 / 46.39 | 0.484 | 32.24 |
+| 5 | 41.47 | 39.60 / 43.23 / 41.59 | 0.420 | 32.39 |
+
+**4 has the higher mean and 3 is the better setting.** The 0.34 t/s gap is 0.8%
+and n-max 4's three reps span 3.24 t/s — its own variance is ten times the
+difference it wins by, while n-max 3 spans 0.04. **No change to the served
+config**; the carried-over 3 was right, and now it is measured rather than
+assumed. Acceptance falls monotonically with depth exactly as before —
+0.64, 0.55, 0.48, 0.42.
+
+Speculation off costs 45% of decode (24.14 vs 44.13), consistent with the 2.1x
+recorded twice before.
+
+### Adaptive MTP (PR #27210) matches a well-chosen fixed depth, and does not beat it
+
+`--spec-type draft-mtp-adaptive` varies draft depth per step. Built here by
+cherry-picking the seven commits of the open PR onto b10902 — see
+`~/llama.cpp/b10902-adaptive-mtp/PROVENANCE.txt`. Same model, context, KV and
+slot count as the table above; the fixed-depth cells are re-measured **on the
+same binary** so the comparison is not confounded with the build:
+
+| setting | mean t/s | reps | acceptance |
+|---|---|---|---|
+| off | 24.25 | 24.26 / 24.24 / 24.24 | — |
+| fixed n-max 3 | 45.01 | 45.02 / 45.00 / 45.00 | 0.569 |
+| fixed n-max 4 | 44.63 | 44.74 / 44.59 / 44.57 | 0.509 |
+| **adaptive** | 45.01 | 45.06 / 45.00 / 44.97 | **0.569** |
+
+**Identical to fixed n-max 3, to three decimal places on acceptance** — the
+controller converged on depth 3 and stayed there. Its value is therefore that it
+removes the need to sweep, not that it is faster: the 2026-09-10 entry's
+conclusion that n-max is workload-dependent and must be re-swept on real traffic
+is exactly what this obsoletes. **On this prompt it costs nothing and saves the
+sweep.** It has not been tested on a workload where the fixed optimum is wrong,
+which is the case where it should actually win, and the PR is still open.
+
+Incidentally the locally built b10902 is ~2% faster than the b10472 prebuilt at
+the same setting (45.01 vs 44.13) with much tighter reps. Not enough to move the
+pin, and not measured on the canary set.
+
+## 2026-09-11: three infrastructure facts
+
+**A local Vulkan build from source works.** b10902 (df03399b8), GCC 15.2, shaders
+via the distro glslc. The 2026-08 entry "the local GCC 15 build is broken" was
+about a **ROCm** build whose llama-server segfaulted in `ggml_cuda_op_scale`; it
+does not generalise, and this does not reverse it. The blocker was never the
+compiler — `glslc`, `libvulkan-dev` and `cmake` were simply absent until
+2026-09-10. One more is still missing and is **not** in that list: **SPIRV-Headers
+is not installed**, and ggml's Vulkan CMakeLists finds the package but does not
+propagate its include directory, so the build dies at `ggml-vulkan.cpp:48` on a
+missing `spirv/unified1/spirv.hpp`. Cloning it at the matching SDK tag into
+`~/.local` and adding `-DCMAKE_CXX_FLAGS=-I$HOME/.local/include` is enough; no
+root needed. Full recipe in `~/llama.cpp/b10902-vulkan-local/PROVENANCE.txt`.
+
+**`harness/install.sh` fires a nightly the moment it runs.** The timers are
+`Persistent=true`, so enabling them after twelve days of downtime immediately
+triggers a catch-up `perf-lab@nightly.service` — which went `activating` while
+two unrelated models held both cards. It was stopped before it loaded anything,
+and the bench guard did the right thing anyway: the five rows it wrote are
+`kind: skipped` with null metrics, not contaminated measurements. **Install the
+timers when the cards are free, or stop the catch-up run immediately after.**
+
+**mimir's `--parallel 1` was never missing.** The 2026-09-10 entry says the
+served config was set with `--parallel 1`; the config diff shows no such flag,
+which reads like the change was lost. It was not: `LlamaCppConfig.ParallelOrDefault()`
+returns **1** when unset, unlike llama-server's own default of 4, so mimir has
+been passing `--parallel 1` all along. The value is now written out explicitly in
+`~/.mimir/mimir.toml` — it changes nothing today, and it stops a load-bearing
+number living in a default that a future edit could move silently.
+
+## 2026-09-11: the served config verified, and two of its keys do nothing
+
+Qwen3.8-27B-Q6_K served with exactly the flags `~/.mimir/mimir.toml` specifies —
+`-c 262144 -ctk q8_0 -ctv q4_0 --flash-attn on --split-mode none --main-gpu 1
+--parallel 1 --spec-type draft-mtp --spec-draft-n-max 3 --mmproj …` — on an idle
+R9700, b10472:
+
+| check | expected | measured |
+|---|---|---|
+| decode | ~48 t/s | **55.48 t/s** per request, acceptance 0.762 |
+| VRAM after load | ~32.1 + 0.9 projector | **32.08 GB** (projector included) |
+| VRAM after an image | flat | **32.11 GB** (+30 MB) |
+| image description | exact | exact, 5/5 |
+
+*"Top-left: red; top-right: blue; bottom-left: yellow; bottom-right: green. A
+horizontal black line crosses the middle."*
+
+Driven as a bare `llama-server` rather than through mimir, so what is confirmed
+is the configuration, not mimir's launcher.
+
+**Two keys added on 2026-09-10 are silently ignored by the installed mimir.**
+`mimir doctor` (build 619ad714a) reports:
+
+> ignored unknown config keys (typo or future-version — they do nothing in this
+> build) keys="llamacpp.vram_headroom_factor, llamacpp.gpu."0000:0c:00.0",
+> llamacpp.gpu."0000:0c:00.0".vram_reserve_gb,
+> llamacpp.gpu."0000:0c:00.0".vram_headroom_factor"
+
+So the whole per-card VRAM budget block — and the long comment beside it
+explaining that a 1.05 headroom factor is "what makes Qwen3.8-27B-Q6_K fit at
+the full 262144 context" — is inert. The model fits regardless, as the table
+above shows; the config comment claims a causal role for settings that are not
+being read. `parallel` was *not* in the ignored list, so that key is live.
+
+The keys exist in `~/git/mimir` source, so the installed binary simply predates
+them. Nothing to fix in the config; the comment needs correcting, and until the
+binary is rebuilt the admission estimate is running on the rig-wide defaults.

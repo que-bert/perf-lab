@@ -1,0 +1,115 @@
+{
+  "model": "Qwen3.8-27B-Q6_K.gguf",
+  "ctx": 262144,
+  "bin": "/home/bbuckham/llama.cpp/b10902-adaptive-mtp",
+  "ctk": "q8_0",
+  "ctv": "q4_0",
+  "n_predict": 256,
+  "reps": 3,
+  "cells": [
+    {
+      "n_max": "off",
+      "parallel": 1,
+      "reps": [
+        {
+          "tps": 24.26,
+          "predicted_n": 256,
+          "acceptance": null
+        },
+        {
+          "tps": 24.24,
+          "predicted_n": 256,
+          "acceptance": null
+        },
+        {
+          "tps": 24.24,
+          "predicted_n": 256,
+          "acceptance": null
+        }
+      ],
+      "tps_mean": 24.25,
+      "tps_min": 24.24,
+      "tps_max": 24.26,
+      "vram_bytes": 29824454656,
+      "vram_gb": 29.82
+    },
+    {
+      "n_max": "3",
+      "parallel": 1,
+      "reps": [
+        {
+          "tps": 45.02,
+          "predicted_n": 256,
+          "acceptance": 0.569
+        },
+        {
+          "tps": 45.0,
+          "predicted_n": 256,
+          "acceptance": 0.569
+        },
+        {
+          "tps": 45.0,
+          "predicted_n": 256,
+          "acceptance": 0.569
+        }
+      ],
+      "tps_mean": 45.01,
+      "tps_min": 45.0,
+      "tps_max": 45.02,
+      "vram_bytes": 32078647296,
+      "vram_gb": 32.08
+    },
+    {
+      "n_max": "4",
+      "parallel": 1,
+      "reps": [
+        {
+          "tps": 44.74,
+          "predicted_n": 256,
+          "acceptance": 0.509
+        },
+        {
+          "tps": 44.59,
+          "predicted_n": 256,
+          "acceptance": 0.509
+        },
+        {
+          "tps": 44.57,
+          "predicted_n": 256,
+          "acceptance": 0.509
+        }
+      ],
+      "tps_mean": 44.63,
+      "tps_min": 44.57,
+      "tps_max": 44.74,
+      "vram_bytes": 32235560960,
+      "vram_gb": 32.24
+    },
+    {
+      "n_max": "adaptive",
+      "parallel": 1,
+      "reps": [
+        {
+          "tps": 45.06,
+          "predicted_n": 256,
+          "acceptance": 0.569
+        },
+        {
+          "tps": 45.0,
+          "predicted_n": 256,
+          "acceptance": 0.569
+        },
+        {
+          "tps": 44.97,
+          "predicted_n": 256,
+          "acceptance": 0.569
+        }
+      ],
+      "tps_mean": 45.01,
+      "tps_min": 44.97,
+      "tps_max": 45.06,
+      "vram_bytes": 32078618624,
+      "vram_gb": 32.08
+    }
+  ]
+}

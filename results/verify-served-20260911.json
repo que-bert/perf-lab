@@ -1,0 +1,21 @@
+{
+  "label": "served-config-verify",
+  "port": 8963,
+  "n_predict": 256,
+  "reps": 3,
+  "levels": [
+    {
+      "concurrency": 1,
+      "batches": 3,
+      "requests": 3,
+      "failed": 0,
+      "generated_tokens": 768,
+      "wall_seconds": 15.5,
+      "agg_tps": 49.55,
+      "per_req_tps": 55.48,
+      "p50_seconds": 4.68,
+      "p95_seconds": 6.24,
+      "draft_acceptance": 0.762
+    }
+  ]
+}

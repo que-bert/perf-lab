@@ -1,0 +1,141 @@
+{
+  "model": "Qwen3.8-27B-Q6_K.gguf",
+  "ctx": 262144,
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "ctk": "q8_0",
+  "ctv": "q4_0",
+  "n_predict": 256,
+  "reps": 3,
+  "cells": [
+    {
+      "n_max": "off",
+      "parallel": 1,
+      "reps": [
+        {
+          "tps": 23.91,
+          "predicted_n": 256,
+          "acceptance": null
+        },
+        {
+          "tps": 24.27,
+          "predicted_n": 256,
+          "acceptance": null
+        },
+        {
+          "tps": 24.24,
+          "predicted_n": 256,
+          "acceptance": null
+        }
+      ],
+      "tps_mean": 24.14,
+      "tps_min": 23.91,
+      "tps_max": 24.27,
+      "vram_bytes": 29825458176,
+      "vram_gb": 29.83
+    },
+    {
+      "n_max": "2",
+      "parallel": 1,
+      "reps": [
+        {
+          "tps": 43.33,
+          "predicted_n": 256,
+          "acceptance": 0.644
+        },
+        {
+          "tps": 43.29,
+          "predicted_n": 256,
+          "acceptance": 0.644
+        },
+        {
+          "tps": 43.21,
+          "predicted_n": 256,
+          "acceptance": 0.644
+        }
+      ],
+      "tps_mean": 43.28,
+      "tps_min": 43.21,
+      "tps_max": 43.33,
+      "vram_bytes": 31921389568,
+      "vram_gb": 31.92
+    },
+    {
+      "n_max": "3",
+      "parallel": 1,
+      "reps": [
+        {
+          "tps": 44.15,
+          "predicted_n": 256,
+          "acceptance": 0.549
+        },
+        {
+          "tps": 44.11,
+          "predicted_n": 256,
+          "acceptance": 0.549
+        },
+        {
+          "tps": 44.12,
+          "predicted_n": 256,
+          "acceptance": 0.549
+        }
+      ],
+      "tps_mean": 44.13,
+      "tps_min": 44.11,
+      "tps_max": 44.15,
+      "vram_bytes": 32078913536,
+      "vram_gb": 32.08
+    },
+    {
+      "n_max": "4",
+      "parallel": 1,
+      "reps": [
+        {
+          "tps": 43.86,
+          "predicted_n": 256,
+          "acceptance": 0.484
+        },
+        {
+          "tps": 43.15,
+          "predicted_n": 256,
+          "acceptance": 0.479
+        },
+        {
+          "tps": 46.39,
+          "predicted_n": 256,
+          "acceptance": 0.534
+        }
+      ],
+      "tps_mean": 44.47,
+      "tps_min": 43.15,
+      "tps_max": 46.39,
+      "vram_bytes": 32235753472,
+      "vram_gb": 32.24
+    },
+    {
+      "n_max": "5",
+      "parallel": 1,
+      "reps": [
+        {
+          "tps": 39.6,
+          "predicted_n": 256,
+          "acceptance": 0.42
+        },
+        {
+          "tps": 43.23,
+          "predicted_n": 256,
+          "acceptance": 0.481
+        },
+        {
+          "tps": 41.59,
+          "predicted_n": 256,
+          "acceptance": 0.456
+        }
+      ],
+      "tps_mean": 41.47,
+      "tps_min": 39.6,
+      "tps_max": 43.23,
+      "vram_bytes": 32392626176,
+      "vram_gb": 32.39
+    }
+  ]
+}
