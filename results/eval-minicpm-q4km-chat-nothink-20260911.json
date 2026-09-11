@@ -1,0 +1,274 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "minicpm5-2b-q4km",
+  "label": "minicpm-q4km",
+  "ctx": 65536,
+  "api": "llama",
+  "prompt_mode": "chat",
+  "thinking": false,
+  "budget": 6144,
+  "results": {
+    "code": [
+      {
+        "task": "rle",
+        "passes": true,
+        "error": null,
+        "text": "def rle(s):\n    if not s:\n        return \"\"\n    result = []\n    count = 1\n    prev = s[0]\n    for char in s[1:]:\n        if char == prev:\n            count += 1\n        else:\n            result.append(f\"{prev}{count}\")\n            prev = char\n            count = 1\n    result.append(f\"{prev}{count}\")\n    return \"\".join(result)\n",
+        "truncated": false
+      },
+      {
+        "task": "roman",
+        "passes": true,
+        "error": null,
+        "text": "def to_roman(n):\n    \"\"\"\n    Convert an integer to a Roman numeral.\n    Supports numbers from 1 to 3999.\n    \"\"\"\n    if not (1 <= n <= 3999):\n        raise ValueError(\"Number out of range (1-3999)\")\n\n    val = [\n        1000, 900, 500, 400,\n        100, 90, 50, 40,\n        10, 9, 5, 4,\n        1\n    ]\n    syms = [\n        \"M\", \"CM\", \"D\", \"CD\",\n        \"C\", \"XC\", \"L\", \"XL\",\n        \"X\", \"IX\", \"V\", \"IV\",\n        \"I\"\n    ]\n\n    roman = \"\"\n    i = 0\n    while n > 0:\n        for value, symbol in zip(val, syms):\n            if n >= value:\n                n -= value\n                roman += symbol\n  ",
+        "truncated": false
+      },
+      {
+        "task": "balanced",
+        "passes": true,
+        "error": null,
+        "text": "def balanced(s):\n    \"\"\"\n    Returns True if brackets (), [], {} in s are correctly nested and closed.\n    Other characters are ignored.\n    \"\"\"\n    stack = []\n    brackets = {')': '(', ']': '[', '}': '{'}\n\n    for char in s:\n        if char in brackets.values():\n            stack.append(char)\n        elif char in brackets:\n            if not stack or stack.pop() != brackets[char]:\n                return False\n    return not stack\n",
+        "truncated": false
+      },
+      {
+        "task": "merge",
+        "passes": true,
+        "error": null,
+        "text": "def merge(a, b):\n    \"\"\"\n    Merges two sorted lists into a new sorted list without using sorted() or .sort().\n\n    Args:\n        a (list): First sorted list.\n        b (list): Second sorted list.\n\n    Returns:\n        list: A new sorted list containing all elements from both input lists.\n    \"\"\"\n    merged = []\n    i = j = 0\n\n    # Traverse both lists and append the smaller element to the result\n    while i < len(a) and j < len(b):\n        if a[i] <= b[j]:\n            merged.append(a[i])\n            i += 1\n        else:\n            merged.append(b[j])\n            j += 1\n\n    # Append any rema",
+        "truncated": false
+      },
+      {
+        "task": "wordfreq",
+        "passes": true,
+        "error": null,
+        "text": "import re\nfrom collections import Counter\n\ndef top_word(s):\n    \"\"\"\n    Returns the most frequent lowercase word in the string s.\n    Breaks ties by returning the word that comes first alphabetically.\n    Words are sequences of letters.\n    \"\"\"\n    # Extract all sequences of letters\n    words = re.findall(r'[a-zA-Z]+', s)\n    # Convert to lowercase\n    words = [word.lower() for word in words]\n    # Filter out empty strings (though regex ensures non-empty)\n    words = [word for word in words if word]\n\n    if not words:\n        return \"\"\n\n    # Count frequencies\n    counts = Counter(words)\n\n    ",
+        "truncated": false
+      },
+      {
+        "task": "basen",
+        "passes": true,
+        "error": null,
+        "text": "def to_base(n, b):\n    \"\"\"\n    Convert a non-negative integer n to a string in base b (2..16).\n    Uses lowercase digits for values 10-15.\n    \"\"\"\n    if n == 0:\n        return \"0\"\n    digits = \"0123456789abcdef\"\n    result = []\n    while n > 0:\n        n, remainder = divmod(n, b)\n        result.append(digits[remainder])\n    return ''.join(reversed(result))\n",
+        "truncated": false
+      }
+    ],
+    "math": [
+      {
+        "task": "crates",
+        "want": 370,
+        "got": 370.0,
+        "passes": true,
+        "said": "We have 17 crates, each holding 24 bottles.\nTotal bottles = 17 * 24 = 408.\n38 bottles are broken and removed.\nRemaining bottles = 408 - 38 = 370.\n\nThe final answer is 370.",
+        "truncated": false
+      },
+      {
+        "task": "trip",
+        "want": 360,
+        "got": 360.0,
+        "passes": true,
+        "said": "To find the total time of the trip, we need to calculate the driving time for each leg and add the rest time.\n\n**1. First leg:**\n*   Distance: $240 \\text{ km}$\n*   Speed: $80 \\text{ km/h}$\n*   Time = $\\frac{\\text{Distance}}{\\text{Speed}} = \\frac{240}{80} = 3 \\text{ hours}$\n*   Convert to minutes: $3",
+        "truncated": false
+      },
+      {
+        "task": "discount",
+        "want": 146,
+        "got": 146.0,
+        "passes": true,
+        "said": "We start with the original price: $180.\n\nFirst, apply the 25% discount:\n$$\n180 \\times (1 - 0.25) = 180 \\times 0.75 = 135\n$$\n\nNext, apply the 8% sales tax to the discounted price:\n$$\n135 \\times (1 + 0.08) = 135 \\times 1.08 = 145.8\n$$\n\nRounded to the nearest whole dollar:\n$$\n145.8 \\approx 146\n$$\n\n**Fi",
+        "truncated": false
+      },
+      {
+        "task": "ages",
+        "want": 18,
+        "got": 18.0,
+        "passes": true,
+        "said": "We are given two pieces of information:\n\n1. Ana is currently three times as old as Ben.\n2. In 6 years, Ana will be twice as old as Ben.\n\nLet\u2019s define:\n- $ A $ = Ana\u2019s current age\n- $ B $ = Ben\u2019s current age\n\nFrom the first statement:\n$$\nA = 3B \\tag{1}\n$$\n\nFrom the second statement (in 6 years):\n$$\nA",
+        "truncated": false
+      },
+      {
+        "task": "pipes",
+        "want": 4,
+        "got": 4.0,
+        "passes": true,
+        "said": "We are given two pipes:\n\n- Pipe A fills the tank in 6 hours \u2192 rate = 1/6 tank per hour.\n- Pipe B fills the tank in 12 hours \u2192 rate = 1/12 tank per hour.\n\nWhen running together, their combined rate is:\n\n$$\n\\frac{1}{6} + \\frac{1}{12} = \\frac{2}{12} + \\frac{1}{12} = \\frac{3}{12} = \\frac{1}{4} \\text{ ta",
+        "truncated": false
+      },
+      {
+        "task": "seats",
+        "want": 770,
+        "got": 770.0,
+        "passes": true,
+        "said": "We have an arithmetic sequence of seat counts per row.\n\n- First row: 14 seats.\n- Each subsequent row adds 2 seats.\n- Number of rows: 22.\n\nWe need the sum of the first 22 terms of an arithmetic sequence with first term $a = 14$ and common difference $d = 2$.\n\nThe sum of an arithmetic sequence is:\n$$\n",
+        "truncated": false
+      },
+      {
+        "task": "coins",
+        "want": 9,
+        "got": 9.0,
+        "passes": true,
+        "said": "Let $q$ be the number of quarters.\nLet $d$ be the number of dimes.\nLet $n$ be the number of nickels.\n\nFrom the problem statement:\n1. \"A jar has 3 times as many dimes as quarters\": $d = 3q$.\n2. \"5 more nickels than dimes\": $n = d + 5$.\n3. \"The total value is 655 cents\": The value of quarters is $25q$",
+        "truncated": false
+      },
+      {
+        "task": "primes",
+        "want": 251,
+        "got": 251.0,
+        "passes": true,
+        "said": "We need to find all prime numbers strictly between 20 and 50, then sum them.\n\nFirst, list the numbers between 20 and 50:\n21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49.\n\nNow, identify the primes:\n- 21: not prime (divisible by 3)\n- 2",
+        "truncated": false
+      }
+    ],
+    "instruct": [
+      {
+        "task": "json_keys",
+        "passes": true,
+        "said": "{\"name\": \"Fruit Basket\", \"count\": 1, \"tags\": [\"apple\", \"banana\", \"orange\"]}",
+        "truncated": false
+      },
+      {
+        "task": "three_bullets",
+        "passes": true,
+        "said": "- Enables collaboration\n- Maintains code history\n- Facilitates safe changes",
+        "truncated": false
+      },
+      {
+        "task": "shout",
+        "passes": true,
+        "said": "BANANA IS THE ANSWER.",
+        "truncated": false
+      },
+      {
+        "task": "no_commas",
+        "passes": true,
+        "said": "The vast sea is a deep and endless feeling that stays with us.",
+        "truncated": false
+      },
+      {
+        "task": "exact_five",
+        "passes": true,
+        "said": "Soft, gentle, fresh, cool, rain",
+        "truncated": false
+      },
+      {
+        "task": "yes_no",
+        "passes": true,
+        "said": "No",
+        "truncated": false
+      }
+    ],
+    "extract": [
+      {
+        "task": "span_kestrel",
+        "want": "412",
+        "passes": true,
+        "said": "412",
+        "truncated": false
+      },
+      {
+        "task": "builder_vance",
+        "want": "Delmar Ironworks",
+        "passes": true,
+        "said": "Delmar Ironworks",
+        "truncated": false
+      },
+      {
+        "task": "engineer_kestrel",
+        "want": "Paul Anselm",
+        "passes": true,
+        "said": "Paul Anselm",
+        "truncated": false
+      },
+      {
+        "task": "year_widened",
+        "want": "2004",
+        "passes": true,
+        "said": "2004",
+        "truncated": false
+      },
+      {
+        "task": "span_rowe",
+        "want": "530",
+        "passes": true,
+        "said": "530",
+        "truncated": false
+      }
+    ],
+    "research": [
+      {
+        "task": "multihop_revenue",
+        "passes": true,
+        "anywhere": false,
+        "said": "700,400",
+        "raw_tail": ". The documents provide the necessary information. No documents indicate that the fee or throughput changed for Marrow. So the calculation is straightforward.\n\nFinal answer: 700,400.\n</think>\n\n700,400",
+        "truncated": false
+      },
+      {
+        "task": "multihop_above_avg",
+        "passes": false,
+        "anywhere": false,
+        "said": "Kell, Vance",
+        "raw_tail": "Kell, Vance",
+        "truncated": false
+      },
+      {
+        "task": "abstain_vance_year",
+        "passes": true,
+        "anywhere": true,
+        "said": "NOT STATED",
+        "raw_tail": "NOT STATED",
+        "truncated": false
+      },
+      {
+        "task": "conflict_vance",
+        "passes": true,
+        "anywhere": true,
+        "said": "The documents disagree about the **Vance** depot's 2024 throughput. The figures given are **27,150** containers and **26,400** containers.",
+        "raw_tail": "The documents disagree about the **Vance** depot's 2024 throughput. The figures given are **27,150** containers and **26,400** containers.",
+        "truncated": false
+      },
+      {
+        "task": "cite_fee_2023",
+        "passes": true,
+        "anywhere": true,
+        "said": "14|D4",
+        "raw_tail": "14|D4",
+        "truncated": false
+      },
+      {
+        "task": "aggregate_throughput",
+        "passes": false,
+        "anywhere": false,
+        "said": "We are asked to use only the figures in document D2 to calculate the combined 2024 throughput of all three depots.\n\nFrom D2:\n- Marrow handled 41,200 containers.\n- Kell handled 18,650 containers.\n- Vance handled 27,150 containers.\n\nThe combined throughput is the sum of these three numbers:\n41,200 + 1",
+        "raw_tail": ".\n- Kell handled 18,650 containers.\n- Vance handled 27,150 containers.\n\nThe combined throughput is the sum of these three numbers:\n41,200 + 18,650 + 27,150 = 87,000.\n\nThus, the final answer is 87,000.",
+        "truncated": false
+      }
+    ]
+  },
+  "score": {
+    "code": {
+      "pass": 6,
+      "of": 6,
+      "skipped": 0
+    },
+    "math": {
+      "pass": 8,
+      "of": 8,
+      "skipped": 0
+    },
+    "instruct": {
+      "pass": 6,
+      "of": 6,
+      "skipped": 0
+    },
+    "extract": {
+      "pass": 5,
+      "of": 5,
+      "skipped": 0
+    },
+    "research": {
+      "pass": 4,
+      "of": 6,
+      "skipped": 0
+    }
+  }
+}

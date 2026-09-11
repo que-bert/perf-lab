@@ -239,14 +239,21 @@ def run_code(port, log, budget):
     for name, prompt, asserts in CODE_TASKS:
         r = _complete(port, prompt, budget)
         txt = r.get("content") or ""
-        m = CODE_FENCE.search(txt)
-        body = m.group(1) if m else strip_think(txt)
+        truncated = r.get("stop_type") == "limit"
+        # Strip the scratchpad BEFORE looking for a fence. A reasoning model
+        # drafts a ```python block inside <think> and then writes the finished
+        # version after it; searching the raw text finds the draft first.
+        # Measured 2026-09-11 on minicpm-q4km: `balanced` scored on the literal
+        # stub "def balanced(s):\n    # code" from the scratchpad while the
+        # real answer was never examined.
+        said = strip_think(txt)
+        m = CODE_FENCE.search(said)
         # A fence nested inside prose or a list arrives uniformly indented, and
         # exec() then raises IndentationError on line 1. Scored as a failure
         # that way, qwen3.5:9b read 1/6 on code it had in fact written
         # correctly -- the indentation was the reviewer's problem, not the
         # model's. dedent is a no-op on an unindented body.
-        body = textwrap.dedent(body)
+        body = textwrap.dedent(m.group(1) if m else said)
         ok, err = False, None
         try:
             ns = {}
@@ -254,10 +261,19 @@ def run_code(port, log, budget):
             ok = True
         except Exception as e:  # a wrong answer is data, not a crash
             err = f"{type(e).__name__}: {e}"[:200]
+        # A generation cut off inside its reasoning block emitted no answer at
+        # all, and exec() then fails with NameError on the function that was
+        # never defined. Counting that as wrong code measures the budget, not
+        # the model -- the same artifact the math suite records as TRUNC.
+        # Measured 2026-09-11: minicpm-q4km chat hit the limit on 5 of 6 items
+        # at budget 6144 and read 1/6.
+        if truncated and not ok:
+            ok, err = None, None
+        verdict = "TRUNC" if ok is None else ("PASS" if ok else "FAIL")
         out.append({"task": name, "passes": ok, "error": err,
-                    "text": body[:600]})
-        log(f"    code     {name:<10} {'PASS' if ok else 'FAIL'}"
-            f"{'' if ok else '  ' + str(err)[:60]}")
+                    "text": body[:600], "truncated": truncated})
+        log(f"    code     {name:<10} {verdict:<5}"
+            f"{'' if ok is not False else '  ' + str(err)[:60]}")
     return out
 
 

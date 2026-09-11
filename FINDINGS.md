@@ -1418,3 +1418,83 @@ the measurement above — the model fits on its own, and what these keys will bu
 once mimir is rebuilt is a more accurate *admission estimate*, not a fit. They
 are left in place because they are correct for a newer binary and harmless to
 this one; deleting them would only mean rediscovering the values later.
+
+## 2026-09-11: Q4_K_M costs one point, and two more scorer bugs were in the way
+
+The 2026-09-11 capability table left `ornith-q4km` and `minicpm-q4km` out: they
+had never been run in chat mode, so the only numbers for them were the raw-mode
+rows from 2026-09-10 that the prompt-mode entry above withdrew. Both re-measured
+here in all three modes, ctx 65536, temperature 0, budget 6144, speculation off,
+`results/eval-{ornith,minicpm}-q4km-{raw,chat,chat-nothink}-20260911.json`.
+
+| model | mode | code | math | instruct | extract | research | total |
+|---|---|---|---|---|---|---|---|
+| ornith-q4km | **chat** | 6/6 | 8/8 | 5/6 | 5/5 | 5/6 | **29/31** |
+| ornith-q4km | chat-nothink | 6/6 | 1/8 | 4/6 | 5/5 | 3/6 | 19/31 |
+| ornith-q4km | raw | 2/3* | 1/1* | 3/6 | 5/5 | 4/4* | 15/19* |
+| minicpm-q4km | chat | 1/1* | 7/7* | 6/6 | 5/5 | 5/6 | 24/25* |
+| minicpm-q4km | **chat-nothink** | 6/6 | 8/8 | 6/6 | 5/5 | 4/6 | **29/31** |
+| minicpm-q4km | raw | 2/5* | 4/5* | 2/6 | 5/5 | 2/2* | 15/23* |
+
+`*` = the suite contained items cut off at the budget, recorded unscoreable
+rather than failed.
+
+**Quantization costs about one point, not a tier.** Ornith-1.5-9B goes
+Q6_K 30/31 → Q4_K_M 29/31, and MiniCPM5-2B goes Q8_0 27/31 → Q4_K_M 29/31 —
+the 2B *improves* on the smaller file, which is only interpretable as the
+suites being saturated at this difficulty, not as Q4_K_M beating Q8_0. The
+prompt-mode result holds on the quantization axis too: both Q4_K_M files read
+15/19 and 15/23 raw and 29/31 in their best chat mode. **The raw-era verdicts
+this table replaces — Ornith Q4_K_M "1/6 on code", MiniCPM Q4_K_M "2/6" — were
+prompting artifacts exactly as the Q6_K and Q8_0 rows were.**
+
+### Two more scorer bugs, both in `run_code` alone
+
+Getting these numbers took fixing the fourth and fifth instances of the bug
+class the entry above fixed three of. Both were in `run_code`, which was the
+only suite that had never been revised:
+
+- **It never checked `stop_type`.** Every other suite records `truncated` and
+  scores a cut-off item unscoreable. `run_code` counted one as wrong code:
+  `exec()` raises `NameError` on the function that was never defined, which in
+  the stored record is indistinguishable from a genuine failure.
+- **It searched for the code fence before stripping `<think>`.** A reasoning
+  model drafts a ` ```python ` block inside its scratchpad and writes the
+  finished version after it; `CODE_FENCE.search` on the raw text found the
+  draft and never examined the answer. This is how `balanced` came to be scored
+  on the literal stub `def balanced(s):\n    # code`.
+
+Both were found by raising MiniCPM Q4_K_M's budget 2048 → 6144 to explain a
+1/6 code score and getting **byte-identical generations** — at temperature 0 the
+budget was not the binding constraint, and the score was not measuring the
+model. Probing the live server showed 5 of 6 code items returning
+`stop_type=limit` with 20-29K characters of reasoning and nothing after
+`</think>`.
+
+**These fixes reach every code score in this file.** Only the two Q4_K_M labels
+have been re-measured under the corrected scorer; the five labels in the table
+above still carry code numbers taken with it. Ornith Q6_K's 6/6 is the one most
+likely to be real — its Q4_K_M sibling scores 6/6 with zero truncations — and
+MiniCPM Q8_0's 3/6 is the one most likely to be an artifact.
+
+### No-think is not one lever, it is two, and they point opposite ways
+
+The entry above concluded `enable_thinking=false` "costs accuracy where the
+scratchpad was doing work". That holds for **math** and is now sharper: Ornith
+Q4_K_M falls 8/8 → 1/8 without thinking. It is **backwards for code on
+MiniCPM5-2B**, which cannot finish a code task with thinking on — 5 of 6 items
+run out of budget mid-scratchpad at 6144 — and scores a clean 6/6 with it off,
+nothing truncated. Ornith shows no such effect: 6/6 either way.
+
+So the scratchpad is load-bearing for arithmetic on both models, and actively
+fatal for code generation on the 2B. **A single no-think setting per model is
+the wrong shape**; it belongs per task type, and any harness scripting MiniCPM
+for code should disable thinking.
+
+### An infrastructure note
+
+Loading the 9B inside a supervised background task was killed for memory
+pressure with 20 GB available, the same supervisor behaviour `serve_unit.sh`
+was written for. The server survives because systemd owns it; the caller does
+not. **Start the unit, then run `model_eval.py` against the live port as a
+separate task** — the load is what crosses the threshold, not the evaluation.

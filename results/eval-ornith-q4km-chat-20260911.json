@@ -1,0 +1,274 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "ornith-9b-q4km",
+  "label": "ornith-q4km",
+  "ctx": 65536,
+  "api": "llama",
+  "prompt_mode": "chat",
+  "thinking": true,
+  "budget": 6144,
+  "results": {
+    "code": [
+      {
+        "task": "rle",
+        "passes": true,
+        "error": null,
+        "text": "def rle(s):\n    if not s:\n        return ''\n    result = []\n    count = 1\n    for i in range(1, len(s)):\n        if s[i] == s[i - 1]:\n            count += 1\n        else:\n            result.append(s[i - 1] + str(count))\n            count = 1\n    result.append(s[-1] + str(count))\n    return ''.join(result)\n",
+        "truncated": false
+      },
+      {
+        "task": "roman",
+        "passes": true,
+        "error": null,
+        "text": "def to_roman(n):\n    table = [\n        (1000, 'M'),\n        (900, 'CM'),\n        (500, 'D'),\n        (400, 'CD'),\n        (100, 'C'),\n        (90, 'XC'),\n        (50, 'L'),\n        (40, 'XL'),\n        (10, 'X'),\n        (9, 'IX'),\n        (5, 'V'),\n        (4, 'IV'),\n        (1, 'I'),\n    ]\n    result = ''\n    for value, symbol in table:\n        while n >= value:\n            result += symbol\n            n -= value\n    return result\n",
+        "truncated": false
+      },
+      {
+        "task": "balanced",
+        "passes": true,
+        "error": null,
+        "text": "def balanced(s):\n    stack = []\n    pairs = {')': '(', ']': '[', '}': '{'}\n    for char in s:\n        if char in '([{':\n            stack.append(char)\n        elif char in ')]}':\n            if not stack or stack[-1] != pairs[char]:\n                return False\n            stack.pop()\n    return not stack\n",
+        "truncated": false
+      },
+      {
+        "task": "merge",
+        "passes": true,
+        "error": null,
+        "text": "def merge(a, b):\n    result = []\n    i, j = 0, 0\n    while i < len(a) and j < len(b):\n        if a[i] <= b[j]:\n            result.append(a[i])\n            i += 1\n        else:\n            result.append(b[j])\n            j += 1\n    while i < len(a):\n        result.append(a[i])\n        i += 1\n    while j < len(b):\n        result.append(b[j])\n        j += 1\n    return result\n",
+        "truncated": false
+      },
+      {
+        "task": "wordfreq",
+        "passes": true,
+        "error": null,
+        "text": "import re\nfrom collections import Counter\n\ndef top_word(s):\n    if not s:\n        return None\n    words = [w.lower() for w in re.findall(r'[a-zA-Z]+', s)]\n    if not words:\n        return None\n    counts = Counter(words)\n    return min(counts, key=lambda w: (-counts[w], w))\n",
+        "truncated": false
+      },
+      {
+        "task": "basen",
+        "passes": true,
+        "error": null,
+        "text": "def to_base(n, b):\n    digits = \"0123456789abcdef\"\n    if n == 0:\n        return \"0\"\n    result = \"\"\n    while n > 0:\n        result = digits[n % b] + result\n        n //= b\n    return result\n",
+        "truncated": false
+      }
+    ],
+    "math": [
+      {
+        "task": "crates",
+        "want": 370,
+        "got": 370.0,
+        "passes": true,
+        "said": "370",
+        "truncated": false
+      },
+      {
+        "task": "trip",
+        "want": 360,
+        "got": 360.0,
+        "passes": true,
+        "said": "360",
+        "truncated": false
+      },
+      {
+        "task": "discount",
+        "want": 146,
+        "got": 146.0,
+        "passes": true,
+        "said": "146",
+        "truncated": false
+      },
+      {
+        "task": "ages",
+        "want": 18,
+        "got": 18.0,
+        "passes": true,
+        "said": "18",
+        "truncated": false
+      },
+      {
+        "task": "pipes",
+        "want": 4,
+        "got": 4.0,
+        "passes": true,
+        "said": "4",
+        "truncated": false
+      },
+      {
+        "task": "seats",
+        "want": 770,
+        "got": 770.0,
+        "passes": true,
+        "said": "770",
+        "truncated": false
+      },
+      {
+        "task": "coins",
+        "want": 9,
+        "got": 9.0,
+        "passes": true,
+        "said": "9",
+        "truncated": false
+      },
+      {
+        "task": "primes",
+        "want": 251,
+        "got": 251.0,
+        "passes": true,
+        "said": "251",
+        "truncated": false
+      }
+    ],
+    "instruct": [
+      {
+        "task": "json_keys",
+        "passes": true,
+        "said": "{\"name\": \"Seasonal Fruit Basket\", \"count\": 12, \"tags\": [\"fresh\", \"colorful\", \"apples\"]}",
+        "truncated": false
+      },
+      {
+        "task": "three_bullets",
+        "passes": true,
+        "said": "- Tracks changes over time, allowing you to see the history of edits and understand how a project evolved.\n- Enables collaboration by letting multiple people work on the same files without overwriting",
+        "truncated": false
+      },
+      {
+        "task": "shout",
+        "passes": false,
+        "said": "A BANANA is a delicious yellow fruit that grows in clusters and provides a great source of energy and potassium.",
+        "truncated": false
+      },
+      {
+        "task": "no_commas",
+        "passes": true,
+        "said": "The vast blue sea stretches endlessly toward the horizon swallowing all light and sound.",
+        "truncated": false
+      },
+      {
+        "task": "exact_five",
+        "passes": true,
+        "said": "Soft gray falling rain drops",
+        "truncated": false
+      },
+      {
+        "task": "yes_no",
+        "passes": true,
+        "said": "No",
+        "truncated": false
+      }
+    ],
+    "extract": [
+      {
+        "task": "span_kestrel",
+        "want": "412",
+        "passes": true,
+        "said": "412",
+        "truncated": false
+      },
+      {
+        "task": "builder_vance",
+        "want": "Delmar Ironworks",
+        "passes": true,
+        "said": "Delmar Ironworks",
+        "truncated": false
+      },
+      {
+        "task": "engineer_kestrel",
+        "want": "Paul Anselm",
+        "passes": true,
+        "said": "Paul Anselm",
+        "truncated": false
+      },
+      {
+        "task": "year_widened",
+        "want": "2004",
+        "passes": true,
+        "said": "2004",
+        "truncated": false
+      },
+      {
+        "task": "span_rowe",
+        "want": "530",
+        "passes": true,
+        "said": "530",
+        "truncated": false
+      }
+    ],
+    "research": [
+      {
+        "task": "multihop_revenue",
+        "passes": true,
+        "anywhere": false,
+        "said": "700,400",
+        "raw_tail": "+ 288,400 = 700,400.\n\nSo the answer is 700,400 dollars.\n\nThe question asks only about Marrow depot, so the Kell closure (D3) and Vance restatement (D6) are irrelevant.\n\nAnswer: 700,400\n</think>700,400",
+        "truncated": false
+      },
+      {
+        "task": "multihop_above_avg",
+        "passes": false,
+        "anywhere": false,
+        "said": "Marrow\n\nThe regional average throughput was 31,000 containers (D5). Comparing each Ardent depot:\n- Marrow: 41,200 (D2) \u2014 above the regional average\n- Kell: 18,650 (D2) \u2014 below\n- Vance: 27,150 (D2), later restated as 26,400 (D6) \u2014 below\n\nOnly Marrow exceeded the regional average.",
+        "raw_tail": "ach Ardent depot:\n- Marrow: 41,200 (D2) \u2014 above the regional average\n- Kell: 18,650 (D2) \u2014 below\n- Vance: 27,150 (D2), later restated as 26,400 (D6) \u2014 below\n\nOnly Marrow exceeded the regional average.",
+        "truncated": false
+      },
+      {
+        "task": "abstain_vance_year",
+        "passes": true,
+        "anywhere": false,
+        "said": "NOT STATED",
+        "raw_tail": "nce depot opened. Let me check the documents.\n\n[D1] says Marrow opened in 2009 and is the oldest of the three.\n\nThere's no mention of when Vance opened. So the answer is NOT STATED.\n</think>NOT STATED",
+        "truncated": false
+      },
+      {
+        "task": "conflict_vance",
+        "passes": true,
+        "anywhere": true,
+        "said": "Answer: The Vance depot. The documents give figures of 27,150 containers (D2) and 26,400 containers (D6).",
+        "raw_tail": "roughput as 26,400 containers.\n\nSo the depot is Vance, with figures 27,150 and 26,400.\n</think>Answer: The Vance depot. The documents give figures of 27,150 containers (D2) and 26,400 containers (D6).",
+        "truncated": false
+      },
+      {
+        "task": "cite_fee_2023",
+        "passes": true,
+        "anywhere": true,
+        "said": "14|D4",
+        "raw_tail": "r handling fee in 2023 and which document states it.\n\nLooking at D4: \"Ardent's per-container handling fee was 14 dollars in 2023. It rose to 17 dollars in 2024.\"\n\nSo the answer is 14|D4.\n</think>14|D4",
+        "truncated": false
+      },
+      {
+        "task": "aggregate_throughput",
+        "passes": true,
+        "anywhere": false,
+        "said": "87,000",
+        "raw_tail": "\n- Marrow: 41,200\n- Kell: 18,650\n- Vance: 27,150\n\nCombined = 41,200 + 18,650 + 27,150 = 87,000\n\nLet me add: 41,200 + 18,650 = 59,850. 59,850 + 27,150 = 87,000.\n\nSo the answer is 87,000.\n</think>87,000",
+        "truncated": false
+      }
+    ]
+  },
+  "score": {
+    "code": {
+      "pass": 6,
+      "of": 6,
+      "skipped": 0
+    },
+    "math": {
+      "pass": 8,
+      "of": 8,
+      "skipped": 0
+    },
+    "instruct": {
+      "pass": 5,
+      "of": 6,
+      "skipped": 0
+    },
+    "extract": {
+      "pass": 5,
+      "of": 5,
+      "skipped": 0
+    },
+    "research": {
+      "pass": 5,
+      "of": 6,
+      "skipped": 0
+    }
+  }
+}
