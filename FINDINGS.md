@@ -1006,3 +1006,54 @@ truncated items now record `passes: None` rather than counting as failures.
 
 Not measured anywhere here: prose quality, helpfulness, tone. Those need a
 judge, and a small model judging small models measures the judge.
+
+## 2026-09-10: `--parallel 1` is the missing flag — it doubles q8_0/q8_0 with MTP
+
+`q8_0`/`q8_0` measured 22.4 t/s against `q8_0`/`q4_0`'s 45.5 at ctx 262144 with MTP,
+and the cause was neither the cache type nor VRAM pressure. `llama-bench` with the KV
+types swept at small context shows unspeculated decode is **indifferent to V**:
+
+| K | V | tg64 @ d0 | tg64 @ d8192 |
+|---|---|---|---|
+| `q8_0` | `q8_0` | 19.75 | 19.43 |
+| `q8_0` | `q4_0` | 19.71 | 19.43 |
+| `q4_0` | `q8_0` | **24.67** | 19.36 |
+| `q4_0` | `q4_0` | **24.69** | 21.51 |
+
+`q8_0`/`q8_0` and `q8_0`/`q4_0` are within 0.2% of each other — so the server-side gap
+came from MTP, not the cache. **K, not V, is what costs unspeculated decode** at depth 0
+(q4_0 K is 25% faster), which is the opposite of where the quality argument points.
+
+**The lever is `--parallel`, which defaults to 4.** MTP n-max 3, ctx 262144, 4 reps:
+
+| K/V | slots | VRAM | decode t/s |
+|---|---|---|---|
+| `q8_0`/`q8_0` | 4 | 33.87 GB | 22.4 |
+| `q8_0`/`q8_0` | **1** | 33.88 GB | **46.4 / 46.7 / 46.6 / 46.5** |
+| `q8_0`/`q4_0` | 4 | 33.65 GB | 46.0 / 47.7 / 47.6 / 47.6 |
+| `q8_0`/`q4_0` | **1** | **32.08 GB** | **48.3 / 48.6 / 48.6 / 48.6** |
+
+**Draft acceptance was 0.607 in every `q8_0`/`q8_0` run regardless of slot count**, so the
+drafts were accepted just as often and the loss is in the verify/batch path, not draft
+quality. Upstream's note that MTP supports only `n_parallel=1` is consistent; the
+mechanism here is **not established** and one upstream report claims `--parallel 3` works.
+
+Two payoffs, and they differ by config. On `q8_0`/`q8_0` it is the difference between
+viable and not (2x). On `q8_0`/`q4_0` it is only ~2% of speed but frees **1.57 GB** — which
+matters at 98% occupancy. `kv_unified` is on, so `n_ctx_slot` stayed at full context in
+every run: the extra slots cost memory and throughput, not context. The cost of
+`--parallel 1` is concurrency — a second simultaneous request queues.
+
+**`q8_0`/`q8_0` is now viable but still not better.** At 240k tokens both configs scored
+9/9 recall and 6/6 code, so there is no measured quality gain for 0.32 GB of headroom
+against 1.8 GB. Adding `--mmproj` to `q8_0`/`q8_0` also destabilised decode (33.3 / 36.1 /
+46.3 t/s against a flat 46.4-46.7 without it); `q8_0`/`q4_0` has the headroom to absorb it.
+
+Served config set in `~/.mimir/mimir.toml` accordingly (backup
+`mimir.toml.bak-pre-parallel1`): `-ctk q8_0 -ctv q4_0 -fa on --spec-type draft-mtp
+--spec-draft-n-max 3 --parallel 1 --main-gpu 1 --mmproj …/mmproj-F16.gguf`. Note
+`cache_type_k` was `q4_0` there while `extra_args` passed `-ctk q8_0`, setting K twice;
+`cache_type_k` is now `q8_0` so the two agree.
+
+**Not measured**: the n-max sweep was run at the default 4 slots, so the optimum n-max
+*under `--parallel 1`* is unknown — 3 is carried over, not re-derived.
