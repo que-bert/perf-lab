@@ -1,0 +1,274 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "gemma4:e2b",
+  "label": "gemma4-e2b",
+  "ctx": 65536,
+  "api": "ollama",
+  "prompt_mode": "raw",
+  "thinking": true,
+  "budget": 6144,
+  "results": {
+    "code": [
+      {
+        "task": "rle",
+        "passes": true,
+        "error": null,
+        "text": "def rle(s):\n    if not s:\n        return \"\"\n\n    encoded = []\n    i = 0\n    while i < len(s):\n        current_char = s[i]\n        count = 1\n        j = i + 1\n        while j < len(s) and s[j] == current_char:\n            count += 1\n            j += 1\n        encoded.append(current_char + str(count))\n        i = j\n    return \"\".join(encoded)\n",
+        "truncated": false
+      },
+      {
+        "task": "roman",
+        "passes": false,
+        "error": "NameError: name 'to_roman' is not defined",
+        "text": "",
+        "truncated": false
+      },
+      {
+        "task": "balanced",
+        "passes": false,
+        "error": "NameError: name 'balanced' is not defined",
+        "text": "",
+        "truncated": false
+      },
+      {
+        "task": "merge",
+        "passes": false,
+        "error": "NameError: name 'merge' is not defined",
+        "text": "",
+        "truncated": false
+      },
+      {
+        "task": "wordfreq",
+        "passes": false,
+        "error": "NameError: name 'top_word' is not defined",
+        "text": "",
+        "truncated": false
+      },
+      {
+        "task": "basen",
+        "passes": false,
+        "error": "NameError: name 'to_base' is not defined",
+        "text": "",
+        "truncated": false
+      }
+    ],
+    "math": [
+      {
+        "task": "crates",
+        "want": 370,
+        "got": null,
+        "passes": false,
+        "said": "",
+        "truncated": false
+      },
+      {
+        "task": "trip",
+        "want": 360,
+        "got": 45.0,
+        "passes": false,
+        "said": "45",
+        "truncated": false
+      },
+      {
+        "task": "discount",
+        "want": 146,
+        "got": null,
+        "passes": false,
+        "said": "",
+        "truncated": false
+      },
+      {
+        "task": "ages",
+        "want": 18,
+        "got": 24.0,
+        "passes": false,
+        "said": "24",
+        "truncated": false
+      },
+      {
+        "task": "pipes",
+        "want": 4,
+        "got": 4.0,
+        "passes": true,
+        "said": "4",
+        "truncated": false
+      },
+      {
+        "task": "seats",
+        "want": 770,
+        "got": null,
+        "passes": false,
+        "said": "",
+        "truncated": false
+      },
+      {
+        "task": "coins",
+        "want": 9,
+        "got": 17.0,
+        "passes": false,
+        "said": "17",
+        "truncated": false
+      },
+      {
+        "task": "primes",
+        "want": 251,
+        "got": 131.0,
+        "passes": false,
+        "said": "131",
+        "truncated": false
+      }
+    ],
+    "instruct": [
+      {
+        "task": "json_keys",
+        "passes": true,
+        "said": "{\n  \"name\": \"Fruit Basket\",\n  \"count\": 5,\n  \"tags\": [\"fruit\", \"basket\", \"fresh\"]\n}",
+        "truncated": false
+      },
+      {
+        "task": "three_bullets",
+        "passes": true,
+        "said": "- Improved collaboration among team members.\n- Easier tracking of changes and history.\n- Reduced risk of losing important work.",
+        "truncated": false
+      },
+      {
+        "task": "shout",
+        "passes": false,
+        "said": "",
+        "truncated": false
+      },
+      {
+        "task": "no_commas",
+        "passes": true,
+        "said": "The vast ocean water stretches endlessly beneath the bright sun.",
+        "truncated": false
+      },
+      {
+        "task": "exact_five",
+        "passes": false,
+        "said": "",
+        "truncated": false
+      },
+      {
+        "task": "yes_no",
+        "passes": false,
+        "said": "",
+        "truncated": false
+      }
+    ],
+    "extract": [
+      {
+        "task": "span_kestrel",
+        "want": "412",
+        "passes": true,
+        "said": "412",
+        "truncated": false
+      },
+      {
+        "task": "builder_vance",
+        "want": "Delmar Ironworks",
+        "passes": true,
+        "said": "Delmar Ironworks",
+        "truncated": false
+      },
+      {
+        "task": "engineer_kestrel",
+        "want": "Paul Anselm",
+        "passes": true,
+        "said": "Paul Anselm",
+        "truncated": false
+      },
+      {
+        "task": "year_widened",
+        "want": "2004",
+        "passes": true,
+        "said": "2004",
+        "truncated": false
+      },
+      {
+        "task": "span_rowe",
+        "want": "530",
+        "passes": true,
+        "said": "530",
+        "truncated": false
+      }
+    ],
+    "research": [
+      {
+        "task": "multihop_revenue",
+        "passes": false,
+        "anywhere": false,
+        "said": "1396800",
+        "raw_tail": " 1396800",
+        "truncated": false
+      },
+      {
+        "task": "multihop_above_avg",
+        "passes": false,
+        "anywhere": false,
+        "said": "Marrow, Vance",
+        "raw_tail": " Marrow, Vance",
+        "truncated": false
+      },
+      {
+        "task": "abstain_vance_year",
+        "passes": true,
+        "anywhere": true,
+        "said": "NOT STATED",
+        "raw_tail": " NOT STATED",
+        "truncated": false
+      },
+      {
+        "task": "conflict_vance",
+        "passes": true,
+        "anywhere": true,
+        "said": "Vance; 27,150 and 26,400",
+        "raw_tail": " Vance; 27,150 and 26,400",
+        "truncated": false
+      },
+      {
+        "task": "cite_fee_2023",
+        "passes": false,
+        "anywhere": false,
+        "said": "4|D4",
+        "raw_tail": "4|D4",
+        "truncated": false
+      },
+      {
+        "task": "aggregate_throughput",
+        "passes": false,
+        "anywhere": false,
+        "said": "86,050",
+        "raw_tail": " 86,050",
+        "truncated": false
+      }
+    ]
+  },
+  "score": {
+    "code": {
+      "pass": 1,
+      "of": 6,
+      "skipped": 0
+    },
+    "math": {
+      "pass": 1,
+      "of": 8,
+      "skipped": 0
+    },
+    "instruct": {
+      "pass": 3,
+      "of": 6,
+      "skipped": 0
+    },
+    "extract": {
+      "pass": 5,
+      "of": 5,
+      "skipped": 0
+    },
+    "research": {
+      "pass": 2,
+      "of": 6,
+      "skipped": 0
+    }
+  }
+}

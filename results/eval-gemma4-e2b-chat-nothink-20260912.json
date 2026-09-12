@@ -1,0 +1,274 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "gemma4:e2b",
+  "label": "gemma4-e2b",
+  "ctx": 65536,
+  "api": "ollama",
+  "prompt_mode": "chat",
+  "thinking": false,
+  "budget": 6144,
+  "results": {
+    "code": [
+      {
+        "task": "rle",
+        "passes": true,
+        "error": null,
+        "text": "def rle(s):\n    if not s:\n        return \"\"\n\n    result = []\n    n = len(s)\n    i = 0\n    while i < n:\n        char = s[i]\n        count = 1\n        j = i + 1\n        while j < n and s[j] == char:\n            count += 1\n            j += 1\n        result.append(char + str(count))\n        i = j\n    return \"\".join(result)\n",
+        "truncated": false
+      },
+      {
+        "task": "roman",
+        "passes": true,
+        "error": null,
+        "text": "def to_roman(n):\n    \"\"\"\n    Converts an integer from 1 to 3999 to its Roman numeral representation.\n    \"\"\"\n    if not 1 <= n <= 3999:\n        raise ValueError(\"Input must be between 1 and 3999\")\n\n    # Define the Roman numeral symbols and their corresponding integer values\n    roman_map = {\n        1000: 'M',\n        900: 'CM',\n        500: 'D',\n        400: 'CD',\n        100: 'C',\n        90: 'XC',\n        50: 'L',\n        40: 'XL',\n        10: 'X',\n        9: 'IX',\n        5: 'V',\n        4: 'IV',\n        1: 'I'\n    }\n\n    # Create a list of (value, symbol) tuples sorted in descending orde",
+        "truncated": false
+      },
+      {
+        "task": "balanced",
+        "passes": true,
+        "error": null,
+        "text": "def balanced(s):\n    \"\"\"\n    Checks if brackets (), [], {} in string s are correctly nested and closed.\n\n    Args:\n        s: The input string.\n\n    Returns:\n        True if the brackets are correctly nested and closed, False otherwise.\n    \"\"\"\n    stack = []\n    mapping = {\")\": \"(\", \"]\": \"[\", \"}\": \"{\"}\n\n    for char in s:\n        if char in \"([{\":\n            # If it's an opening bracket, push it onto the stack\n            stack.append(char)\n        elif char in \")]}\":\n            # If it's a closing bracket, check if the stack is empty or if the top matches\n            if not stack:\n        ",
+        "truncated": false
+      },
+      {
+        "task": "merge",
+        "passes": true,
+        "error": null,
+        "text": "def merge(a, b):\n    \"\"\"\n    Merges two sorted lists into one sorted list without using sorted() or .sort().\n\n    Args:\n        a: A sorted list of numbers.\n        b: A sorted list of numbers.\n\n    Returns:\n        A new sorted list containing all elements from a and b.\n    \"\"\"\n    merged = []\n    i = 0  # Pointer for list a\n    j = 0  # Pointer for list b\n\n    # While both lists have elements to compare\n    while i < len(a) and j < len(b):\n        if a[i] <= b[j]:\n            merged.append(a[i])\n            i += 1\n        else:\n            merged.append(b[j])\n            j += 1\n\n    # Append",
+        "truncated": false
+      },
+      {
+        "task": "wordfreq",
+        "passes": false,
+        "error": "AssertionError: ",
+        "text": "from collections import Counter\n\ndef top_word(s: str) -> str:\n    \"\"\"\n    Returns the most frequent lowercase word in s, breaking ties alphabetically.\n    Words are sequences of letters.\n    \"\"\"\n    if not s:\n        return \"\"\n\n    # 1. Extract all words (sequences of letters) and convert to lowercase\n    words = []\n    current_word = \"\"\n    for char in s:\n        if 'a' <= char <= 'z':\n            current_word += char\n        else:\n            if current_word:\n                words.append(current_word)\n            current_word = \"\"\n\n    if current_word:\n        words.append(current_word)\n\n   ",
+        "truncated": false
+      },
+      {
+        "task": "basen",
+        "passes": true,
+        "error": null,
+        "text": "def to_base(n, b):\n    \"\"\"\n    Converts a non-negative integer n to a string in base b (2..16), \n    using lowercase digits. Zero is '0'.\n\n    Args:\n        n (int): The non-negative integer to convert.\n        b (int): The base (must be between 2 and 16, inclusive).\n\n    Returns:\n        str: The string representation of n in base b.\n    \"\"\"\n    if not (2 <= b <= 16):\n        raise ValueError(\"Base 'b' must be between 2 and 16.\")\n\n    if n == 0:\n        return '0'\n\n    # Define the characters for bases up to 16 (a=10, b=11, ..., f=15)\n    digits = \"0123456789abcdef\"\n\n    result = \"\"\n    while",
+        "truncated": false
+      }
+    ],
+    "math": [
+      {
+        "task": "crates",
+        "want": 370,
+        "got": 390.0,
+        "passes": false,
+        "said": "390",
+        "truncated": false
+      },
+      {
+        "task": "trip",
+        "want": 360,
+        "got": 105.0,
+        "passes": false,
+        "said": "105",
+        "truncated": false
+      },
+      {
+        "task": "discount",
+        "want": 146,
+        "got": 135.0,
+        "passes": false,
+        "said": "135",
+        "truncated": false
+      },
+      {
+        "task": "ages",
+        "want": 18,
+        "got": 18.0,
+        "passes": true,
+        "said": "18",
+        "truncated": false
+      },
+      {
+        "task": "pipes",
+        "want": 4,
+        "got": 4.0,
+        "passes": true,
+        "said": "4",
+        "truncated": false
+      },
+      {
+        "task": "seats",
+        "want": 770,
+        "got": 376.0,
+        "passes": false,
+        "said": "376",
+        "truncated": false
+      },
+      {
+        "task": "coins",
+        "want": 9,
+        "got": 9.0,
+        "passes": true,
+        "said": "Let $Q$ be the number of quarters.\nLet $D$ be the number of dimes.\nLet $N$ be the number of nickels.\n\nFrom the problem statement, we have the following relationships:\n1. The jar has 3 times as many dimes as quarters: $D = 3Q$\n2. The jar has 5 more nickels than dimes: $N = D + 5$\nSubstituting (1) int",
+        "truncated": false
+      },
+      {
+        "task": "primes",
+        "want": 251,
+        "got": 106.0,
+        "passes": false,
+        "said": "106",
+        "truncated": false
+      }
+    ],
+    "instruct": [
+      {
+        "task": "json_keys",
+        "passes": true,
+        "said": "{\n  \"name\": \"Fruit Basket\",\n  \"count\": 5,\n  \"tags\": [\n    \"fresh\",\n    \"sweet\",\n    \"healthy\"\n  ]\n}",
+        "truncated": false
+      },
+      {
+        "task": "three_bullets",
+        "passes": true,
+        "said": "- Tracks changes to code over time.\n- Facilitates collaboration among team members.\n- Allows for easy rollback to previous versions.",
+        "truncated": false
+      },
+      {
+        "task": "shout",
+        "passes": true,
+        "said": "THE BANANA IS A NUTRITIOUS AND POPULAR FRUIT KNOWN FOR ITS SWEET TASTE.",
+        "truncated": false
+      },
+      {
+        "task": "no_commas",
+        "passes": true,
+        "said": "The vast ocean water stretches endlessly beneath the bright sun.",
+        "truncated": false
+      },
+      {
+        "task": "exact_five",
+        "passes": true,
+        "said": "Water falls from the sky",
+        "truncated": false
+      },
+      {
+        "task": "yes_no",
+        "passes": true,
+        "said": "Yes",
+        "truncated": false
+      }
+    ],
+    "extract": [
+      {
+        "task": "span_kestrel",
+        "want": "412",
+        "passes": true,
+        "said": "412",
+        "truncated": false
+      },
+      {
+        "task": "builder_vance",
+        "want": "Delmar Ironworks",
+        "passes": true,
+        "said": "Delmar Ironworks",
+        "truncated": false
+      },
+      {
+        "task": "engineer_kestrel",
+        "want": "Paul Anselm",
+        "passes": true,
+        "said": "Paul Anselm",
+        "truncated": false
+      },
+      {
+        "task": "year_widened",
+        "want": "2004",
+        "passes": true,
+        "said": "2004",
+        "truncated": false
+      },
+      {
+        "task": "span_rowe",
+        "want": "530",
+        "passes": true,
+        "said": "530",
+        "truncated": false
+      }
+    ],
+    "research": [
+      {
+        "task": "multihop_revenue",
+        "passes": false,
+        "anywhere": false,
+        "said": "100800",
+        "raw_tail": "100800",
+        "truncated": false
+      },
+      {
+        "task": "multihop_above_avg",
+        "passes": true,
+        "anywhere": true,
+        "said": "Marrow",
+        "raw_tail": "Marrow",
+        "truncated": false
+      },
+      {
+        "task": "abstain_vance_year",
+        "passes": true,
+        "anywhere": true,
+        "said": "NOT STATED",
+        "raw_tail": "NOT STATED",
+        "truncated": false
+      },
+      {
+        "task": "conflict_vance",
+        "passes": true,
+        "anywhere": true,
+        "said": "Depot: Vance, Figures: 27,150 and 26,400",
+        "raw_tail": "Depot: Vance, Figures: 27,150 and 26,400",
+        "truncated": false
+      },
+      {
+        "task": "cite_fee_2023",
+        "passes": false,
+        "anywhere": false,
+        "said": "4|D4",
+        "raw_tail": "4|D4",
+        "truncated": false
+      },
+      {
+        "task": "aggregate_throughput",
+        "passes": false,
+        "anywhere": false,
+        "said": "86,950",
+        "raw_tail": "86,950",
+        "truncated": false
+      }
+    ]
+  },
+  "score": {
+    "code": {
+      "pass": 5,
+      "of": 6,
+      "skipped": 0
+    },
+    "math": {
+      "pass": 3,
+      "of": 8,
+      "skipped": 0
+    },
+    "instruct": {
+      "pass": 6,
+      "of": 6,
+      "skipped": 0
+    },
+    "extract": {
+      "pass": 5,
+      "of": 5,
+      "skipped": 0
+    },
+    "research": {
+      "pass": 3,
+      "of": 6,
+      "skipped": 0
+    }
+  }
+}

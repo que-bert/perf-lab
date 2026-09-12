@@ -1574,3 +1574,43 @@ truncating item now generates the full 32768 tokens at ~50 t/s. Raw is the mode
 whose results were already withdrawn. **Do not re-run raw at a high budget
 again** — the information return is zero and it is the most expensive row in
 the matrix.
+
+## 2026-09-12: the five stale labels re-scored — two moved, three did not
+
+The scorer debt from the entry above is paid. All five labels whose code scores
+predated the `run_code` fixes re-run in all three prompt modes, budget 6144
+throughout (the 2026-09-11 table used 2048 for four of them and 6144 only for
+`qwen35-9b` chat; one budget now covers the matrix).
+`results/eval-*-20260912.json`, 15 runs, 11:05–12:50.
+
+| label | chat, published | chat, re-scored | moved |
+|---|---|---|---|
+| ornith-q6k | 30/31 | 29/31 | instruct 5/6 → 4/6; code unchanged 6/6 |
+| minicpm-q8 | 27/31 | **26/27*** | **code 3/6 → 3/3***, math 8/8 → 7/7* |
+| gemma4-e2b | 31/31 | 31/31 | nothing |
+| gemma4-e4b | 30/31 | 30/31 | nothing |
+| qwen35-9b | 30/30* | 30/30* | nothing |
+
+`*` = contains unscoreable items.
+
+**The two predictions made when the bugs were found both held.** MiniCPM Q8_0's
+3/6 on code was called as the likeliest artifact and it was: three of those
+"failures" were truncations scored as wrong code, and the honest reading is
+3/3 with three unscoreable. Ornith Q6_K's 6/6 was called as likeliest real, and
+it is unchanged.
+
+**The three ollama-backed labels are byte-identical across every mode.** They
+never tripped either bug — no draft fence inside a scratchpad, no truncation
+mis-scored. That is worth knowing: the bugs were specific to reasoning models
+served through llama-server, not general to the harness.
+
+**Ornith's one-point instruct drop is not a change.** It is inside the ±1
+run-to-run spread measured the same night, and this run cannot distinguish a
+scorer effect from that noise. Both of the labels that moved changed two
+variables at once — scorer and budget — so neither delta is cleanly
+attributable; the *direction* is what the fix guarantees, not the magnitude.
+
+**What is still not fixed:** the suites remain saturated. Four of five labels
+sit at 29-31 of 31 in chat mode after all of this. Every conclusion about
+which of these models is better still waits on a harder tier, and now also on
+repeated runs with a reported spread rather than n=1.
