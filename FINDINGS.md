@@ -1439,8 +1439,16 @@ here in all three modes, ctx 65536, temperature 0, budget 6144, speculation off,
 `*` = the suite contained items cut off at the budget, recorded unscoreable
 rather than failed.
 
-**Quantization costs about one point, not a tier.** Ornith-1.5-9B goes
+**Quantization costs nothing measurable here.** Ornith-1.5-9B goes
 Q6_K 30/31 → Q4_K_M 29/31, and MiniCPM5-2B goes Q8_0 27/31 → Q4_K_M 29/31 —
+
+> **Superseded the same night — see the reproducibility entry below.** This
+> paragraph originally read "quantization costs about one point, not a tier",
+> resting on Ornith's 30/31 → 29/31. Ornith was then measured scoring 29 and
+> 30 on **two runs of the same file at the same quant**, so that one point is
+> run-to-run variance and cannot be attributed to the quantization. The
+> direction of the remaining text stands; the one-point cost does not.
+
 the 2B *improves* on the smaller file, which is only interpretable as the
 suites being saturated at this difficulty, not as Q4_K_M beating Q8_0. The
 prompt-mode result holds on the quantization axis too: both Q4_K_M files read
@@ -1498,3 +1506,71 @@ pressure with 20 GB available, the same supervisor behaviour `serve_unit.sh`
 was written for. The server survives because systemd owns it; the caller does
 not. **Start the unit, then run `model_eval.py` against the live port as a
 separate task** — the load is what crosses the threshold, not the evaluation.
+
+## 2026-09-12: Ornith is not reproducible at temperature 0, and MiniCPM is
+
+Both Q4_K_M labels re-run at budget **32768** rather than 6144, to test whether
+the output cap was still deciding scores. It is not — but the re-run exposed
+something that matters more.
+
+| label | mode | 6144 | 32768 | identical? |
+|---|---|---|---|---|
+| minicpm-q4km | raw | 15/23* | 15/23* | **yes, byte-for-byte** |
+| minicpm-q4km | chat | 24/25* | 24/25* | **yes** |
+| minicpm-q4km | chat-nothink | 29/31 | 29/31 | **yes** |
+| ornith-q4km | raw | 15/19* | 15/20* | no |
+| ornith-q4km | chat | 29/31 | **30/31** | no |
+| ornith-q4km | chat-nothink | 19/31 | 20/31 | no |
+
+`*` = contains unscoreable items.
+
+**MiniCPM5-2B is bit-identical across every mode at both budgets.** Same
+prompts, same greedy sampling, same text. That is the control, and it says the
+harness itself is deterministic.
+
+**Ornith-1.5-9B is not**, and the differences are not truncation artifacts —
+they appear on items that ran to EOS at both budgets:
+
+- `code/wordfreq` — a `Counter`-based implementation in one run, a manual
+  comprehension in the other. Both correct.
+- `research/conflict_vance` — different prose from the first token.
+- `research/multihop_above_avg` — `"Marrow"` alone in one run, `"Marrow"` plus
+  three sentences in the other. **That is the item that flipped 29 → 30.**
+
+**Consequence: a one-point difference between two Ornith configurations means
+nothing.** Every Ornith score in this file is n=1, and n=1 now has a measured
+spread of at least ±1. That directly undercuts the quantization claim made
+earlier the same night — Q6_K 30/31 against Q4_K_M 29/31 is the same gap that
+appeared between two runs of the *identical* Q4_K_M file, so the comparison
+does not survive. The corrected reading: **no capability difference between
+Ornith Q6_K and Q4_K_M was measurable.**
+
+**Cause not established.** The obvious suspect is that Ornith is a hybrid
+SSM+attention model with an MTP head (`blk.32.nextn.*`) while MiniCPM is plain
+`llama` arch, and that SSM state or MTP draft acceptance carries slot and batch
+history across requests in a way the simpler architecture does not. That is a
+hypothesis; it has not been tested. What is established is the asymmetry: one
+model reproduces exactly and the other does not, on the same server, the same
+build and the same harness.
+
+**What this costs.** Any future ranking of Ornith against anything needs
+repeated runs and a reported spread, not a single number. The cheapest
+sufficient check is running one mode three times and reporting the range,
+which is also the thing that should have been done before any of the one-point
+conclusions in this file were written.
+
+### The budget question, answered
+
+Raising the cap 5.3x changed no MiniCPM score at all, and moved Ornith only
+within its own noise. **The cap was never the binding constraint on a
+terminating answer** — it only ever mattered because `run_code` scored a
+truncation as a wrong answer, which is fixed. Where a model does run away, it
+runs away past 32768 too: MiniCPM with thinking on still fails to finish 5 of 6
+code items at the larger budget, so no-think is not a workaround for that
+model, it is the only mode in which its code suite is answerable.
+
+Cost note: raw mode at 32768 took **four hours** on the 9B, because each
+truncating item now generates the full 32768 tokens at ~50 t/s. Raw is the mode
+whose results were already withdrawn. **Do not re-run raw at a high budget
+again** — the information return is zero and it is the most expensive row in
+the matrix.

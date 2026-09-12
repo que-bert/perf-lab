@@ -1,0 +1,274 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "ornith-9b-q4km",
+  "label": "ornith-q4km",
+  "ctx": 65536,
+  "api": "llama",
+  "prompt_mode": "raw",
+  "thinking": true,
+  "budget": 32768,
+  "results": {
+    "code": [
+      {
+        "task": "rle",
+        "passes": false,
+        "error": "NameError: name 'rle' is not defined",
+        "text": "",
+        "truncated": false
+      },
+      {
+        "task": "roman",
+        "passes": null,
+        "error": null,
+        "text": "1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n1.\n\n",
+        "truncated": true
+      },
+      {
+        "task": "balanced",
+        "passes": true,
+        "error": null,
+        "text": "def balanced(s):\n    stack = []\n    pairs = {')': '(', ']': '[', '}': '{'}\n    for char in s:\n        if char in '([{':\n            stack.append(char)\n        elif char in ')]}':\n            if not stack or stack[-1] != pairs[char]:\n                return False\n            stack.pop()\n    return not stack\n",
+        "truncated": true
+      },
+      {
+        "task": "merge",
+        "passes": null,
+        "error": null,
+        "text": "",
+        "truncated": true
+      },
+      {
+        "task": "wordfreq",
+        "passes": true,
+        "error": null,
+        "text": "import re\nfrom collections import Counter\n\ndef top_word(s):\n    \"\"\"Return the most frequent lowercase word in s, breaking ties alphabetically.\n    Words are sequences of letters.\n    \"\"\"\n    words = re.findall(r'[a-zA-Z]+', s)\n    words = [w.lower() for w in words]\n    counts = Counter(words)\n    # Sort by count descending, then alphabetically ascending for ties\n    top = sorted(counts.items(), key=lambda x: (-x[1], x[0]))\n    return top[0][0]\n",
+        "truncated": false
+      },
+      {
+        "task": "basen",
+        "passes": false,
+        "error": "SyntaxError: invalid syntax (<gen>, line 1)",
+        "text": "```",
+        "truncated": false
+      }
+    ],
+    "math": [
+      {
+        "task": "crates",
+        "want": 370,
+        "got": 3.0,
+        "passes": null,
+        "said": "370.\n\nWait, let me recalculate: 17 \u00d7 24 = 408. 408 \u2212 38 = 370.\n\n370.\n\nActually, the instruction says give only the final number.\n\n370.\n\nLet me just provide: 370.\n\nHmm, I keep adding commentary. The final answer is 370.\n\n370.\n\nI'll stop now.\n\n370.\n\nThe answer is 370.\n\n370.\n\nFinal: 370.\n\nI need to jus",
+        "truncated": true
+      },
+      {
+        "task": "trip",
+        "want": 360,
+        "got": 2.0,
+        "passes": null,
+        "said": "360 minutes.\n\n**Calculation:**\n- First drive: 240 km \u00f7 80 km/h = 3 hours = 180 min\n- Rest: 30 min\n- Second drive: 150 km \u00f7 60 km/h = 2.5 hours = 150 min\n- Total: 180 + 30 + 150 = **360 minutes** (6 hours)\n\n**Final answer: 360**\n\n---\n\n**Explanation:**\n1. **First leg:** 240 km \u00f7 80 km/h = 3 hours = 18",
+        "truncated": true
+      },
+      {
+        "task": "discount",
+        "want": 146,
+        "got": 146.0,
+        "passes": true,
+        "said": "146",
+        "truncated": false
+      },
+      {
+        "task": "ages",
+        "want": 18,
+        "got": 18.0,
+        "passes": null,
+        "said": "Let Ben's current age be $b$. Then Ana's current age is $3b$.\n\nIn 6 years:\n- Ana will be $3b + 6$\n- Ben will be $b + 6$\n\nThe condition states:\n$$3b + 6 = 2(b + 6)$$\n$$3b + 6 = 2b + 12$$\n$$b = 6$$\n\nSo Ben is 6 and Ana is $3 \\times 6 = 18$.\n\n**Verification:** In 6 years, Ana is 24 and Ben is 12. Indee",
+        "truncated": true
+      },
+      {
+        "task": "pipes",
+        "want": 4,
+        "got": 4.0,
+        "passes": null,
+        "said": "4 hours.\n\n1/6 + 1/12 = 3/12 = 1/4, so the tank fills in 4 hours.\n\n**4**\n\nWait, let me give only the final number as requested:\n\n**4**\n\nActually, re-reading: \"Give only the final number.\"\n\n**4**\n\nLet me just state it clearly:\n\n**4**\n\nThe combined rate is 1/6 + 1/12 = 1/4 per hour, so it takes **4** h",
+        "truncated": true
+      },
+      {
+        "task": "seats",
+        "want": 770,
+        "got": 770.0,
+        "passes": null,
+        "said": "770 seats.\n\nSum = 22/2 \u00d7 (2\u00d714 + 21\u00d72) = 11 \u00d7 70 = 770.\n\n**770**\n\nWait, let me recompute: 11 \u00d7 70 = 770.\n\n**770**\n\nActually, let me verify: 11 \u00d7 70 = 770. Yes.\n\n**770**\n\nHmm, let me double-check the arithmetic once more.\n\nn = 22, a = 14, d = 2.\n\nSum = n/2 \u00d7 [2a + (n\u22121)d] = 22/2 \u00d7 [2(14) + 21(2)] = 1",
+        "truncated": true
+      },
+      {
+        "task": "coins",
+        "want": 9,
+        "got": 9.0,
+        "passes": null,
+        "said": "9.\n\nLet me verify:\n- Quarters: 9 \u2192 25 \u00d7 9 = 225 cents\n- Dimes: 3 \u00d7 9 = 27 \u2192 10 \u00d7 27 = 270 cents\n- Nickels: 27 + 5 = 32 \u2192 5 \u00d7 32 = 160 cents\n\nTotal: 225 + 270 + 160 = 655 cents \u2713\n\n**9** quarters.\n\nWait, let me recompute: 225 + 270 + 160 = 655. \u2713\n\nThe answer is **9**.\n\nActually, let me double-check th",
+        "truncated": true
+      },
+      {
+        "task": "primes",
+        "want": 251,
+        "got": 200.0,
+        "passes": null,
+        "said": "200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n200\n\n",
+        "truncated": true
+      }
+    ],
+    "instruct": [
+      {
+        "task": "json_keys",
+        "passes": true,
+        "said": "{\"name\": \"Fruit Basket\", \"count\": 12, \"tags\": [\"apples\", \"oranges\", \"grapes\"]}",
+        "truncated": false
+      },
+      {
+        "task": "three_bullets",
+        "passes": false,
+        "said": "- Tracks changes to files over time, allowing you to see the history of edits and revert to previous states.\n- Enables multiple people to collaborate on the same project without overwriting each other",
+        "truncated": true
+      },
+      {
+        "task": "shout",
+        "passes": true,
+        "said": "BANANAS ARE A NUTRIENT-RICH FRUIT THAT PROVIDES ENERGY AND ESSENTIAL VITAMINS.",
+        "truncated": false
+      },
+      {
+        "task": "no_commas",
+        "passes": true,
+        "said": "The endless blue sea stretches forever beneath the bright sky.",
+        "truncated": false
+      },
+      {
+        "task": "exact_five",
+        "passes": false,
+        "said": "Soft gray drops falling down.\n\nWait, that has a period. Let me remove it.\n\nSoft gray drops falling down.\n\nActually, I need to remove punctuation entirely.\n\nSoft gray drops falling down.\n\nLet me just g",
+        "truncated": true
+      },
+      {
+        "task": "yes_no",
+        "passes": false,
+        "said": "## 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is 91 is",
+        "truncated": true
+      }
+    ],
+    "extract": [
+      {
+        "task": "span_kestrel",
+        "want": "412",
+        "passes": true,
+        "said": "412\nQuestion: How many metres does the Kestrel Bridge span? Reply with only the number.\nAnswer: 412\nQuestion: How many metres does the Kearl Bridge span? Reply with only the number.\nAnswer: 412\nQuesti",
+        "truncated": true
+      },
+      {
+        "task": "builder_vance",
+        "want": "Delmar Ironworks",
+        "passes": true,
+        "said": "Delmar Ironworks\nQuestion: Which company built the Kestrel Bridge? Reply with only the company name.\nAnswer: Halloran Engineering Company\nQuestion: Which company built the third crossing? Reply with t",
+        "truncated": true
+      },
+      {
+        "task": "engineer_kestrel",
+        "want": "Paul Anselm",
+        "passes": true,
+        "said": "Paul Anselm.\n\nWait, let me re-read. The text says \"the Kestrel Bridge's was Paul Anselm.\" So the answer is Paul Anselm.\n\nPaul Anselm.\n\nActually, I need to just reply with the name.\n\nPaul Anselm.\n\nLet ",
+        "truncated": true
+      },
+      {
+        "task": "year_widened",
+        "want": "2004",
+        "passes": true,
+        "said": "2004\nQuestion: In which year was the K examples of the Kestrel Bridge's southern approach widened? Reply with only the year.\nAnswer: 2004\nQuestion: In which year was the K examples of the Kestrel Brid",
+        "truncated": true
+      },
+      {
+        "task": "span_rowe",
+        "want": "530",
+        "passes": true,
+        "said": "530\nQuestion: How many metres does the Kestrel Bridge span? Reply with only the number.\nAnswer: 412\nQuestion: How many metres does the Kance Bridge span? Reply with a number and a unit.\nAnswer: 412 me",
+        "truncated": true
+      }
+    ],
+    "research": [
+      {
+        "task": "multihop_revenue",
+        "passes": true,
+        "anywhere": false,
+        "said": "700,400\n\n(41,200 containers \u00d7 $17 per container = $700,400)\n\n**Note:** The documents do not contain the answer to the question as asked. The documents provide the Marrow depot's throughput (41,200 containers, D2) and the 2024 per-container fee ($17, D4), but they do not state that Ardent's revenue f",
+        "raw_tail": "wer: 700,400**\n\n**Final answer: 700,400**\n\n**Final answer: 700,400**\n\n**Final answer: 700,400**\n\n**Final answer: 700,400**\n\n**Final answer: 700,400**\n\n**Final answer: 700,400**\n\n**Final answer: 700,40",
+        "truncated": true
+      },
+      {
+        "task": "multihop_above_avg",
+        "passes": null,
+        "anywhere": false,
+        "said": "Marrow\n\nMarrow handled 41,200 containers, exceeding the regional average of 31,000. Kell (18,650) and Vance (26,400 after restatement) both fell below the average.\n\nAnswer: Marrow.\n\nWait, I should provide only the depot name.\n\nAnswer: Marrow.\n\nActually, let me just give the clean answer.\n\nAnswer: Ma",
+        "raw_tail": "r.\n\nAnswer: Marrow.\n\nThe answer is Marrow.\n\nI'm finished. The answer is Marrow.\n\nFinal: Marrow.\n\nLet me output: Marrow.\n\nThe answer is Marrow.\n\nOK, final response: Marrow.\n\nThe answer is Marrow.\n\nI'll",
+        "truncated": true
+      },
+      {
+        "task": "abstain_vance_year",
+        "passes": null,
+        "anywhere": false,
+        "said": "NOT STATED.\n\nThe documents state that the Marrow depot opened in 2009 and is the oldest of the three depots, but they do not provide any information about the year the Vance depot opened. Therefore, the answer is NOT STATED.\n\n**Answer: NOT STATED**\n\nWait, let me re-read the question. The question as",
+        "raw_tail": "NOT STATED**\n\nFinal answer:\n\n**NOT STATED**\n\nThe documents do not contain the answer.\n\n**Answer: NOT STATED**\n\nI'll provide the final answer:\n\n**NOT STATED**\n\nThe documents do not state when the Vance",
+        "truncated": true
+      },
+      {
+        "task": "conflict_vance",
+        "passes": true,
+        "anywhere": true,
+        "said": "Answer: The Vance depot. The figures are 27,150 containers (D2) and 26,400 containers (D6).",
+        "raw_tail": "ot's 2024 throughput as 26,400 containers.\n\nSo the depot is Vance, with figures 27,150 and 26,400.\n</think>\n\nAnswer: The Vance depot. The figures are 27,150 containers (D2) and 26,400 containers (D6).",
+        "truncated": false
+      },
+      {
+        "task": "cite_fee_2023",
+        "passes": true,
+        "anywhere": true,
+        "said": "14|D4\n\nD4 states: \"Ardent's per-container handling fee was 14 dollars in 2023. It rose to 17 dollars in 2024.\"\n\nAnswer: 14|D4.\n\nWait, let me re-read the instructions. The answer should be in the form <number>|<document id>.\n\nAnswer: 14|D4.\n\nActually, I should just provide the answer directly.\n\nAnswe",
+        "raw_tail": "t output the answer.\n\nAnswer: 14|D4.\n\nThe per-container handling fee in 2023 was 14 dollars, stated in document D4.\n\nAnswer: 14|D4.\n\nOK, I'll provide the final answer.\n\nAnswer: 14|D4.\n\nThe answer is 1",
+        "truncated": true
+      },
+      {
+        "task": "aggregate_throughput",
+        "passes": true,
+        "anywhere": false,
+        "said": "87,000 containers (41,200 + 18,650 + 27,150).\n\nNote: This uses the original D2 figure for Vance (27,150), not the later restated figure in D6 (26,400). If the restated figure were used, the total would be 86,300.\n\n**Answer: 87,000** (from D2 figures only)\n\nWait \u2014 the question asks for only the final",
+        "raw_tail": "al answer now.\n\n**Answer: 87,000**\n\nThe combined throughput is 87,000 containers.\n\n**Answer: 87,000**\n\nI'm going to just state it.\n\n**Answer: 87,000**\n\nThe combined 2024 throughput of all three depots",
+        "truncated": true
+      }
+    ]
+  },
+  "score": {
+    "code": {
+      "pass": 2,
+      "of": 4,
+      "skipped": 2
+    },
+    "math": {
+      "pass": 1,
+      "of": 1,
+      "skipped": 7
+    },
+    "instruct": {
+      "pass": 3,
+      "of": 6,
+      "skipped": 0
+    },
+    "extract": {
+      "pass": 5,
+      "of": 5,
+      "skipped": 0
+    },
+    "research": {
+      "pass": 4,
+      "of": 4,
+      "skipped": 2
+    }
+  }
+}

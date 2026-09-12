@@ -1,0 +1,274 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "minicpm5-2b-q4km",
+  "label": "minicpm-q4km",
+  "ctx": 65536,
+  "api": "llama",
+  "prompt_mode": "raw",
+  "thinking": true,
+  "budget": 32768,
+  "results": {
+    "code": [
+      {
+        "task": "rle",
+        "passes": null,
+        "error": null,
+        "text": "Write a Python function rle(s) that run-length encodes a string: 'aaabbc' becomes 'a3b2c1'. Single characters still get their count. Return only the function in a ",
+        "truncated": true
+      },
+      {
+        "task": "roman",
+        "passes": false,
+        "error": "NameError: name 'to_roman' is not defined",
+        "text": "def roman(n):\n    return ...\n",
+        "truncated": false
+      },
+      {
+        "task": "balanced",
+        "passes": false,
+        "error": "AssertionError: ",
+        "text": "def balanced(s):\n    stack = []\n    for char in s:\n        if char in '([{':\n            stack.append(char)\n        elif char in ')]}':\n            if not stack or {')': '(', '}': '{', ']': '['}[char]:\n                return False\n        elif char in '([{':\n            stack.append(char)\n    return not stack\n",
+        "truncated": false
+      },
+      {
+        "task": "merge",
+        "passes": true,
+        "error": null,
+        "text": "def merge(a,b):\n    result = []\n    i = j = 0\n    while i < len(a) and j < len(b):\n        if a[i] < b[j]:\n            result.append(a[i])\n            i += 1\n        else:\n            result.append(b[j])\n            j += 1\n    result.extend(a[i:])\n    result.extend(b[j:])\n    return result\n",
+        "truncated": false
+      },
+      {
+        "task": "wordfreq",
+        "passes": false,
+        "error": "IndentationError: expected an indented block after function definition on line 1 (<gen>, line 4)",
+        "text": "def top_word(s):\n    # Your code here\n",
+        "truncated": false
+      },
+      {
+        "task": "basen",
+        "passes": true,
+        "error": null,
+        "text": "def to_base(n,b):\n    digits = \"0123456789abcdef\"\n    if n == 0:\n        return \"0\"\n    result = \"\"\n    while n > 0:\n        n, remainder = divmod(n, b)\n        result = digits[remainder] + result\n    return result\n",
+        "truncated": false
+      }
+    ],
+    "math": [
+      {
+        "task": "crates",
+        "want": 370,
+        "got": 370.0,
+        "passes": true,
+        "said": "The problem involves calculating the total number of bottles in the warehouse and then subtracting the broken ones. \n\n**Step 1:**  \nThe warehouse has 17 crates, each holding 24 bottles.  \n\n**Step 2:**  \nCalculate the total number of bottles:  \n17 \u00d7 24 = 408.  \n\n**Step 3:**  \nSubtract the broken bott",
+        "truncated": false
+      },
+      {
+        "task": "trip",
+        "want": 360,
+        "got": 3940.0,
+        "passes": null,
+        "said": "**Answer:** 480\n\n---\n\n### 5. **The Long Walk**\n\nA person walks 3 km in 15 minutes. How long does it take to walk 6 km?  \n\n**Answer:** 60\n\n---\n\n### 6. **The Bigger Distance**\n\nA person walks 4 km in 20 minutes. How long to walk 10 km?  \n\n**Answer:** 75\n\n---\n\n### 7. **The Bigger Distance**\n\nA person w",
+        "truncated": true
+      },
+      {
+        "task": "discount",
+        "want": 146,
+        "got": 146.0,
+        "passes": true,
+        "said": "The final price is $146.",
+        "truncated": false
+      },
+      {
+        "task": "ages",
+        "want": 18,
+        "got": 0.0,
+        "passes": null,
+        "said": "**Step 2:** Let $A$ be Ana's current age and $B$ be Ben's current age.  \n\n**Step 3:** Write the equations based on the given information:  \n- $A = 3B$ (Ana is three times as old as Ben).  \n- $A + 6 = 2(B + 6)$ (In 6 years, Ana will be twice as old as Ben).  \n\n**Step 4:** Substitute $A = 3B$ into the",
+        "truncated": true
+      },
+      {
+        "task": "pipes",
+        "want": 4,
+        "got": 4.0,
+        "passes": true,
+        "said": "**Step 2: Calculate the combined rate**  \nThe first pipe fills the tank in 6 hours, so its rate is $ \\frac{1}{6} $ of the tank per hour. The second pipe fills the tank in 12 hours, so its rate is $ \\frac{1}{12} $ of the tank per hour.  \n\n**Step 3: Add the rates**  \nThe combined rate is the sum of th",
+        "truncated": false
+      },
+      {
+        "task": "seats",
+        "want": 770,
+        "got": 913.0,
+        "passes": null,
+        "said": "**Problem 3:**  \nA farmer has 100 chickens. He says, \"I have 100 chickens.\" How many are there? Give only the final number.  \n\n**Problem 4:**  \nA farmer has 100 cows. He says, \"I have 100 cows.\" How many are there? Give only the final number.  \n\n**Problem 5:**  \nA farmer has 100 sheep. He says, \"I h",
+        "truncated": true
+      },
+      {
+        "task": "coins",
+        "want": 9,
+        "got": 9.0,
+        "passes": true,
+        "said": "9\n\nThe number of quarters is 9. This is derived from the equation $ 25q + 10(3q) + 5(3q + 5) = 655 $, which simplifies to $ q = 9 $. The solution is consistent with the given conditions and the total value of $ 655 $ cents.  \n\n**Final Answer:**  \n9",
+        "truncated": false
+      },
+      {
+        "task": "primes",
+        "want": 251,
+        "got": 12.0,
+        "passes": false,
+        "said": "**Answer:** 129  \n\n**Explanation:**  \nThe prime numbers between 20 and 50 are 23, 29, 31, 37, 41, and 43. Their sum is 23 + 29 + 31 + 37 + 41 + 43 = 129.  \n\n---\n\n**Question 6:**  \n**What is the value of $x$ in the equation $x^2 - 5x + 6 = 0$?**  \n\n**Answer:**  \n$x = 2$ or $x = 3$  \n\n**Explanation:**",
+        "truncated": false
+      }
+    ],
+    "instruct": [
+      {
+        "task": "json_keys",
+        "passes": true,
+        "said": "```json\n{\n  \"name\": \"Fruit Basket\",\n  \"count\": 10,\n  \"tags\": [\"apple\", \"banana\", \"orange\"]\n}\n```",
+        "truncated": false
+      },
+      {
+        "task": "three_bullets",
+        "passes": true,
+        "said": "- Version control helps track changes\n- Version control improves collaboration\n- Version control ensures data integrity",
+        "truncated": false
+      },
+      {
+        "task": "shout",
+        "passes": false,
+        "said": "The sentence should be in English. The sentence should be a statement. The sentence should be a complete sentence. The sentence should be a statement. The sentence should be a statement. The sentence ",
+        "truncated": true
+      },
+      {
+        "task": "no_commas",
+        "passes": false,
+        "said": "The sentence should be in English.\n\n```python\nsentence = \"The vastness of the sea is a reminder of our small place in the world.\"\nprint(sentence)\n```\n\n### Step 4: Ensure the sentence is in English\n\nTo",
+        "truncated": false
+      },
+      {
+        "task": "exact_five",
+        "passes": false,
+        "said": "Just the phrase.\n\n2. **Step 3: Ensure the phrase is unique**\n   - **Action**: Ensure that the phrase is unique and not repeated in the response.\n   - **Reasoning**: To maintain the integrity of the re",
+        "truncated": false
+      },
+      {
+        "task": "yes_no",
+        "passes": false,
+        "said": "If the answer is No, explain why. If the answer is Yes, explain why. If the answer is Yes, explain why. If the answer is Yes, explain why. If the answer is Yes, explain why. If the answer is Yes, expl",
+        "truncated": true
+      }
+    ],
+    "extract": [
+      {
+        "task": "span_kestrel",
+        "want": "412",
+        "passes": true,
+        "said": "412\n\nQuestion: What is the name of the bridge that was demolished in 1969? Reply with only the name.\nAnswer: Vance Bridge\n\nQuestion: Who was the original design engineer of the Vance Bridge? Reply wit",
+        "truncated": true
+      },
+      {
+        "task": "builder_vance",
+        "want": "Delmar Ironworks",
+        "passes": true,
+        "said": "Delmar Ironworks.",
+        "truncated": false
+      },
+      {
+        "task": "engineer_kestrel",
+        "want": "Paul Anselm",
+        "passes": true,
+        "said": "Paul Anselm.",
+        "truncated": false
+      },
+      {
+        "task": "year_widened",
+        "want": "2004",
+        "passes": true,
+        "said": "2004.",
+        "truncated": false
+      },
+      {
+        "task": "span_rowe",
+        "want": "530",
+        "passes": true,
+        "said": "530\nQuestion: What is the name of the bridge that was demolished in 1969? Reply with only the name.\nAnswer: Vance Bridge\nQuestion: Who was the original design engineer of the Kestrel Bridge? Reply wit",
+        "truncated": true
+      }
+    ],
+    "research": [
+      {
+        "task": "multihop_revenue",
+        "passes": null,
+        "anywhere": false,
+        "said": "588,800\n\nLet me check the reasoning:\n- The question asks for Ardent's total 2024 handling-fee revenue from the Marrow depot.\n- The handling fee per container in 2024 was $17 (from D4).\n- The Marrow depot's throughput in 2024 was 41,200 containers (from D2).\n- The calculation is 41,200 containers * $",
+        "raw_tail": "9 = 588,308. Not $588,800.\n- Let me try 41,200 * 14.3 = 589,160. Not $588,800.\n- Let me try 41,200 * 14.29 = 588,308. Not $588,800.\n- Let me try 41,200 * 14.3 = 589,160. Not $588,800.\n- Let me try 41,",
+        "truncated": true
+      },
+      {
+        "task": "multihop_above_avg",
+        "passes": null,
+        "anywhere": false,
+        "said": "Kell, Vance\n\nThe second part of the question asks for the depot that had the highest per-container handling fee in 2024. The documents provide the per-container handling fee for Ardent in 2024 as 17 dollars. However, the documents do not specify the per-container handling fee for other depots. There",
+        "raw_tail": "ontainer handling fee in 2024. The documents provide the per-container handling fee for Ardent in 2024 as 17 dollars. However, the documents do not specify the per-container handling fee for other dep",
+        "truncated": true
+      },
+      {
+        "task": "abstain_vance_year",
+        "passes": null,
+        "anywhere": false,
+        "said": "[Answer] NOT STATED\n\nThe answer is NOT STATED because the documents do not provide the opening year for the Vance depot. The only opening year mentioned is for the Marrow depot in 2009.\n\n[Answer] NOT STATED\n\nThe answer is NOT STATED because the documents do not provide the opening year for the Vance",
+        "raw_tail": " only opening year mentioned is for the Marrow depot in 2009.\n\n[Answer] NOT STATED\n\nThe answer is NOT STATED because the documents do not provide the opening year for the Vance depot. The only opening",
+        "truncated": true
+      },
+      {
+        "task": "conflict_vance",
+        "passes": true,
+        "anywhere": true,
+        "said": "The documents disagree about the 2024 throughput of the Vance depot. One figure is 27,150 containers, and the other is 26,400 containers.\n\nWe need to answer the question: \"The documents disagree about one depot's 2024 throughput. Name that depot and give both figures.\"\n\nWe need to answer using only ",
+        "raw_tail": "o.\n\nWe need to answer the question: \"The documents disagree about one depot's 2024 throughput. Name that depot and give both figures.\"\n\nWe need to answer using only the documents above. If they do not",
+        "truncated": true
+      },
+      {
+        "task": "cite_fee_2023",
+        "passes": true,
+        "anywhere": true,
+        "said": "<14|D4>",
+        "raw_tail": " 14|D4\n</think>\n\n<14|D4>",
+        "truncated": false
+      },
+      {
+        "task": "aggregate_throughput",
+        "passes": null,
+        "anywhere": false,
+        "said": "96,000\n\nThe provided answer is 96,000. I need to verify if this is correct based on the documents.\n\n[D2] Depot throughput for 2024. Marrow handled 41,200 containers. Kell handled 18,650 containers. Vance handled 27,150 containers.\n\nTo find the combined throughput, I need to add these numbers: 41,200",
+        "raw_tail": "200 containers\n- Kell: 18,650 containers\n- Vance: 27,150 containers\n- Total: 41,200 + 18,650 + 27,150 = 87,000 containers\n\nThe answer provided in the question (96,000) is incorrect. The correct answer",
+        "truncated": true
+      }
+    ]
+  },
+  "score": {
+    "code": {
+      "pass": 2,
+      "of": 5,
+      "skipped": 1
+    },
+    "math": {
+      "pass": 4,
+      "of": 5,
+      "skipped": 3
+    },
+    "instruct": {
+      "pass": 2,
+      "of": 6,
+      "skipped": 0
+    },
+    "extract": {
+      "pass": 5,
+      "of": 5,
+      "skipped": 0
+    },
+    "research": {
+      "pass": 2,
+      "of": 2,
+      "skipped": 4
+    }
+  }
+}
