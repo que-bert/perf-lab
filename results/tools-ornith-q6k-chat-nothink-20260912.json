@@ -1,0 +1,157 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "ornith-9b-q6k",
+  "label": "ornith-q6k",
+  "ctx": 32768,
+  "api": "llama",
+  "prompt_mode": "chat",
+  "thinking": false,
+  "budget": 2048,
+  "results": {
+    "tools": [
+      {
+        "task": "single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/etc/hostname\"}"
+        ],
+        "said": "I'll read the contents of the file for you.\n\n"
+      },
+      {
+        "task": "pick_files_not_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\"TODO\",\"directory\":\"/srv/app\"}"
+        ],
+        "said": "I'll search the source files under /srv/app for the string \"TODO\".\n\n"
+      },
+      {
+        "task": "pick_memory_not_files",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_memory"
+        ],
+        "arguments": [
+          "{\"query\":\"retry policy decision\"}"
+        ],
+        "said": "I'll search my long-term memory for information about the retry policy decision.\n\n"
+      },
+      {
+        "task": "pick_url_not_file",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "fetch_url"
+        ],
+        "arguments": [
+          "{\"url\":\"https://example.com/spec.txt\"}"
+        ],
+        "said": "I'll fetch that document for you.\n\n"
+      },
+      {
+        "task": "enum_constraint",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "set_log_level"
+        ],
+        "arguments": [
+          "{\"level\":\"error\"}"
+        ],
+        "said": "I'll set the log level to \"error\" so the daemon only reports genuine failures.\n\n"
+      },
+      {
+        "task": "integer_type",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/var/log/app.log\",\"max_bytes\":500}"
+        ],
+        "said": "I'll read the first 500 bytes of the log file for you.\n\n"
+      },
+      {
+        "task": "abstain_no_tool_needed",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "17 \u00d7 24 = 408"
+      },
+      {
+        "task": "abstain_no_such_tool",
+        "passes": false,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\".\",\"directory\":\"/srv/app\"}"
+        ],
+        "said": "I'll help you delete files under `/srv/app`. Let me first see what's there before deleting anything.\n\n"
+      },
+      {
+        "task": "lexical_decoy_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\"allocator\",\"directory\":\"/srv/app/docs\"}"
+        ],
+        "said": "I'll search the file contents under `/srv/app/docs` for information about the memory allocator.\n\n"
+      },
+      {
+        "task": "no_invented_argument",
+        "passes": false,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/etc/config\"}"
+        ],
+        "said": "I'll read the config file for you.\n\n"
+      },
+      {
+        "task": "ordering_dependency",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/srv/app/target.txt\"}"
+        ],
+        "said": "I'll start by reading the target file to get the URL.\n\n"
+      },
+      {
+        "task": "plural_single_call",
+        "passes": false,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "All tools are disabled for this turn. I can't read the file or use any other tools."
+      }
+    ]
+  },
+  "score": {
+    "tools": {
+      "pass": 9,
+      "of": 12,
+      "skipped": 0
+    }
+  }
+}

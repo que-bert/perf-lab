@@ -1,0 +1,163 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "ornith-9b-q4km",
+  "label": "ornith-q4km",
+  "ctx": 32768,
+  "api": "llama",
+  "prompt_mode": "chat",
+  "thinking": false,
+  "budget": 2048,
+  "results": {
+    "tools": [
+      {
+        "task": "single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/etc/hostname\"}"
+        ],
+        "said": "I'll read the contents of /etc/hostname using the read_file tool.\n\n"
+      },
+      {
+        "task": "pick_files_not_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\"TODO\",\"directory\":\"/srv/app\"}"
+        ],
+        "said": "I'll search for the string \"TODO\" in the source files under /srv/app.\n\n"
+      },
+      {
+        "task": "pick_memory_not_files",
+        "passes": false,
+        "truncated": false,
+        "calls": [
+          "search_memory",
+          "search_memory"
+        ],
+        "arguments": [
+          "{\"query\":\"retry policy decision\"}",
+          "{\"query\":\"retry logic backoff exponential\"}"
+        ],
+        "said": "I'll search my long-term memory for any earlier decisions about the retry policy.\n\n"
+      },
+      {
+        "task": "pick_url_not_file",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "fetch_url"
+        ],
+        "arguments": [
+          "{\"url\":\"https://example.com/spec.txt\"}"
+        ],
+        "said": "I'll fetch that document for you using the fetch tool.\n\n"
+      },
+      {
+        "task": "enum_constraint",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "set_log_level"
+        ],
+        "arguments": [
+          "{\"level\":\"error\"}"
+        ],
+        "said": "I'll set the log level to `error`, which is the most restrictive level that only reports genuine failures.\n\n"
+      },
+      {
+        "task": "integer_type",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/var/log/app.log\",\"max_bytes\":500}"
+        ],
+        "said": "I'll read the first 500 bytes of the log file for you.\n\n"
+      },
+      {
+        "task": "abstain_no_tool_needed",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "408"
+      },
+      {
+        "task": "abstain_no_such_tool",
+        "passes": false,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\".\",\"directory\":\"/srv/app\"}"
+        ],
+        "said": "I'll help you delete files under `/srv/app`. Let me first see what's there before deleting anything.\n\n"
+      },
+      {
+        "task": "lexical_decoy_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\"allocator|allocat|memory\",\"directory\":\"/srv/app/docs\"}"
+        ],
+        "said": "I'll search the files under `/srv/app/docs` for content about the memory allocator.\n\n"
+      },
+      {
+        "task": "no_invented_argument",
+        "passes": false,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\"config\"}"
+        ],
+        "said": "I'll read the config file for you. Let me first find it on the disk.\n\n"
+      },
+      {
+        "task": "ordering_dependency",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/srv/app/target.txt\"}"
+        ],
+        "said": "I'll start by reading the file to get the URL.\n\n"
+      },
+      {
+        "task": "plural_single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/etc/hostname\"}"
+        ],
+        "said": ""
+      }
+    ]
+  },
+  "score": {
+    "tools": {
+      "pass": 9,
+      "of": 12,
+      "skipped": 0
+    }
+  }
+}

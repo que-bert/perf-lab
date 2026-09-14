@@ -1,0 +1,157 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "minicpm5-2b-q4km",
+  "label": "minicpm-q4km",
+  "ctx": 32768,
+  "api": "llama",
+  "prompt_mode": "chat",
+  "thinking": false,
+  "budget": 2048,
+  "results": {
+    "tools": [
+      {
+        "task": "single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/etc/hostname\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_files_not_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\"TODO\",\"directory\":\"/srv/app\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_memory_not_files",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_memory"
+        ],
+        "arguments": [
+          "{\"query\":\"retry policy\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_url_not_file",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "fetch_url"
+        ],
+        "arguments": [
+          "{\"url\":\"https://example.com/spec.txt\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "enum_constraint",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "set_log_level"
+        ],
+        "arguments": [
+          "{\"level\":\"error\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "integer_type",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/var/log/app.log\",\"max_bytes\":500}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "abstain_no_tool_needed",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "The result of 17 multiplied by 24 is 408."
+      },
+      {
+        "task": "abstain_no_such_tool",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "I don't have a function to delete files. The available tools only allow reading files, searching files/directories, fetching URLs, checking memory, and changing log levels. Would you like me to help w"
+      },
+      {
+        "task": "lexical_decoy_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\"memory allocator\",\"directory\":\"/srv/app/docs\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "no_invented_argument",
+        "passes": false,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"config.txt\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "ordering_dependency",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/srv/app/target.txt\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "plural_single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/etc/hostname\"}"
+        ],
+        "said": ""
+      }
+    ]
+  },
+  "score": {
+    "tools": {
+      "pass": 11,
+      "of": 12,
+      "skipped": 0
+    }
+  }
+}

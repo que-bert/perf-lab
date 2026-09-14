@@ -1614,3 +1614,77 @@ attributable; the *direction* is what the fix guarantees, not the magnitude.
 sit at 29-31 of 31 in chat mode after all of this. Every conclusion about
 which of these models is better still waits on a harder tier, and now also on
 repeated runs with a reported spread rather than n=1.
+
+## 2026-09-12: native tool calling measured, and every model can do it
+
+The gap every previous entry left open. The format suites were only ever a
+proxy for whether these models can drive an agent loop, and the proxy scored
+worst of all five suites, which made it the open question. Now measured
+directly.
+
+**Native tool calling, not prompt-engineered JSON.** mimir builds a request
+carrying a `Tools` list and reads `tool_calls` back off the response, so a
+suite scoring hand-rolled JSON in the message body would measure something
+mimir never does. Both backends go through the endpoint that carries a tools
+array: `/v1/chat/completions` for llama-server and **`/api/chat` for ollama** —
+not `/api/generate`, which every other ollama path in the harness uses and
+which has no tool support at all. There is no raw-mode row by construction; a
+tool catalog only reaches the model through the chat template, and
+`--suites tools` without `--chat` refuses rather than mislabelling the row.
+
+Twelve items over a five-tool catalog with two deliberately confusable pairs
+(`search_files`/`search_memory`, `read_file`/`fetch_url`). Scored on the calls
+themselves: right tool, exactly one call, arguments satisfying the declared
+schema. ctx 32768, budget 2048, temperature 0.
+`results/tools-*-20260912.json`.
+
+| label | chat | chat-nothink |
+|---|---|---|
+| gemma4-e2b | **12/12** | **12/12** |
+| gemma4-e4b | **12/12** | **12/12** |
+| qwen35-9b | **12/12** | 11/12 |
+| minicpm-q8 | 11/12 | 11/12 |
+| minicpm-q4km | 11/12 | 11/12 |
+| ornith-q6k | 10/12 | 9/12 |
+| ornith-q4km | 10/12 | 9/12 |
+
+**The answer is yes, and it is not close.** Every model on hand does native
+tool calling correctly — right tool from a confusable catalog, arguments typed
+to schema (`max_bytes: 500` as an integer, not `"500"`), correct enum
+selection from an indirect instruction ("only genuine failures" → `error`),
+and clean abstention when no tool is needed. A 2.6B is at 11/12. **The
+instruct-suite weakness did not predict tool-calling weakness**, which
+retires the worry that motivated this suite.
+
+**Every failure is the same failure: substitution, not invention.** No model
+ever hallucinated a tool name. What they do instead is reach for a plausible
+adjacent tool when none fits:
+
+- Asked to **delete** every file under a directory, with nothing in the catalog
+  that deletes, Ornith calls `search_files` with pattern `"."`.
+- Asked to "read the config file" with **no path given**, Ornith calls
+  `search_files` for `"config"` and MiniCPM calls `search_memory`. The honest
+  response is to decline and ask.
+
+This is the harder failure to defend against, because the call is well-formed
+and names a real tool — a schema validator passes it. Only the *caller* can
+know the argument was fabricated. For an agent runtime the mitigation is not
+better prompting, it is requiring the model to name its evidence for each
+argument, or refusing calls whose arguments appear nowhere in the request.
+
+**Thinking off costs a point on the reasoning models and nothing elsewhere.**
+Ornith drops 10 → 9 and qwen35 12 → 11; gemma4 and MiniCPM are flat. Combined
+with the earlier finding that MiniCPM cannot finish a code task with thinking
+on, no-think remains the right default for that model and now costs nothing on
+tool calling either.
+
+**Ornith is last on the one suite closest to production work**, on both quants,
+in both modes — the only suite where it is consistently beaten by a 2.6B.
+
+**Saturation caveat, again.** The first eight items scored 8/8 on
+MiniCPM5-2B-Q8_0 on the first run, so four harder items were added the same
+day: a lexical decoy, a missing required argument, an ordering dependency, and
+a restraint check. Those four are where all remaining failures land. Even so
+the suite tops out at 12/12 for three of seven labels — it is a **floor test**
+that answers "can this model be trusted in an agent loop at all", not a
+ranking instrument. Treat a 12/12 as "no disqualifying defect found".

@@ -194,6 +194,79 @@ def _complete(port, prompt, n_predict, extra=None):
     return _BACKENDS[(_API, _CHAT)](port, prompt, n_predict, extra)
 
 
+# ------------------------------------------------------------ tool calling
+# Native tool calling, not prompt-engineered JSON. mimir builds a Request with
+# a Tools list and reads tool_calls back off the response, so a suite that
+# scores hand-rolled JSON in the message body would measure something mimir
+# never does. Both backends therefore go through the endpoint that carries a
+# tools array: /v1/chat/completions for llama-server, /api/chat for ollama --
+# NOT /api/generate, which the other ollama paths here use and which has no
+# tool support at all.
+#
+# Always chat-shaped: a tool catalog only reaches the model through the chat
+# template. There is no raw-mode row for this suite, by construction.
+
+def _toolcall_llama(port, prompt, tools, n_predict, extra=None):
+    import urllib.request
+    body = {"messages": [{"role": "user", "content": prompt}],
+            "tools": tools, "tool_choice": "auto",
+            "max_tokens": n_predict, "temperature": 0, "stream": False}
+    body.update(extra or {})
+    req = urllib.request.Request(
+        f"http://127.0.0.1:{port}/v1/chat/completions",
+        data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=3600) as r:
+        d = json.load(r)
+    ch = (d.get("choices") or [{}])[0]
+    msg = ch.get("message") or {}
+    calls = []
+    for tc in (msg.get("tool_calls") or []):
+        fn = tc.get("function") or {}
+        calls.append({"name": fn.get("name"), "arguments": fn.get("arguments")})
+    return {"calls": calls, "content": msg.get("content") or "",
+            "stop_type": "limit" if ch.get("finish_reason") == "length"
+            else "eos"}
+
+
+def _toolcall_ollama(port, prompt, tools, n_predict, extra=None):
+    import urllib.request
+    body = {"model": _OLLAMA_MODEL,
+            "messages": [{"role": "user", "content": prompt}],
+            "tools": tools, "stream": False,
+            "options": {"temperature": 0, "num_predict": n_predict,
+                        "num_ctx": _CTX}}
+    body.update(extra or {})
+    req = urllib.request.Request(
+        f"http://127.0.0.1:{port}/api/chat",
+        data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=3600) as r:
+        d = json.load(r)
+    msg = d.get("message") or {}
+    calls = []
+    for tc in (msg.get("tool_calls") or []):
+        fn = tc.get("function") or {}
+        # ollama returns arguments already decoded; llama-server returns a
+        # JSON string. Normalise to the string form so one scorer reads both.
+        args = fn.get("arguments")
+        if not isinstance(args, str):
+            args = json.dumps(args)
+        calls.append({"name": fn.get("name"), "arguments": args})
+    return {"calls": calls, "content": msg.get("content") or "",
+            "stop_type": "limit" if d.get("done_reason") == "length"
+            else "eos"}
+
+
+def _toolcall(port, prompt, tools, n_predict):
+    extra = None
+    if _NO_THINK:
+        extra = {"think": False} if _API == "ollama" \
+            else {"chat_template_kwargs": {"enable_thinking": False}}
+    fn = _toolcall_ollama if _API == "ollama" else _toolcall_llama
+    return fn(port, prompt, tools, n_predict, extra)
+
+
 # ---------------------------------------------------------------- code
 CODE_TASKS = [
     ("rle",
@@ -650,6 +723,185 @@ def run_research(port, log, budget, complete=None):
 
 
 # ---------------------------------------------------------------- recall
+# ---------------------------------------------------------------- tools
+# A catalog shaped like the one an agent actually carries: several tools whose
+# descriptions overlap, so picking correctly requires reading them rather than
+# matching the first keyword. Two pairs are deliberately confusable --
+# search_files against search_memory, and read_file against fetch_url.
+TOOL_CATALOG = [
+    {"type": "function", "function": {
+        "name": "read_file",
+        "description": "Read the contents of a file from the local disk.",
+        "parameters": {"type": "object", "properties": {
+            "path": {"type": "string",
+                     "description": "Absolute path to the file."},
+            "max_bytes": {"type": "integer",
+                          "description": "Stop after this many bytes."}},
+            "required": ["path"]}}},
+    {"type": "function", "function": {
+        "name": "search_files",
+        "description": "Search file CONTENTS on the local disk for a regex. "
+                       "Use for source code and documents on this machine.",
+        "parameters": {"type": "object", "properties": {
+            "pattern": {"type": "string", "description": "Regex to match."},
+            "directory": {"type": "string",
+                          "description": "Directory to search under."}},
+            "required": ["pattern"]}}},
+    {"type": "function", "function": {
+        "name": "search_memory",
+        "description": "Search the agent's own long-term MEMORY of past "
+                       "conversations and decisions. Not files.",
+        "parameters": {"type": "object", "properties": {
+            "query": {"type": "string", "description": "What to look for."}},
+            "required": ["query"]}}},
+    {"type": "function", "function": {
+        "name": "fetch_url",
+        "description": "Fetch a document over HTTP from a remote URL.",
+        "parameters": {"type": "object", "properties": {
+            "url": {"type": "string", "description": "The URL to fetch."}},
+            "required": ["url"]}}},
+    {"type": "function", "function": {
+        "name": "set_log_level",
+        "description": "Change the daemon's logging verbosity.",
+        "parameters": {"type": "object", "properties": {
+            "level": {"type": "string", "enum": ["debug", "info", "warn",
+                                                 "error"],
+                      "description": "New level."}},
+            "required": ["level"]}}},
+]
+
+
+def _args_of(call):
+    """Decode a call's arguments, tolerating a model that emits junk."""
+    try:
+        v = json.loads(call.get("arguments") or "{}")
+        return v if isinstance(v, dict) else {}
+    except (ValueError, TypeError):
+        return {}
+
+
+def _one_call(calls, name):
+    """Exactly one call, to `name`. Over-calling is a failure, not a pass."""
+    return len(calls) == 1 and calls[0].get("name") == name
+
+
+# Each task: (name, prompt, check(calls) -> bool). The checks are deliberately
+# strict about COUNT as well as content: an agent that fires three tools when
+# one was asked for is broken in a way that scoring "did it call the right one
+# at least once" would hide.
+TOOL_TASKS = [
+    ("single_call",
+     "What is in /etc/hostname? Use a tool.",
+     lambda c: _one_call(c, "read_file")
+     and _args_of(c[0]).get("path") == "/etc/hostname"),
+
+    ("pick_files_not_memory",
+     "Find every place the string TODO appears in the source files under "
+     "/srv/app. Use a tool.",
+     lambda c: _one_call(c, "search_files")
+     and "TODO" in str(_args_of(c[0]).get("pattern", ""))),
+
+    ("pick_memory_not_files",
+     "What did we decide about the retry policy in an earlier conversation? "
+     "Use a tool.",
+     lambda c: _one_call(c, "search_memory")),
+
+    ("pick_url_not_file",
+     "Get the document at https://example.com/spec.txt. Use a tool.",
+     lambda c: _one_call(c, "fetch_url")
+     and _args_of(c[0]).get("url") == "https://example.com/spec.txt"),
+
+    ("enum_constraint",
+     "Turn the daemon's logging down so it only reports genuine failures, "
+     "nothing lower. Use a tool.",
+     lambda c: _one_call(c, "set_log_level")
+     and _args_of(c[0]).get("level") == "error"),
+
+    ("integer_type",
+     "Read the first 500 bytes of /var/log/app.log. Use a tool.",
+     lambda c: _one_call(c, "read_file")
+     and _args_of(c[0]).get("path") == "/var/log/app.log"
+     # The schema says integer. A model that sends "500" has produced a
+     # payload the caller must coerce or reject, which is the bug this
+     # catches -- mimir unmarshals into a typed struct.
+     and _args_of(c[0]).get("max_bytes") == 500),
+
+    ("abstain_no_tool_needed",
+     "What is 17 multiplied by 24? Answer directly.",
+     lambda c: len(c) == 0),
+
+    ("abstain_no_such_tool",
+     "Delete every file under /srv/app and confirm when done.",
+     # Nothing in the catalog deletes anything. The failure mode being caught
+     # is inventing a plausible name like delete_file, or bending an unrelated
+     # tool to the task.
+     lambda c: len(c) == 0),
+
+    # ---- harder tier. The eight above saturate: MiniCPM5-2B-Q8_0 scored 8/8
+    # first try on 2026-09-12. These four attack the failure modes that a
+    # keyword match survives -- a lexical decoy, an invented argument, an
+    # ordering dependency, and a plural that invites over-calling.
+    ("lexical_decoy_memory",
+     "Our design notes are checked into the repo. Search the files under "
+     "/srv/app/docs for what they say about the memory allocator. Use a tool.",
+     # Says "memory" twice and "notes" once, but the target is files on disk.
+     # A model matching on the word picks search_memory.
+     lambda c: _one_call(c, "search_files")),
+
+    ("no_invented_argument",
+     "Read the config file. Use a tool.",
+     # The path is genuinely unspecified. Calling read_file with a guessed
+     # path like /etc/config.json is worse than not calling: the caller acts
+     # on a fabricated argument. Either abstain and ask, or do not call.
+     lambda c: len(c) == 0),
+
+    ("ordering_dependency",
+     "The file /srv/app/target.txt contains a single URL. Fetch whatever "
+     "document that URL points at. Use a tool.",
+     # read_file must come first -- the URL is not knowable yet. A model that
+     # calls fetch_url has hallucinated a URL it cannot have.
+     lambda c: len(c) >= 1 and c[0].get("name") == "read_file"
+     and _args_of(c[0]).get("path") == "/srv/app/target.txt"),
+
+    ("plural_single_call",
+     "Read /etc/hostname. Do not read anything else.",
+     # Tests restraint: exactly one call, no speculative extras alongside it.
+     lambda c: _one_call(c, "read_file")
+     and _args_of(c[0]).get("path") == "/etc/hostname"),
+]
+
+
+def run_tools(port, log, budget):
+    """Native tool calling: does the model call the right tool, once, with
+    arguments that satisfy the declared schema -- and does it stay quiet when
+    no tool applies.
+
+    This is the suite closest to what an agent runtime needs, and the one the
+    format suites were only ever a proxy for.
+    """
+    out = []
+    for name, prompt, check in TOOL_TASKS:
+        r = _toolcall(port, prompt, TOOL_CATALOG, budget)
+        calls = r.get("calls") or []
+        truncated = r.get("stop_type") == "limit"
+        try:
+            ok = bool(check(calls))
+        except Exception:      # a malformed call is a fail, not a crash
+            ok = False
+        # Same rule the other suites use: a generation cut off before it could
+        # emit a call has not been measured.
+        if truncated and not ok:
+            ok = None
+        verdict = "TRUNC" if ok is None else ("PASS" if ok else "FAIL")
+        names = [c.get("name") for c in calls]
+        out.append({"task": name, "passes": ok, "truncated": truncated,
+                    "calls": names,
+                    "arguments": [c.get("arguments") for c in calls][:4],
+                    "said": (r.get("content") or "")[:200]})
+        log(f"    tools    {name:<24} {verdict:<5} calls={names}")
+    return out
+
+
 def run_recall(port, corpus, lengths, log, budget):
     out = []
     needles = [("the north vault", "CORAL-MERIDIAN-48"),
@@ -705,7 +957,9 @@ def main():
     ap.add_argument("--budget", type=int, default=768,
                     help="n_predict; reasoning models need room before the answer")
     ap.add_argument("--suites",
-                    default="code,math,instruct,extract,research,recall")
+                    default="code,math,instruct,extract,research,recall",
+                    help="tools needs --chat: a tool catalog only reaches "
+                         "the model through the chat template")
     ap.add_argument("--out", default="")
     ap.add_argument("--api", choices=("llama", "ollama"), default="llama",
                     help="ollama drives ollama's own runtime, for GGUFs "
@@ -777,6 +1031,16 @@ def main():
             results["extract"] = run_extract(port, log, a.budget)
         if "research" in suites:
             results["research"] = run_research(port, log, a.budget)
+        if "tools" in suites:
+            # Native tool calling only reaches the model through the chat
+            # template, so there is no raw row to take. Refuse rather than
+            # emit a row whose prompt_mode says "raw" and whose transport was
+            # a chat endpoint -- that mislabelling is what the prompt_mode
+            # field exists to prevent.
+            if not _CHAT:
+                log("    tools    SKIPPED -- needs --chat (no raw transport)")
+            else:
+                results["tools"] = run_tools(port, log, a.budget)
         if "recall" in suites and a.recall_lengths:
             corpus = pathlib.Path(a.corpus or os.environ.get(
                 "PERF_LAB_HELDOUT",

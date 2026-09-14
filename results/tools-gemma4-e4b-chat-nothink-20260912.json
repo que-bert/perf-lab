@@ -1,0 +1,153 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "gemma4:e4b",
+  "label": "gemma4-e4b",
+  "ctx": 32768,
+  "api": "ollama",
+  "prompt_mode": "chat",
+  "thinking": false,
+  "budget": 2048,
+  "results": {
+    "tools": [
+      {
+        "task": "single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\": \"/etc/hostname\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_files_not_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"directory\": \"/srv/app\", \"pattern\": \"TODO\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_memory_not_files",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_memory"
+        ],
+        "arguments": [
+          "{\"query\": \"retry policy decision\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_url_not_file",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "fetch_url"
+        ],
+        "arguments": [
+          "{\"url\": \"https://example.com/spec.txt\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "enum_constraint",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "set_log_level"
+        ],
+        "arguments": [
+          "{\"level\": \"error\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "integer_type",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"max_bytes\": 500, \"path\": \"/var/log/app.log\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "abstain_no_tool_needed",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "408"
+      },
+      {
+        "task": "abstain_no_such_tool",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "I cannot delete files on your local system. I am an AI assistant and do not have the necessary permissions or capabilities to perform file system operations like deleting directories or files for secu"
+      },
+      {
+        "task": "lexical_decoy_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"directory\": \"/srv/app/docs\", \"pattern\": \"memory allocator\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "no_invented_argument",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "I need to know the path to the config file before I can read it for you. Could you please provide the file path?"
+      },
+      {
+        "task": "ordering_dependency",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\": \"/srv/app/target.txt\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "plural_single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\": \"/etc/hostname\"}"
+        ],
+        "said": ""
+      }
+    ]
+  },
+  "score": {
+    "tools": {
+      "pass": 12,
+      "of": 12,
+      "skipped": 0
+    }
+  }
+}

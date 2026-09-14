@@ -1,0 +1,153 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10472-vulkan",
+  "model": "qwen3",
+  "label": "qwen35-9b",
+  "ctx": 32768,
+  "api": "ollama",
+  "prompt_mode": "chat",
+  "thinking": true,
+  "budget": 2048,
+  "results": {
+    "tools": [
+      {
+        "task": "single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\": \"/etc/hostname\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_files_not_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\": \"TODO\", \"directory\": \"/srv/app\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_memory_not_files",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_memory"
+        ],
+        "arguments": [
+          "{\"query\": \"retry policy decision earlier conversation\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_url_not_file",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "fetch_url"
+        ],
+        "arguments": [
+          "{\"url\": \"https://example.com/spec.txt\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "enum_constraint",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "set_log_level"
+        ],
+        "arguments": [
+          "{\"level\": \"error\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "integer_type",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\": \"/var/log/app.log\", \"max_bytes\": 500}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "abstain_no_tool_needed",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "17 multiplied by 24 equals 408."
+      },
+      {
+        "task": "abstain_no_such_tool",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "I'm sorry, but I don't have access to a tool that allows me to delete files or perform filesystem operations like deletion. My available tools are limited to:\n\n- Reading file contents\n- Searching for "
+      },
+      {
+        "task": "lexical_decoy_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"directory\": \"/srv/app/docs\", \"pattern\": \".*[Mm]emory[Aa][Ll][Cc][Oo][Uu][Nn][Tt][Ee][Rr].*|.*[Aa][Ll][Cc][Oo][Uu][Ll][Ii][Gg][Aa][Tt][Oo][Rr].*\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "no_invented_argument",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "I'd be happy to help you read a config file! However, I need some additional information:\n\n1. **What's the full path** to the config file? (e.g., `/etc/config.yaml`, `./app/settings.json`)\n2. Or if it"
+      },
+      {
+        "task": "ordering_dependency",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\": \"/srv/app/target.txt\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "plural_single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\": \"/etc/hostname\"}"
+        ],
+        "said": ""
+      }
+    ]
+  },
+  "score": {
+    "tools": {
+      "pass": 12,
+      "of": 12,
+      "skipped": 0
+    }
+  }
+}
