@@ -38,11 +38,23 @@ PROMPT = (
 )
 
 
+CHAT = False  # set by --chat; see the note in main()
+
+
 def one(port, i, n_predict, timeout):
-    body = {"prompt": PROMPT.format(i=i), "n_predict": n_predict,
-            "temperature": 0, "cache_prompt": False}
+    if CHAT:
+        # A drafter trained on chat-formatted text is measured off-distribution
+        # through /completion, which applies no template. Measured 2026-09-15:
+        # DFlash2 acceptance is a floor under raw prompts for that reason.
+        path = "/v1/chat/completions"
+        body = {"messages": [{"role": "user", "content": PROMPT.format(i=i)}],
+                "max_tokens": n_predict, "temperature": 0, "stream": False}
+    else:
+        path = "/completion"
+        body = {"prompt": PROMPT.format(i=i), "n_predict": n_predict,
+                "temperature": 0, "cache_prompt": False}
     req = urllib.request.Request(
-        f"http://127.0.0.1:{port}/completion", data=json.dumps(body).encode(),
+        f"http://127.0.0.1:{port}{path}", data=json.dumps(body).encode(),
         headers={"Content-Type": "application/json"})
     t0 = time.time()
     with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -112,7 +124,14 @@ def main():
     ap.add_argument("--timeout", type=int, default=900)
     ap.add_argument("--label", default="")
     ap.add_argument("--out", default="")
+    ap.add_argument("--chat", action="store_true",
+                    help="drive /v1/chat/completions so the chat template is "
+                         "applied; required to judge a drafter trained on "
+                         "chat-formatted text")
     a = ap.parse_args()
+
+    global CHAT
+    CHAT = a.chat
 
     # One throwaway batch first: the first request after a load pays for
     # warm-up and would otherwise land entirely in the c=1 row.

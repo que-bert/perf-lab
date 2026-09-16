@@ -1688,3 +1688,104 @@ a restraint check. Those four are where all remaining failures land. Even so
 the suite tops out at 12/12 for three of seven labels — it is a **floor test**
 that answers "can this model be trusted in an agent loop at all", not a
 ranking instrument. Treat a 12/12 as "no disqualifying defect found".
+
+## 2026-09-15: n-max 3 is confirmed under `--parallel 1`, and DFlash2 does not beat MTP
+
+Two questions, both left open by the 2026-09-10 entries: the n-max optimum was
+swept at the default 4 slots and never re-derived after `--parallel 1` was
+adopted, and block-diffusion drafting (DFlash2 / DSpark) had never been tried.
+Scripts: `harness/nmax_sweep.sh`, `harness/dflash_sweep.sh`.
+
+### MTP draft depth under one slot
+
+b10472-vulkan (the SERVING build), ctx 262144, `q8_0`/`q4_0`, `--parallel 1`,
+`--mmproj`, 4 reps of `n_predict` 256 at concurrency 1.
+
+| n-max | agg t/s | per-req t/s | wall | acceptance |
+|---|---|---|---|---|
+| off | 23.24 | 24.11 | 44.1 s | — |
+| 1 | 36.79 | 39.47 | 27.8 s | 0.888 |
+| 2 | 44.97 | 49.19 | 22.8 s | 0.808 |
+| **3** | **47.55** | 53.18 | **21.5 s** | 0.728 |
+| 4 | 39.69 | 42.81 | 25.8 s | 0.484 |
+| 5 | 35.91 | 38.93 | 28.5 s | 0.415 |
+| 6 | 46.21 | 57.97 | 22.2 s | 0.580 |
+
+**n-max 3 is the optimum, and the served config was already right** — carried
+over from the 4-slot sweep, now actually measured. 2.0x over speculation off.
+
+**n-max 6 is a variance artifact, not a win.** Its per-request mean (57.97) is
+the highest in the table while its aggregate (46.21) and wall clock (22.16 s
+against 21.53 s) are both worse than n-max 3: one request ran very fast and
+another very slow (p50 5.59 s, p95 8.93 s). This is the same instability
+recorded at n-max 7 on 2026-09-10. **At concurrency 1, read wall clock and
+aggregate; the mean of per-request rates hides a bimodal distribution.**
+
+Decode at n-max 3 also measures **53.18 t/s per-request here against 45.45 on
+2026-09-10** at the same build, ctx and quant. The difference is `--parallel 1`,
+which the earlier sweep did not have. The slot count is worth ~17%.
+
+### DFlash2 and DSpark lose to MTP on this box
+
+b10902-adaptive-mtp (b10472 has no `draft-dflash`), ctx 262144, `q8_0`/`q4_0`,
+`--parallel 1`, no mmproj, same 4x256 protocol. Drafters in
+`…/models/qwen3.8:27b/drafters/`.
+
+| config | agg t/s | per-req t/s | VRAM | acceptance |
+|---|---|---|---|---|
+| **draft-mtp n=3 (reference)** | **45.05** | 50.05 | **29.19 GB** | **0.659** |
+| dflash2 Q4_K_M n=4 | 44.66 | 51.31 | 29.31 GB | 0.529 |
+| dflash2 Q4_K_M n=8 | 36.68 | 44.98 | 29.89 GB | 0.369 |
+| dflash2 Q8_0 n=4 | 43.49 | 49.96 | 30.16 GB | 0.524 |
+| dflash2 Q8_0 n=8 | 36.21 | 44.26 | 30.74 GB | 0.365 |
+| dflash2 Q8_0 n=15 | 15.79 | 18.97 | 31.73 GB | 0.365 |
+| dspark Q8_0 n=7 | 10.79 | 13.39 | 31.47 GB | 0.228 |
+| dspark Q8_0 n=15 | 19.44 | 24.79 | 31.66 GB | 0.228 |
+
+**The best DFlash2 row ties MTP and costs more VRAM.** 44.66 against 45.05 agg,
+at lower acceptance (0.529 against 0.659) and +0.12 GB; the Q8_0 drafter is
+strictly worse than the Q4_K_M one. Deeper blocks — the whole premise, "emit 15
+tokens in one pass" — **degrade monotonically**, exactly as autoregressive MTP
+depth does. Acceptance is flat from n=8 to n=15 (0.365) while throughput falls
+by 2.4x, so the extra drafted tokens are generated and then thrown away.
+
+**DSpark is not usable with these drafters.** Acceptance 0.228 at both depths.
+The available Qwen3.8-27B DSpark checkpoints were trained against NVFP4 and FP8
+targets, not this Q6_K GGUF; a target mismatch is the most likely cause and is
+**not established**.
+
+**The newer build is slower.** `draft-mtp n=3` measures 50.05 per-req on
+b10902-adaptive-mtp against 53.18 on b10472-vulkan under identical settings —
+~6% down. Consistent with the b10438 prefill regression already recorded. There
+is no reason to move the serving build for DFlash2, because DFlash2 does not
+win even on its own build.
+
+### The chat template does not rescue DFlash2
+
+The rows above go through `/completion`, which applies no template — the same
+off-distribution risk as the `--suites tools` requires `--chat` trap. Re-run
+through `/v1/chat/completions` (`harness/throughput.py --chat`, added here),
+same build and settings:
+
+| config | agg t/s | per-req t/s | acceptance |
+|---|---|---|---|
+| draft-mtp n=3 | 36.23 | 39.94 | 0.476 |
+| dflash2 Q4_K_M n=4 | **36.75** | 41.00 | 0.407 |
+| dflash2 Q4_K_M n=8 | 29.88 | 32.76 | 0.271 |
+
+**Still a tie.** DFlash2 leads by 1.4% on aggregate, which is inside the spread
+of these runs, and still drafts at lower acceptance. The verdict does not
+depend on the template, so the raw-prompt measurement was not the problem.
+
+Chat mode costs both configs ~19% against raw prompts (36.2 against 45.1 for
+MTP) and drops MTP acceptance from 0.659 to 0.476 — the template puts the model
+in a different generation regime, so **chat and raw rows must not be compared
+across tables.**
+
+### NOT verified
+- `dflash2 Q4_K_M n_max=15` failed to load while `Q8_0 n_max=15` loaded fine on
+  the same settings. Not diagnosed; one occurrence.
+- Quality was not measured for any DFlash2 or DSpark row — speed only.
+- `--spec-draft-conf-min`, which truncates a drafted block at the first
+  low-confidence position, was never swept. It is the one DFlash2/DSpark knob
+  that directly targets the "drafted then discarded" waste above.
