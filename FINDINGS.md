@@ -1789,3 +1789,112 @@ across tables.**
 - `--spec-draft-conf-min`, which truncates a drafted block at the first
   low-confidence position, was never swept. It is the one DFlash2/DSpark knob
   that directly targets the "drafted then discarded" waste above.
+
+## 2026-09-15: `-ctk q4_0` is faster, smaller, and does not measurably cost quality
+
+The served config carries `-ctk q8_0` on a quality argument that was never
+tested against q4_0 K. The 2026-09-10 comparison moved **V** (q8_0/q8_0 against
+q8_0/q4_0) and left K alone, while the KV-type table in the same entry found
+q4_0 K was 25% faster than q8_0 K unspeculated at depth 0 — measured with
+speculation off and at 4 slots, so neither half applied to the served config.
+
+### Speed
+
+b10472-vulkan, ctx 262144, `--parallel 1`, `--mmproj`, MTP n_max 3, V pinned to
+`q4_0`, 4 reps of `n_predict` 256 at concurrency 1. `harness/kcache_sweep.sh`.
+
+| ctk | agg t/s | wall | VRAM | acceptance |
+|---|---|---|---|---|
+| **q4_0** | **50.34** | **20.34 s** | **28.05 GB** | **0.785** |
+| q5_1 | 48.53 | 21.10 s | 28.80 GB | 0.738 |
+| q8_0 (served) | 47.88 | 21.39 s | 30.05 GB | 0.728 |
+| q4_1 | 47.67 | 21.48 s | 28.30 GB | 0.720 |
+| iq4_nl | 46.81 | 21.88 s | 28.05 GB | 0.699 |
+
+**q4_0 K is 5.1% faster than the served q8_0 and frees 2.0 GB.** That is the
+headroom the 98%-occupancy problem has been short of all along — it is larger
+than the entire 1.14 GB DFlash2 drafter measured earlier today.
+
+Draft acceptance also *rose* (0.785 against 0.728). The K cache is shared with
+the MTP draft pass, so drafter and target see the same quantization and may
+agree more often, but **this is a guess and the effect is one run per cell.**
+
+### Quality
+
+`harness/kcache_quality.sh`, ctx 131072, `--chat`, budget 768, recall needles at
+34k / 71k / 129k tokens.
+
+| suite | ctk q8_0 | ctk q4_0 |
+|---|---|---|
+| recall | 2/3 | **3/3** |
+| extract | 5/5 | 5/5 |
+| code (executed) | 4/4, 2 truncated | **5/5, 1 truncated** |
+
+**No quality regression, and q4_0 came out ahead on both suites that moved.**
+Treat that as "no evidence of harm", not as evidence q4_0 is better: each arm
+is one run, and the two differences are a single recall needle and a single
+code item that truncated in one arm and not the other.
+
+**The 129k recall item sits at the context boundary** — 129,417 tokens of
+needle inside a 131,072 window leaves ~1.6k for prompt and answer. The q8_0
+failure there is as likely to be crowding as K-cache precision. Re-run at ctx
+262144 before leaning on it.
+
+### NOT verified
+
+- Perplexity or KL-divergence against a BF16 reference — the suites here are
+  pass/fail on a handful of items and cannot resolve a small quality delta.
+- Whether the acceptance gain is real or run-to-run noise; one run per cell.
+- The n-max optimum was re-derived under q8_0 K. It may move under q4_0 K.
+- **Nothing in `~/.mimir/` was changed.** The served config still runs
+  `-ctk q8_0`; this entry is the evidence for a change, not the change.
+
+## 2026-09-15: backend survey — nothing replaces llama.cpp on this card today
+
+Desk research, not measurement. Recorded because the answer is a constraint on
+the hardware, not a preference, and should not be re-derived.
+
+The box is an R9700: **gfx1201 (RDNA4), 32 GB, 640 GB/s, ROCm 7.2.4**, served
+through llama.cpp's **Vulkan** backend.
+
+| candidate | status on gfx1201 | why it does not land |
+|---|---|---|
+| **NInfer** | no | CUDA-only by design; the only AMD port in progress is gfx906 (MI50/MI60, CDNA1) |
+| **SGLang** | no | ROCm path is Instinct-only (gfx942/gfx950). RDNA enablement exists on the `amd_march` branch, 1184 commits behind main, no PR to main |
+| **vLLM** | community forks only | not upstream; needs FP8/MXFP4/AWQ weights, and there are **zero safetensors on the mount** |
+| **ik_llama.cpp** | no | CPU and CUDA only; the project explicitly declines Vulkan and ROCm issues |
+| **llama.cpp (current)** | **yes** | — |
+
+**vLLM is the only real candidate and it is a fork bet.** `Capicua25x/vllm-rocm-rdna4`
+and `kyuz0/amd-r9700-vllm-toolboxes` both carry hand-written RDNA4 kernels;
+the former claims MTP-3 and a DFlash2-FP8 profile at "+18-26%" single-stream
+over MTP-3. No independent decode figure for a 27B on a single R9700 was found —
+the one public benchmark dashboard is a 2x R9700 rig and loads its numbers
+dynamically.
+
+**FP8 is a trap here.** ROCm 7.2.1 silently dequantizes FP8 weights to FP32 on
+gfx1201, and gfx1201 is missing from AITER's arch table, so an FP8 config can
+look configured and be running at FP32 width. Any vLLM attempt must verify the
+kernel actually ran FP8 rather than trusting the flag.
+
+**The switching cost is the model, not the engine.** The served weights are a
+22.9 GB Q6_K GGUF. vLLM wants FP8 (~27 GB, does not leave room for a long-context
+KV on 32 GB) or MXFP4/AWQ 4-bit (~14 GB, fits easily but is coarser than Q6_K).
+Either way it is a fresh download and a different quantization, so a comparison
+would not be measuring the engine alone.
+
+### The number worth chasing
+
+`sergiuszm/ninfer-4090` reports **148.6 t/s at 0.81 draft acceptance** for
+Qwen3.8-27B code decode with MTP3 at full 262K context, on a 24 GB RTX 4090,
+using an **E8 4-bit lattice-quantized KV cache**. Normalising by memory
+bandwidth (1008 against 640 GB/s) that is ~94 t/s of bandwidth-equivalent
+against the 50.3 measured here — roughly **1.9x**, and it is engine efficiency,
+not silicon.
+
+Two caveats before treating 1.9x as available: that figure is *code* decode,
+which is copy-heavy and accepts drafts far more often (0.81 against 0.785 here),
+and decode is not purely bandwidth-bound. But the direction is consistent with
+today's K-cache result — **the KV cache is where the remaining headroom is**,
+and llama.cpp's coarsest K option is q4_0 while NInfer ships a 4-bit lattice
+scheme. That is a concrete thing to want, not a reason to change engines.
