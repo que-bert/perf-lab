@@ -1,0 +1,19 @@
+{
+  "label": "two PTQ1_0 instances 131072 q4_0/q4_0",
+  "instances": 2,
+  "ports": [
+    8097,
+    8098
+  ],
+  "n_predict": 128,
+  "reps": 2,
+  "generated_tokens": 477,
+  "wall_seconds": 14.61,
+  "agg_tps": 32.65,
+  "per_req_tps": [
+    20.11,
+    18.47,
+    18.56,
+    18.39
+  ]
+}

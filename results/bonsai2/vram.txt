@@ -1,0 +1,17 @@
+IDLE: used=59912192 total=34208743424
+Running as unit: bonsai-mem-8099.service; invocation ID: 1ad8c3ae193b40309c2c781146354c6b
+PTQ1_0 32768 q8_0/q8_0: ctx=32768 kv=q8_0/q8_0 used=8052322304 total=34208743424 used_GiB=7.50 pct=23.5
+Running as unit: bonsai-mem-8099.service; invocation ID: 153905b7cd5e4412b7339c2cd5576471
+PTQ1_0 262144 q8_0/q8_0: ctx=262144 kv=q8_0/q8_0 used=17212112896 total=34208743424 used_GiB=16.03 pct=50.3
+Running as unit: bonsai-mem-8099.service; invocation ID: 07a5d727a06646d18024b37ef9585fa7
+PTQ1_0 262144 q8_0/q4_0: ctx=262144 kv=q8_0/q4_0 used=13767692288 total=34208743424 used_GiB=12.82 pct=40.2
+Running as unit: bonsai-mem-8099.service; invocation ID: e6f1d9909e5d4b05ba5a19d7c63fd1ea
+PTQ1_0 262144 q4_0/q4_0: ctx=262144 kv=q4_0/q4_0 used=12987162624 total=34208743424 used_GiB=12.10 pct=38.0
+Running as unit: bonsai-mem-8099.service; invocation ID: 8847343b28b84ba08585b440d350690f
+PQ2_0 32768 q8_0/q8_0: ctx=32768 kv=q8_0/q8_0 used=9243918336 total=34208743424 used_GiB=8.61 pct=27.0
+Running as unit: bonsai-mem-8099.service; invocation ID: d9625b42a86f49159b338bdfaf6377d0
+PQ2_0 262144 q8_0/q8_0: ctx=262144 kv=q8_0/q8_0 used=18403729408 total=34208743424 used_GiB=17.14 pct=53.8
+Running as unit: bonsai-mem-8099.service; invocation ID: bc9f7f84e5804df5915814c69acd94bb
+PQ2_0 262144 q8_0/q4_0: ctx=262144 kv=q8_0/q4_0 used=14959259648 total=34208743424 used_GiB=13.93 pct=43.7
+Running as unit: bonsai-mem-8099.service; invocation ID: fadfc1f19f024a81b6d64dabb6eadf52
+PQ2_0 262144 q4_0/q4_0: ctx=262144 kv=q4_0/q4_0 used=14178504704 total=34208743424 used_GiB=13.20 pct=41.4

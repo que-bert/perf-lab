@@ -1,0 +1,44 @@
+Running as unit: bonsai-slots.service; invocation ID: 11db26269a3040bb9030052ded36dc5a
+PQ2_0 ctx=262144 q4_0/q4_0 parallel=1: used_GiB=13.45 pct=42.2 n_slots = 1, n_ctx_slot = 262144
+Running as unit: bonsai-slots.service; invocation ID: 79fa65f1cb124354be88a49a316f289a
+PQ2_0 ctx=262144 q4_0/q4_0 parallel=2: used_GiB=13.47 pct=42.3 n_slots = 2, n_ctx_slot = 131072
+Running as unit: bonsai-slots.service; invocation ID: f25adc745b6d495fb8b3775c1dd5a304
+PQ2_0 ctx=262144 q4_0/q4_0 parallel=4: used_GiB=13.70 pct=43.0 n_slots = 4, n_ctx_slot = 65536
+Running as unit: bonsai-slots.service; invocation ID: b782bfae71464fde85748e663ee33f19
+PQ2_0 ctx=262144 q4_0/q4_0 parallel=8: used_GiB=14.26 pct=44.7 n_slots = 8, n_ctx_slot = 32768
+Running as unit: bonsai-slots.service; invocation ID: daea33493de54dd39dba568eab64c9bf
+PQ2_0 ctx=262144 q4_0/q4_0 parallel=16: used_GiB=15.41 pct=48.4 n_slots = 16, n_ctx_slot = 16384
+Running as unit: bonsai-slots.service; invocation ID: 0772a535c7f44ab6aa596b44ee0c4638
+PQ2_0 ctx=262144 q8_0/q8_0 parallel=1: used_GiB=17.39 pct=54.6 n_slots = 1, n_ctx_slot = 262144
+Running as unit: bonsai-slots.service; invocation ID: 458bccf927894ce2ba9906ec7844eed3
+PQ2_0 ctx=262144 q8_0/q8_0 parallel=2: used_GiB=17.41 pct=54.6 n_slots = 2, n_ctx_slot = 131072
+Running as unit: bonsai-slots.service; invocation ID: 8235d7264e44400582853ce5c95efa26
+PQ2_0 ctx=262144 q8_0/q8_0 parallel=4: used_GiB=17.64 pct=55.4 n_slots = 4, n_ctx_slot = 65536
+Running as unit: bonsai-slots.service; invocation ID: 5e47f1eeae7845fda72b2c50fb70005d
+PQ2_0 ctx=262144 q8_0/q8_0 parallel=8: used_GiB=18.19 pct=57.1 n_slots = 8, n_ctx_slot = 32768
+Running as unit: bonsai-slots.service; invocation ID: d4f2f1fd417d4b78ba1cd12e8a230fd9
+PQ2_0 ctx=262144 q8_0/q8_0 parallel=16: used_GiB=19.34 pct=60.7 n_slots = 16, n_ctx_slot = 16384
+Running as unit: bonsai-slots.service; invocation ID: 50e8648bac9740d7b80cb781b657c654
+PTQ1_0 ctx=262144 q4_0/q4_0 parallel=1: used_GiB=12.34 pct=38.7 n_slots = 1, n_ctx_slot = 262144
+Running as unit: bonsai-slots.service; invocation ID: dd3cf44b7ff148f591bf00a7a5cdb43a
+PTQ1_0 ctx=262144 q4_0/q4_0 parallel=2: used_GiB=12.36 pct=38.8 n_slots = 2, n_ctx_slot = 131072
+Running as unit: bonsai-slots.service; invocation ID: f0bdd7b6a0264f7380c13dea1b516991
+PTQ1_0 ctx=262144 q4_0/q4_0 parallel=4: used_GiB=12.59 pct=39.5 n_slots = 4, n_ctx_slot = 65536
+Running as unit: bonsai-slots.service; invocation ID: 2656d23eab0e41adabaa86cb9128eaa1
+PTQ1_0 ctx=262144 q4_0/q4_0 parallel=8: used_GiB=13.15 pct=41.3 n_slots = 8, n_ctx_slot = 32768
+Running as unit: bonsai-slots.service; invocation ID: 61f00c1cc4de44b98ccccbe37679c8b5
+PTQ1_0 ctx=262144 q4_0/q4_0 parallel=16: used_GiB=14.30 pct=44.9 n_slots = 16, n_ctx_slot = 16384
+Running as unit: bonsai-slots.service; invocation ID: 6d221cc2e04e485aa60c3df5dedb0fd0
+PQ2_0 ctx=262144 q4_0/q4_0 parallel=32: used_GiB=17.74 pct=55.7 n_slots = 32, n_ctx_slot = 8192
+Running as unit: bonsai-slots.service; invocation ID: ce392851cb2b49a8890bbf9b3218a437
+PQ2_0 ctx=262144 q4_0/q4_0 parallel=64: used_GiB=22.41 pct=70.3 n_slots = 64, n_ctx_slot = 4096
+Running as unit: bonsai-slots.service; invocation ID: 140c09fa6506466b9b10e3ce3cd152cf
+PQ2_0 ctx=262144 q8_0/q8_0 parallel=32: used_GiB=21.67 pct=68.0 n_slots = 32, n_ctx_slot = 8192
+Running as unit: bonsai-slots.service; invocation ID: fb7ba7df3c0f4f918e6e46190f19d223
+PQ2_0 ctx=262144 q8_0/q8_0 parallel=64: used_GiB=26.35 pct=82.7 n_slots = 64, n_ctx_slot = 4096
+Running as unit: bonsai-slots.service; invocation ID: 89c44094dea04dd6b886bb945a763799
+PQ2_0 ctx=262144 f16/f16 parallel=1: used_GiB=23.93 pct=75.1 n_slots = 1, n_ctx_slot = 262144
+Running as unit: bonsai-slots.service; invocation ID: 98b685bd09344c98a9e0b54be9bf9f01
+PQ2_0 ctx=262144 f16/f16 parallel=2: used_GiB=23.96 pct=75.2 n_slots = 2, n_ctx_slot = 131072
+Running as unit: bonsai-slots.service; invocation ID: a98753145a164971a21a9e5cee9dc5af
+PQ2_0 ctx=262144 q4_0/q4_0 parallel=128: used_GiB=31.76 pct=99.7 n_slots = 128, n_ctx_slot = 2048

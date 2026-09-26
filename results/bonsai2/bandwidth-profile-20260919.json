@@ -1,0 +1,95 @@
+{
+  "probe": "read bandwidth",
+  "measured_GBps": 640.2,
+  "spec_GBps": 640,
+  "profile": "Bonsai PQ2_0 ROCm, llama-bench -p2048 -n64 -r1, rocprofv3",
+  "total_gpu_kernel_s": 5.084,
+  "top_kernels": [
+    {
+      "name": "_ZL9mul_mat_qIL9ggml_type142ELi128ELb0EEvPKcPKiS4_S4_Pf",
+      "calls": 3200,
+      "ms": 2750.7,
+      "pct": 54.1
+    },
+    {
+      "name": "_ZL13mul_mat_vec_qIL9ggml_type142ELi1ELb0ELb0ELb0ELb0EE",
+      "calls": 15667,
+      "ms": 474.6,
+      "pct": 9.3
+    },
+    {
+      "name": "_Z20gated_delta_net_cudaILi128ELb0ELb0ELb1ELb0EEvPKfS1_",
+      "calls": 3504,
+      "ms": 441.7,
+      "pct": 8.7
+    },
+    {
+      "name": "_ZL13mul_mat_vec_qIL9ggml_type142ELi1ELb1ELb1ELb0ELb0EE",
+      "calls": 2600,
+      "ms": 218.0,
+      "pct": 4.3
+    },
+    {
+      "name": "_ZL13mul_mat_vec_qIL9ggml_type142ELi1ELb1ELb0ELb0ELb0EE",
+      "calls": 5200,
+      "ms": 203.9,
+      "pct": 4.0
+    },
+    {
+      "name": "_ZL15flash_attn_tileILi256ELi256ELi16ELi2ELb0EEvPKcS1_S",
+      "calls": 128,
+      "ms": 174.0,
+      "pct": 3.4
+    },
+    {
+      "name": "_Z15fwht_cuda_blockILi1024ELi256EfLb1EEvPKT1_PflfPKfi.k",
+      "calls": 18755,
+      "ms": 108.5,
+      "pct": 2.1
+    },
+    {
+      "name": "_ZL21unary_gated_op_kernelIXadL_ZL7op_silufEEfEvPKT0_S2",
+      "calls": 5576,
+      "ms": 107.0,
+      "pct": 2.1
+    },
+    {
+      "name": "_ZL10cpy_scalarIXadL_ZL12cpy_1_scalarIffEvPKcPcEEEvS2_S",
+      "calls": 8176,
+      "ms": 77.6,
+      "pct": 1.5
+    },
+    {
+      "name": "_ZL12rms_norm_f32ILi1024ELb1ELb0EEvPKfPfilllfS1_lll15HI",
+      "calls": 9417,
+      "ms": 73.3,
+      "pct": 1.4
+    },
+    {
+      "name": "_ZL17quantize_mmq_q8_1IL18mmq_q8_1_ds_layout0ELb0ELb0EL",
+      "calls": 3200,
+      "ms": 69.1,
+      "pct": 1.4
+    },
+    {
+      "name": "_ZL15concat_non_contIjLi0EEvPKcS1_Pcllllmmmmllllmmmmlll",
+      "calls": 384,
+      "ms": 53.2,
+      "pct": 1.0
+    }
+  ],
+  "decode_ceiling_tps": {
+    "qwen_q6k_22.884GB": 28.0,
+    "bonsai_pq2_0_7.206GB": 88.8,
+    "bonsai_ptq1_0_5.947GB": 107.6
+  },
+  "measured_unspec": {
+    "qwen_q6k": 22.8,
+    "bonsai_pq2_0": 45.1,
+    "bonsai_ptq1_0": 32.3
+  },
+  "pct_of_wall": {
+    "qwen_q6k": 81.5,
+    "bonsai_pq2_0": 50.8
+  }
+}

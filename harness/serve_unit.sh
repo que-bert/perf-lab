@@ -34,9 +34,28 @@ fi
 systemctl --user reset-failed "$UNIT" 2>/dev/null
 systemctl --user stop "$UNIT" 2>/dev/null
 
+# Extra environment for the server, as KEY=VAL;KEY=VAL. systemd-run does not
+# inherit the caller's environment, and some levers are env-only (e.g.
+# GGML_VK_DISABLE_COOPMAT), so they must be named explicitly.
+ENV_ARGS=()
+IFS=';' read -ra _pairs <<< "${PERFLAB_ENV:-}"
+for _p in "${_pairs[@]}"; do
+  [ -n "$_p" ] && ENV_ARGS+=(--setenv="$_p")
+done
+
+# When PERFLAB_LOG is set, keep the server's stdout/stderr (the Vulkan perf
+# logger writes to stderr) instead of discarding it.
+LOG_ARGS=()
+if [ -n "${PERFLAB_LOG:-}" ]; then
+  : > "$PERFLAB_LOG"
+  LOG_ARGS=(-p "StandardOutput=append:$PERFLAB_LOG" -p "StandardError=append:$PERFLAB_LOG")
+fi
+
 systemd-run --user --unit="$UNIT" --collect \
   --setenv=LD_LIBRARY_PATH="$B" \
   --setenv=GGML_VK_VISIBLE_DEVICES="$GPU" \
+  "${ENV_ARGS[@]}" \
+  "${LOG_ARGS[@]}" \
   "$B/llama-server" -m "$MODEL" \
   --port "$PORT" --host 127.0.0.1 --no-webui \
   -c "$CTX" -ctk "$CTK" -ctv "$CTV" -fa on -ngl "$NGL" -t 8 "$@" >/dev/null \

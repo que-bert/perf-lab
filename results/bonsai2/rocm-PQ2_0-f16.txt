@@ -1,0 +1,23 @@
+### PQ2_0 f16/f16 reference (shallow + deep)
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 32624 MiB):
+  Device 0: AMD Radeon AI PRO R9700, gfx1201 (0x1201), VMM: no, Wave Size: 32, VRAM: 32624 MiB
+load_backend: loaded ROCm backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-hip.so
+load_backend: loaded RPC backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-rpc.so
+load_backend: loaded CPU backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-cpu-haswell.so
+| model                          |       size |     params | backend    | ngl | threads |  fa |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ------: | --: | --------------: | -------------------: |
+| qwen35 27B PQ2_0 - 2.13 bpw (group 128) |   6.70 GiB |    26.90 B | ROCm       |  99 |       8 |   1 |          pp2048 |       1012.67 ± 0.91 |
+| qwen35 27B PQ2_0 - 2.13 bpw (group 128) |   6.70 GiB |    26.90 B | ROCm       |  99 |       8 |   1 |            tg64 |         46.44 ± 0.61 |
+
+build: 7dffb158d (10685)
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 32624 MiB):
+  Device 0: AMD Radeon AI PRO R9700, gfx1201 (0x1201), VMM: no, Wave Size: 32, VRAM: 32624 MiB
+load_backend: loaded ROCm backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-hip.so
+load_backend: loaded RPC backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-rpc.so
+load_backend: loaded CPU backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-cpu-haswell.so
+| model                          |       size |     params | backend    | ngl | threads |  fa |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ------: | --: | --------------: | -------------------: |
+| qwen35 27B PQ2_0 - 2.13 bpw (group 128) |   6.70 GiB |    26.90 B | ROCm       |  99 |       8 |   1 |  pp512 @ d16384 |       665.60 ± 11.77 |
+| qwen35 27B PQ2_0 - 2.13 bpw (group 128) |   6.70 GiB |    26.90 B | ROCm       |  99 |       8 |   1 |   tg64 @ d16384 |         43.32 ± 0.44 |
+
+build: 7dffb158d (10685)

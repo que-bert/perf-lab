@@ -1,0 +1,219 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10902-vulkan-local",
+  "model": "Qwen3.8-27B-Q6_K",
+  "label": "qwen38-Q6K-q8q8-chat",
+  "ctx": 32768,
+  "api": "llama",
+  "prompt_mode": "chat",
+  "thinking": true,
+  "budget": 768,
+  "results": {
+    "code": [
+      {
+        "task": "rle",
+        "passes": true,
+        "error": null,
+        "text": "def rle(s):\n    if not s:\n        return \"\"\n\n    result = []\n    prev = s[0]\n    count = 1\n\n    for ch in s[1:]:\n        if ch == prev:\n            count += 1\n        else:\n            result.append(f\"{prev}{count}\")\n            prev = ch\n            count = 1\n\n    result.append(f\"{prev}{count}\")\n    return \"\".join(result)\n",
+        "truncated": false
+      },
+      {
+        "task": "roman",
+        "passes": true,
+        "error": null,
+        "text": "def to_roman(n):\n    if not isinstance(n, int) or isinstance(n, bool) or not 1 <= n <= 3999:\n        raise ValueError(\"n must be an integer between 1 and 3999\")\n\n    values = [\n        (1000, \"M\"),\n        (900, \"CM\"),\n        (500, \"D\"),\n        (400, \"CD\"),\n        (100, \"C\"),\n        (90, \"XC\"),\n        (50, \"L\"),\n        (40, \"XL\"),\n        (10, \"X\"),\n        (9, \"IX\"),\n        (5, \"V\"),\n        (4, \"IV\"),\n        (1, \"I\"),\n    ]\n\n    result = []\n    for value, numeral in values:\n        while n >= value:\n            result.append(numeral)\n            n -= value\n\n    return \"\".join(result)",
+        "truncated": false
+      },
+      {
+        "task": "balanced",
+        "passes": true,
+        "error": null,
+        "text": "def balanced(s):\n    stack = []\n    matching = {')': '(', ']': '[', '}': '{'}\n\n    for ch in s:\n        if ch in \"([{\":\n            stack.append(ch)\n        elif ch in \")]}\":\n            if not stack or stack[-1] != matching[ch]:\n                return False\n            stack.pop()\n\n    return not stack\n",
+        "truncated": false
+      },
+      {
+        "task": "merge",
+        "passes": true,
+        "error": null,
+        "text": "def merge(a, b):\n    i = j = 0\n    result = []\n\n    while i < len(a) and j < len(b):\n        if a[i] <= b[j]:\n            result.append(a[i])\n            i += 1\n        else:\n            result.append(b[j])\n            j += 1\n\n    result.extend(a[i:])\n    result.extend(b[j:])\n\n    return result\n",
+        "truncated": false
+      },
+      {
+        "task": "wordfreq",
+        "passes": null,
+        "error": null,
+        "text": "",
+        "truncated": true
+      },
+      {
+        "task": "basen",
+        "passes": true,
+        "error": null,
+        "text": "def to_base(n, b):\n    digits = \"0123456789abcdef\"\n    if n == 0:\n        return \"0\"\n    result = []\n    while n:\n        n, r = divmod(n, b)\n        result.append(digits[r])\n    return \"\".join(reversed(result))\n",
+        "truncated": false
+      }
+    ],
+    "math": [
+      {
+        "task": "crates",
+        "want": 370,
+        "got": 370.0,
+        "passes": true,
+        "said": "370",
+        "truncated": false
+      },
+      {
+        "task": "trip",
+        "want": 360,
+        "got": 360.0,
+        "passes": true,
+        "said": "360",
+        "truncated": false
+      },
+      {
+        "task": "discount",
+        "want": 146,
+        "got": 146.0,
+        "passes": true,
+        "said": "146",
+        "truncated": false
+      },
+      {
+        "task": "ages",
+        "want": 18,
+        "got": 18.0,
+        "passes": true,
+        "said": "18",
+        "truncated": false
+      },
+      {
+        "task": "pipes",
+        "want": 4,
+        "got": 4.0,
+        "passes": true,
+        "said": "4",
+        "truncated": false
+      },
+      {
+        "task": "seats",
+        "want": 770,
+        "got": 770.0,
+        "passes": true,
+        "said": "770",
+        "truncated": false
+      },
+      {
+        "task": "coins",
+        "want": 9,
+        "got": 9.0,
+        "passes": true,
+        "said": "9",
+        "truncated": false
+      },
+      {
+        "task": "primes",
+        "want": 251,
+        "got": 251.0,
+        "passes": true,
+        "said": "251",
+        "truncated": false
+      }
+    ],
+    "instruct": [
+      {
+        "task": "json_keys",
+        "passes": true,
+        "said": "{\"name\":\"Fruit Basket\",\"count\":12,\"tags\":[\"apples\",\"bananas\",\"grapes\"]}",
+        "truncated": false
+      },
+      {
+        "task": "three_bullets",
+        "passes": true,
+        "said": "- Tracks changes over time\n- Enables collaboration and merging\n- Allows rollback to previous versions",
+        "truncated": false
+      },
+      {
+        "task": "shout",
+        "passes": true,
+        "said": "THE BANANA IS YELLOW.",
+        "truncated": false
+      },
+      {
+        "task": "no_commas",
+        "passes": true,
+        "said": "The sea stretches endlessly beneath the bright morning sky.",
+        "truncated": false
+      },
+      {
+        "task": "exact_five",
+        "passes": true,
+        "said": "rain falls softly on earth",
+        "truncated": false
+      },
+      {
+        "task": "yes_no",
+        "passes": true,
+        "said": "No",
+        "truncated": false
+      }
+    ],
+    "extract": [
+      {
+        "task": "span_kestrel",
+        "want": "412",
+        "passes": true,
+        "said": "412",
+        "truncated": false
+      },
+      {
+        "task": "builder_vance",
+        "want": "Delmar Ironworks",
+        "passes": true,
+        "said": "Delmar Ironworks",
+        "truncated": false
+      },
+      {
+        "task": "engineer_kestrel",
+        "want": "Paul Anselm",
+        "passes": true,
+        "said": "Paul Anselm",
+        "truncated": false
+      },
+      {
+        "task": "year_widened",
+        "want": "2004",
+        "passes": true,
+        "said": "2004",
+        "truncated": false
+      },
+      {
+        "task": "span_rowe",
+        "want": "530",
+        "passes": true,
+        "said": "530",
+        "truncated": false
+      }
+    ]
+  },
+  "score": {
+    "code": {
+      "pass": 5,
+      "of": 5,
+      "skipped": 1
+    },
+    "math": {
+      "pass": 8,
+      "of": 8,
+      "skipped": 0
+    },
+    "instruct": {
+      "pass": 6,
+      "of": 6,
+      "skipped": 0
+    },
+    "extract": {
+      "pass": 5,
+      "of": 5,
+      "skipped": 0
+    }
+  }
+}

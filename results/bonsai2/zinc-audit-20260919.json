@@ -1,0 +1,62 @@
+{
+  "date": "2026-09-19",
+  "topic": "ZINC audit + R9700 Qwen3.8-27B alternative runtimes",
+  "zinc_audit": {
+    "repo": "https://github.com/zolotukhin/zinc",
+    "stars": 513,
+    "language": "Zig",
+    "license": "MIT",
+    "created": "2026-03-25",
+    "last_push": "2026-09-19T17:19:30Z",
+    "commits": 4958,
+    "author": {"login": "zolotukhin", "name": "Stepan Zolotukhin", "github_since": "2013-07-25", "followers": 31, "bio": "Sr. SDE at AWS"},
+    "external_build_deps": "none (build.zig.zon lists no dependencies)",
+    "npm": "dev-only, private, single dep 'openai', no postinstall",
+    "releases_published": "none (install.sh prebuilt path is inert; built from source)",
+    "build_time_execution": "glslc for Vulkan shaders; bun only for tests. No downloads, no curl|bash.",
+    "network_in_binary": "Hugging Face model downloads only (src/model/hf.zig); server binds localhost; browser opener via xdg-open",
+    "malware_scan": {
+      "destructive_commands": "none found",
+      "obfuscation": "none; @embedFile only embeds chat.html and test sources",
+      "suspicious_base64": "scripts/gpu_monitor.sh base64 -d is an inline nvidia-smi sampler deployed over SSH to their own benchmark fleet, not a payload",
+      "shell_tool": "the 'shell' tool in routes.zig is a unit-test fixture, not a production endpoint",
+      "prebuilt_binaries": "src/cuda/cubins/*.cubin/.fatbin are NVIDIA sm89/sm120 kernels for the experimental CUDA backend; unused on AMD"
+    },
+    "ci": "Tests and Socket Security Check both passing on main 2026-09-19",
+    "verdict": "No malware found. Legitimate young project. Caveats: v0.1.0, single primary author, developed by AI agent loops, no SECURITY.md, no signed releases. Treat as normal young OSS; we built from source and did not run the installer."
+  },
+  "zinc_build": {
+    "commit": "03a1d912b7933098e5a03121a82cb8085927bcab",
+    "binary_sha256_16": "cfb876312bec0f2e3b6365a5fb3caa1f",
+    "zig": "0.15.2 (official tarball, sha256 verified against ziglang.org index)",
+    "cmake_equiv": "ROCM_PATH=/opt/rocm zig build -Dbackend=rocm -Doptimize=ReleaseFast",
+    "installed": "~/.local/bin/zinc-rocm (runs standalone; ldd resolves /opt/rocm/lib)",
+    "check": "READY, AMD Radeon AI PRO R9700 [gfx1201], 32 CU, 31.86 GiB"
+  },
+  "zinc_measured_qwen38_q6k_rocm": {
+    "code_prompt": {"decode_tps": [50.37, 44.77], "acceptance": "64/64 (100%)", "prefill_23tok_ms": [61099, 6387]},
+    "explain_prompt_ctx32768": {"decode_tps": 46.12, "acceptance": "149/212 (70.3%)", "prefill_46tok_ms": 2017},
+    "note": "NextN/MTP is enabled on the ROCm path in current HEAD. The 61s first prefill is a one-time cold compile; warm is still ~2-6s fixed startup per process. Decode 45-50 t/s.",
+    "vs_llama_cpp_mtp": "llama.cpp b10902 Vulkan + draft-mtp n4 on the same Q6_K at 262k: 52.6 t/s. ZINC is at parity or slightly slower."
+  },
+  "zinc_benchmark_verification": {
+    "claim": "ZINC beats the comparison llama.cpp build on prefill, decode, and combined time for all six R9700 models",
+    "finding": "The comparison is against llama.cpp with speculative decoding DISABLED (baseline spec: false for 5/6, and for qwen38 on ROCm spec is null), while ZINC uses NextN. On the ROCm target ZINC qwen38 decodes 32.43 vs llama.cpp 29.92 (8%), not a leap.",
+    "vulkan_target_qwen38": {"zinc": 54.88, "llama_cpp_no_spec": 31.0, "note": "177% headline; inflated by the unspeculated baseline"},
+    "rocm_target_qwen38": {"zinc": 32.43, "llama_cpp_vulkan_no_spec": 29.92},
+    "conclusion": "Real but modest, and against a weak baseline. It does not beat a tuned llama.cpp+MTP config."
+  },
+  "other_repos": {
+    "R9V": {"url": "https://github.com/Dyluhn/R9V", "status": "requires TWO R9700 + 128 GiB host RAM + ~170 GiB disk (Docker image bundle + model). Not applicable to a single R9700.", "model": "Qwen3.8 Flash Next, IQ4_XS / Q4_K_XL, MTP4, dual-GPU"},
+    "vllm_kyuz0": {"url": "https://github.com/kyuz0/amd-r9700-vllm-toolboxes", "status": "real single-R9700 gfx1201 vLLM container (vllm-therock-gfx1201). Needs safetensors (AWQ/MXFP4/FP8), not GGUF. Highest plausible decode ceiling, but re-downloads weights and carries gfx1201 vLLM caveats (FP8 dequant to FP32)."},
+    "ninfer": {"url": "https://github.com/Neroued/ninfer", "status": "CUDA-only, hard-coded sm_120a. No AMD port."},
+    "ik_llama": {"status": "CUDA/CPU; HIP repaired for RDNA3 only, not RDNA4."},
+    "zynfer": {"url": "https://github.com/thanos/zynfer", "status": "3 stars, NInfer-inspired, R9700 target not yet running."}
+  },
+  "recommendation": {
+    "for_qwen38_27b_today": "Keep llama.cpp b10902 Vulkan + draft-mtp n4 + q4_0/q4_0 KV at 262k (52.6 t/s, 28 GiB). ZINC is a credible alternative but not faster, and has per-process startup overhead.",
+    "fork_zinc": "Low payoff for decode. The only plausible win is prefill or upstreaming ROCm NextN fixes.",
+    "different_ceiling": "vLLM (MXFP4/AWQ) via kyuz0 container is the only path to a materially higher number, at the cost of new weights.",
+    "from_scratch": "Not worth it; ZINC already implements the NInfer idea for this card."
+  }
+}

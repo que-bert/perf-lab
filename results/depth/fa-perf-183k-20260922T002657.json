@@ -1,0 +1,25 @@
+[
+  {
+    "label": "~176k",
+    "reps_requested": 4000,
+    "prompt_n": 182889,
+    "decode_mean": 24.549,
+    "decode_steady_mean": 24.549,
+    "decode_steady_min": 24.549,
+    "decode_steady_max": 24.549,
+    "decode_spread_pct": null,
+    "prefill": 311.40274690905335,
+    "accept_frac": 1.0,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 24.54943027786448,
+        "prefill": 311.40274690905335,
+        "prompt_n": 182889,
+        "accepted": 5,
+        "drafted": 5,
+        "wall": 587.919846534729
+      }
+    ]
+  }
+]

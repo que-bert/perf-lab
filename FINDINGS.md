@@ -1898,3 +1898,1430 @@ and decode is not purely bandwidth-bound. But the direction is consistent with
 today's K-cache result — **the KV cache is where the remaining headroom is**,
 and llama.cpp's coarsest K option is q4_0 while NInfer ships a 4-bit lattice
 scheme. That is a concrete thing to want, not a reason to change engines.
+
+## 2026-09-18: Bonsai 2 27B — ROCm runs it, Vulkan does not, and q8/q4 KV is a trap
+
+First Bonsai 2 measurement on the R9700. The model is
+`prism-ml/Ternary-Bonsai-2-27B-gguf`, a ternary (1.75-2.13 bpw) rebuild of
+Qwen3.8-27B. **Stock llama.cpp cannot run it**: the weights live in a rotated
+basis and need an activation transform that only the `PrismML-Eng/llama.cpp`
+fork (branch `prism`) carries. `PTQ1_0`/`PQ2_0` are refused outright upstream;
+the testing-only `Q2_0` band loads upstream and outputs gibberish. Every number
+here is the official `prism-b10685-7dffb15` prebuilt, ROCm 7.2 and Vulkan, on
+gfx1201. Both bands produced coherent text ("The capital of France is" ->
+"Paris."), so the fork requirement is real and satisfied.
+
+`llama-bench`, `-ngl 99 -fa on -t 8 -r 3`. "shallow" is d0/p2048/n64; "deep"
+is d16384/p512/n64.
+
+### ROCm: PQ2_0 is the band, q8_0/q8_0 and q4_0/q4_0 are the fast pairs
+
+| band | KV | shallow pp2048 | shallow tg64 | deep pp512 | deep tg64 |
+|---|---|---:|---:|---:|---:|
+| PTQ1_0 | q8_0/q8_0 | 935.2 | 32.3 | 622.0 | 28.2 |
+| PTQ1_0 | q4_0/q4_0 | 920.2 | 31.3 | 629.3 | 24.9 |
+| PTQ1_0 | q8_0/q4_0 | **92.5** | 30.8 | **4.8** | **3.8** |
+| PTQ1_0 | q4_0/q8_0 | 165.2 | 30.5 | 8.2 | — |
+| PQ2_0 | f16/f16 | 1012.7 | **46.4** | 665.6 | **43.3** |
+| PQ2_0 | q8_0/q8_0 | 1010.4 | 45.1 | 658.1 | 38.6 |
+| PQ2_0 | q4_0/q4_0 | 997.5 | 43.8 | 669.1 | 31.8 |
+| PQ2_0 | q8_0/q4_0 | **96.1** | 42.3 | **4.8** | **3.8** |
+
+Three results, each of which contradicts a reasonable prior:
+
+- **The mismatched-pair cliff is back, and it is a prefill cliff.** `q8_0` K
+  with `q4_0` V measures 92.5 t/s prefill shallow and **4.8 t/s at depth 16384**
+  — 130x below the matched pairs — while decode looks almost normal at 42.3 t/s
+  shallow. This is the same shape the Qwen canaries exist to catch, now on a
+  second model. `q4_0` K with `q8_0` V is merely slow, not collapsed.
+- **KV quantization costs decode here.** On Qwen3.8-27B, q4_0 V was free. On
+  Bonsai 2 at depth, f16 43.3 > q8_0 38.6 > q4_0 31.8 — a 27% decode loss from
+  f16 to q4_0. The ternary weight path is so cheap that KV dequant overhead is
+  no longer hidden. q4_0 is a memory tool on this model, not a free one.
+- **PQ2_0 beats PTQ1_0 by ~40% decode** (45.1 vs 32.3 shallow; 38.6 vs 28.2
+  deep) and ~7% prefill, for 1.17 GiB more. The dense 1.75 bpw packing is the
+  smaller file, not the faster one. PQ2_0 is the band to run.
+
+### Vulkan: the ternary kernels are not there
+
+| band | pp2048 | tg64 | note |
+|---|---:|---:|---|
+| PTQ1_0 | ~522 | ~8.2 | **identical for q8_0/q8_0, q8_0/q4_0, q4_0/q8_0, q4_0/q4_0** |
+| PQ2_0 | 0.73 | 0.62 | loads, generic fallback, unusable |
+
+Vulkan shows **zero KV-type sensitivity** (1.8% spread across every pair, same
+as the Qwen canaries) — but decode is ~4x below ROCm and PQ2_0 is ~70x below.
+The fork's own format table says Vulkan PQ2_0 kernels are "not yet (port
+planned)"; this is the measurement behind that note. **ROCm is the only usable
+backend for Bonsai 2 on this card today.** No from-source Vulkan build was
+attempted; that was the agreed stopping point.
+
+### VRAM (total 34,208,743,424 B = 31.86 GiB; idle 0.06 GiB)
+
+| band | ctx | KV | used GiB | % of card |
+|---|---|---:|---:|---:|
+| PTQ1_0 | 32k | q8_0/q8_0 | 7.50 | 23.5 |
+| PTQ1_0 | 262k | q8_0/q8_0 | 16.03 | 50.3 |
+| PTQ1_0 | 262k | q8_0/q4_0 | 12.82 | 40.2 |
+| PTQ1_0 | 262k | q4_0/q4_0 | 12.10 | 38.0 |
+| PQ2_0 | 32k | q8_0/q8_0 | 8.61 | 27.0 |
+| PQ2_0 | 262k | q8_0/q8_0 | 17.14 | 53.8 |
+| PQ2_0 | 262k | q8_0/q4_0 | 13.93 | 43.7 |
+| PQ2_0 | 262k | q4_0/q4_0 | 13.20 | 41.4 |
+| PQ2_0 | 262k | f16/f16 | 23.69 | 74.3 |
+
+Full 262k context fits on the 32 GB card on every band and KV type — the
+hybrid-attention backbone keeps KV small. q4_0 is the only way to keep a second
+resident copy comfortable: two q4_0 instances at 131k measured 17.5 GiB
+(PTQ1_0) and 19.7 GiB (PQ2_0).
+
+### Concurrency: slots scale for PQ2_0, instances do not
+
+One server, `--parallel 2`, ctx 131072, q4_0/q4_0, `/completion`, n=128:
+
+| band | c=1 agg / per-req | c=2 agg / per-req | c=4 agg / per-req |
+|---|---|---|---|
+| PTQ1_0 | 27.9 / 32.2 | **23.1** / 14.1 | 23.8 / 14.0 |
+| PQ2_0 | 40.3 / 44.2 | **66.6** / 38.1 | 64.6 / 38.0 |
+
+Two **separate instances** (independent processes, `--parallel 1`, same GPU):
+
+| band | VRAM | agg t/s | per-req t/s |
+|---|---:|---:|---|
+| PTQ1_0 | 17.5 GiB | 32.7 | 18.4-20.1 |
+| PQ2_0 | 19.7 GiB | 25.2 | 12.2-15.2 |
+
+PQ2_0's two slots buy 1.66x aggregate; PTQ1_0's slots make aggregate *worse*
+(27.9 -> 23.1). Two independent PQ2_0 instances are far worse than one instance
+with two slots (25.2 vs 66.6) — the opposite of what "two instances" suggests.
+If a queue matters, run one PQ2_0 server with `--parallel 2`, not two servers.
+
+### Tuning and the best config
+
+- **ubatch** 128 -> 776, 256 -> 924, 512 -> 998, **1024 -> 1016** t/s prefill;
+  decode flat at ~44.5. 1024 buys 1.9% prefill over the default 512.
+- **threads** 6/8/12: no measurable difference (fully offloaded).
+- **Speculative decoding is unavailable.** Bonsai 2 ships no dspark drafter and
+  no MTP heads; the demo downloader states it. The single biggest llama.cpp
+  lever does not exist for this model.
+
+Best single-stream decode on the R9700: **PQ2_0, f16/f16 KV, `-ngl 99 -fa on
+-ub 1024`** -> 46.4 t/s shallow, 43.3 t/s at d16384. Best memory-per-token:
+q8_0/q8_0 -> 45.1/38.6 t/s at 17.1 GiB for 262k. **Never q8_0 K with q4_0 V.**
+Best aggregate: one PQ2_0 server, `--parallel 2`, q4_0/q4_0 -> 66.6 t/s at c=2.
+
+### Caveats
+
+- r=3, one card, page cache warm, single session; decode spread was <1% on the
+  fast pairs.
+- The `q4_0` K with `q8_0` V deep cell is prefill-only; that pairing was not
+  the question and the run was cut rather than spend 20 minutes on a slow path.
+- The fork binary is a PrismML prebuilt, not built here; both backend hashes are
+  recorded in `results/bonsai2/`. Existing local builds were not touched.
+- Only `prism-ml` and `PrismML-Eng` artifacts were used; the many reupload
+  repos were deliberately ignored.
+
+## 2026-09-18: why Bonsai 2 "matches" Qwen, no speculation lever, and 64 slots
+
+Follow-ups on the Bonsai 2 entry above. Four questions, four answers.
+
+### The decode parity is against Qwen's *speculated* number
+
+Bonsai 2 PQ2_0 decodes at 43-46 t/s; that is not the same as Qwen3.8-27B Q6_K
+unspeculated. Today's ROCm canary rows (`fast-q8`, q8_0/q8_0, depth 0) put Qwen
+at **22.77-22.78 t/s**; `fast-q4` at 22.44-22.64. Qwen *with* `draft-mtp
+--spec-draft-n-max 4` is **46.15 t/s** at 0.77 acceptance. Bonsai's unspeculated
+46.4 t/s sits on Qwen's speculated figure, which is the coincidence being read.
+
+The mechanism is bandwidth. Qwen's Q6_K file is 22.884 GB and decodes at 22.8 t/s
+-> **521 GB/s, 81% of the card's 640 GB/s**. Bonsai PQ2_0 is 7.206 GB and decodes
+at 45.1 t/s -> **325 GB/s, 51% of peak**. Qwen is near bandwidth-bound; Bonsai's
+ternary kernel is not, because every weight must be dequantized and the Hadamard
+transform applied at runtime. If Bonsai hit Qwen's 81% efficiency it would decode
+at ~72 t/s. A 3.2x smaller file buys only ~2x decode, and that lands on Qwen+MTP.
+
+### There is no speculative-decoding lever for Bonsai 2
+
+- `--spec-type draft-mtp` -> server exits 1 at load. No MTP heads in the file.
+- `--spec-type draft-dspark` -> server starts, drafts nothing (`draft_n` null).
+  No paired drafter exists.
+- **ngram** (`ngram-mod`, `ngram-cache`, `ngram-simple`, `ngram-map-k`) needs no
+  drafter and was tested properly: chat template, fresh server per rep, 3 reps,
+  256 tokens, ctx 16384, q8_0/q8_0.
+
+| config | chat_code | chat_explain | acceptance |
+|---|---|---|---|
+| none | 39.4 / 43.4 / 44.1 | 44.1 / 43.6 / 44.1 | — |
+| ngram-mod default | 44.0 / 43.9 / 43.9 | 41.8 / 42.1 / 42.1 | 0.031 |
+| ngram-mod tuned | 43.2 / 43.1 / 43.3 | 42.8 / 45.8 / 45.8 | 0.26-0.78 |
+
+**No real speedup** — every ngram config is within noise of baseline and the
+explain case is sometimes slower. An earlier raw-prompt continuation measured
+92-108 t/s at acceptance 1.0, but that was a highly repetitive output the ngram
+matched perfectly; it does not generalize. **Do not enable ngram for Bonsai 2.**
+
+The only remaining lever is the third-party `ProCreations/Ternary-Bonsai-2-27B-MTP`
+drafter, which ships a separate MTP head and a CUDA-targeted runtime patch, not
+an official or ROCm/Vulkan path. Not attempted.
+
+### Slots: 64 fit at q8_0/q8_0, but context-per-slot is the real limit
+
+PQ2_0, ctx 262144 total (slots share the pool, `n_ctx_slot = 262144/N`), VRAM in
+GiB of 31.86:
+
+| slots | q4_0/q4_0 | q8_0/q8_0 |
+|---|---|---|
+| 1 | 13.45 | 17.39 |
+| 4 | 13.70 | 17.64 |
+| 16 | 15.41 | 19.34 |
+| 32 | 17.74 | 21.67 |
+| 64 | 22.41 | 26.35 (82.7%) |
+| 128 | 31.76 (99.7%, 2048 ctx/slot) | — |
+
+VRAM alone would allow 64 slots at q8_0/q8_0 and 128 at q4_0/q4_0, but a slot
+only gets `262144/N` context. The useful statement is slots by minimum context:
+8 slots at 32k, 16 at 16k, 32 at 8k, 64 at 4k. For **separate instances** (own
+weights and KV, not shared slots) q4_0/q4_0 at 131k is 9.86 GiB each, so two
+instances fit (19.7 GiB measured) and three project to ~29.6 GiB.
+
+### Intelligence: Bonsai measured, Qwen blocked
+
+`harness/model_eval.py`, chat mode, ctx 32768, q8_0/q8_0:
+
+| suite | Bonsai PQ2_0 |
+|---|---|
+| code | 5/5 (1 truncation) |
+| math | 8/8 |
+| instruct | 6/6 |
+| extract | 5/5 |
+
+The Qwen3.8-27B Q6_K comparison **could not be run**: the host's 23 GiB swap is
+100% full and there is no passwordless sudo to drop caches. The 22.9 GB model
+load ran 40 minutes twice without completing (12.5 GB memory peak, 39m46s CPU).
+The nightly canaries load the same file, so this is the host's current memory
+state, not the model or the build.
+
+What can be said without it: Bonsai 2 is a ternary quantization of the *same*
+base model as Qwen3.8-27B-Q6_K, and the KV type is q8_0/q8_0 in both, so the
+comparison isolates weight precision (2.13 vs 6.56 bpw). The model card claims
+98.2% of FP16 retained, 84.78 average across 14 thinking benchmarks, within 0.4
+of UD-Q4_K_XL. Bonsai's 24/24 on perf-lab's small suite is consistent with that
+and does not contradict it, but it is not a substitute for the head-to-head.
+**Re-run when memory frees.**
+
+### A host trap worth recording
+
+ROCm's `comgr` writes kernel-compile temp dirs to `/tmp` (`/tmp/comgr-<pid>-*`).
+`/tmp` here is a 16 GiB tmpfs and was at 80%; repeated model loads then failed
+with `LLVM ERROR: IO failure on output stream: Disk quota exceeded`. Setting
+`TMPDIR` to a directory on `/` for the server unit fixed it immediately. Any
+harness that spawns many loads should set `TMPDIR`.
+
+## 2026-09-19: Bonsai 2 gets MTP and beats Qwen; the quality gap is real
+
+The previous entry's conclusion — that Bonsai 2 has no speculation lever and
+only matches Qwen — is **withdrawn**. A third-party MTP head plus a 12-line
+fork patch changes the picture completely.
+
+### MTP works, and it is the whole game
+
+`ProCreations/Ternary-Bonsai-2-27B-MTP` ships a combined
+`Ternary-Bonsai-2-27B-PQ2_0-MTP-Q8_0.gguf` (7.66 GB) with a Q8_0 MTP head
+embedded, and a pre-patched fork source (`prism-dflash2-source.tar.gz`). The
+only fork change is a 12-line `src/models/qwen35.cpp` `graph_mtp` patch applying
+the inverse Hadamard transform to the MTP head's token-embedding lookup. **The
+official prebuilt refuses it**: `Hadamard-latent table 'token_embd.weight' is
+read without the inverse transform`. So this is a build-your-own-fork task, and
+it is the only reason to.
+
+Built here for gfx1201 (`-DGGML_HIP=ON -DGPU_TARGETS=gfx1201`, ROCm clang 22).
+Measured on the R9700, q8_0/q8_0, `--spec-type draft-mtp --spec-draft-n-max 2`:
+
+| mode | MTP off | MTP on | speedup | acceptance |
+|---|---:|---:|---:|---:|
+| chat_code | 44.83 | **72.1** | **1.61x** | 0.71 |
+| chat_explain | 40.35 | **58.35** | **1.45x** | 0.468 |
+| raw_code | 45.0 | **78.25** | **1.74x** | 0.801 |
+
+n-max 2 is the optimum (the head is trained for 2 draft tokens): n=1 62.0, n=2
+69.2, n=3 65.7 on chat_code. At 262144 the rate holds — 70.3/71.8/72.0 t/s,
+**19.41 GiB (60.9% of the card)**.
+
+### Bonsai + MTP vs Qwen3.8-27B Q6_K + MTP, both at 262k q8_0/q8_0
+
+Qwen's own MTP was re-measured on `b10902-vulkan-local` (Vulkan) with `mmproj`:
+**chat_code 52.6, chat_explain 35.1, raw_code 63.2**, at **31.66 GiB (99.4%)**.
+The 45-46 t/s figure this repo has quoted is real; the old b10472 Vulkan
+"20-23 t/s for q8_0/q8_0 at 262k" no longer holds on b10902.
+
+| mode | Bonsai PQ2_0 + MTP | Qwen Q6_K + MTP | Bonsai |
+|---|---:|---:|---:|
+| chat_code | 71.8 | 52.6 | **1.37x** |
+| chat_explain | 58.4 | 35.1 | **1.66x** |
+| raw_code | 78.3 | 63.2 | **1.24x** |
+| VRAM @262k | 19.41 GiB | 31.66 GiB | — |
+
+So the earlier "Bonsai only matches Qwen" was an artifact of comparing Bonsai
+*unspeculated* against Qwen *speculated*. With both speculated, Bonsai is
+1.24-1.66x faster at 61% vs 99% of the card.
+
+### Building from source buys ~1%, not more
+
+A gfx1201-only build against the official prebuilt, non-MTP, PQ2_0 q8_0/q8_0:
+pp2048 1019.6 vs 1010.4, tg64 45.41 vs 45.11, deep pp512 664.9 vs 658.1, deep
+tg64 38.93 vs 38.62 — 0.7-1.0%, inside noise. **The prebuilt is not leaving
+decode on the table.** The ternary kernel is the wall: Bonsai uses ~51% of the
+640 GB/s (7.206 GB x 45.1 t/s = 325 GB/s) where Qwen Q6_K reaches ~81%
+(22.884 GB x 22.8 = 521 GB/s). Speculation, not a kernel rewrite, is how you
+get past it.
+
+### The quality gap is real, and perplexity is where it shows
+
+`llama-perplexity`, the 79 KB held-out corpus, ctx 4096, 5 chunks:
+
+| model | PPL | stderr |
+|---|---:|---:|
+| Bonsai PQ2_0 (ROCm) | 3.8833 | 0.0867 |
+| Bonsai PTQ1_0 (ROCm) | 3.8833 | 0.0867 |
+| Qwen3.8-27B Q6_K (Vulkan) | **3.0467** | 0.0632 |
+
+Bonsai is **27.5% higher perplexity** than the Q6_K it is derived from. The two
+Bonsai bands are byte-for-byte identical on this metric, which corroborates the
+"PTQ1_0 lossless vs PQ2_0" claim. Backend differs (Bonsai ROCm, Qwen Vulkan),
+but backend perplexity effects are typically <1%, so the gap is quantization.
+
+Perf-lab's pass/fail suites do **not** see it: code, math, instruct, extract,
+research all tie (24/24 and 6/6), and tools ties at 10/12 with the same two
+failures (`abstain_no_such_tool`, `no_invented_argument`). **A pass/fail suite
+is not sensitive enough to judge a 2-bit quantization; perplexity is.** The
+"98.2% of FP16" card claim is not reproduced by this corpus.
+
+### NInfer and the bespoke-runner question
+
+`Neroued/ninfer` (not `sergiuszm`) is CUDA-only and hard-codes `sm_120a`; there
+is no AMD port. A from-scratch NInfer-style engine for the R9700 is a 6+ month
+project against a less mature toolchain (CK RDNA4 correctness bugs, Triton
+gfx1201 lowering gaps, AITER shipping 0/123 gfx1201 code objects). The R9700
+projects that actually exist are **ZINC** (Vulkan+ROCm, measured on one R9700,
+~7-8% decode and up to 1.9x prefill over llama.cpp), **R9V** (dual-R9700,
+experimental), and the **vLLM radiance fork** (single R9700 MXFP4 + MTP, 137.7
+t/s, but needs MXFP4/FP8 weights that are not on this mount). For a single
+R9700, ZINC is the pragmatic step, not a from-scratch engine.
+
+## 2026-09-19: where the Qwen decode jump came from, and the speed ceiling
+
+### The Qwen jump was the build, not the config
+
+The "20-23 t/s for q8_0/q8_0 at 262k with MTP" in the 2026-08-16 entry is
+**stale**. On `b10902` Vulkan the same config measures **52.6 t/s chat_code**.
+The difference is 411+ builds of upstream Vulkan progress between b10472 and
+b10902, not a weight, KV, prompt, or sampling change. Re-measured on a fresh
+build of current master (`c1b6b6107`, Vulkan, includes adaptive MTP): identical
+52.3/52.8/52.7. **Do not keep quoting the b10472 figure for q8_0/q8_0 at 262k.**
+
+### Qwen: q4_0 KV is free, adaptive MTP helps prose only
+
+New-master Vulkan, 262k, `mmproj`, 3 reps:
+
+| config | chat_code | chat_explain | VRAM |
+|---|---:|---:|---:|
+| MTP n4, q8_0/q8_0 | 52.3-52.8 | 35.2 | 31.34 GiB |
+| MTP-adaptive, q8_0/q8_0 | 51.7-52.2 | 36.5 | 31.20 GiB |
+| MTP n4, q4_0/q4_0 | 52.6-53.4 | 35.8 | **28.21 GiB** |
+| MTP-adaptive, q4_0/q4_0 | 49.4-51.9 | **38.0** | 28.06 GiB |
+
+**q4_0/q4_0 frees 3.1 GiB at identical decode** — this is the config to serve.
+`draft-mtp-adaptive` buys 1.3-2.7 t/s on chat_explain and costs stability on
+code; it is a prose-only win. Code decode is pinned near **52-53 t/s**.
+
+### Bonsai: q4_0 KV is free, DFlash2 loses, MTP+ngram is a mirage
+
+From-source MTP build, 262k, 3 reps:
+
+| config | chat_code | chat_explain | VRAM |
+|---|---:|---:|---:|
+| MTP n2, q8_0/q8_0 | 70.2-70.9 | 57.0 | 18.89 GiB |
+| MTP n2, q4_0/q4_0 | 65.1-69.3 | 58.4 | **14.96 GiB** |
+| DFlash2 n3 | 66.4-70.2 | 55.8 | — |
+| DFlash2 n4 | 68.5-69.9 | 51.8 | — |
+| DFlash2 n5 | 59.9-68.6 | 47.7 | — |
+
+**q4_0/q4_0 frees ~3.9 GiB at the same decode.** The 2 GB DFlash2 drafter is
+not better than the 0.85 GB MTP head at any depth — MTP n2 stays the choice.
+`draft-mtp,ngram-mod` produced 280-353 t/s for two reps at acceptance 1.0 and
+then `chat_explain` fell to 39.7: **that spike is the ngram cache remembering the
+identical temperature-0 request from the previous rep**, first rep is 70. A real
+single-request number never showed it. Ignore it.
+
+### Answer to "build our own backend?"
+
+For **llama.cpp gains: no.** Both models are speculation-limited now, and the
+KV/batch/ubatch/thread knobs are exhausted (see the earlier entries). The next
+real step is a different engine, and it should be **adopted, not written**:
+ZINC already beats llama.cpp on one R9700 without a from-scratch effort, and the
+vLLM radiance fork measures 137.7 t/s on a single R9700 (with weights that are
+not on this mount). NInfer itself is CUDA-only and hard-codes `sm_120a`; a
+bespoke R9700 engine is a 6+ month project for a gain ZINC offers today.
+
+## 2026-09-19: ZINC audited and built — safe, but not faster than our config
+
+ZINC (`zolotukhin/zinc`, 513*, Zig, MIT) is the R9700-native engine the earlier
+entry named. Audited the source, then built and ran it.
+
+**Trust.** No external build dependencies (`build.zig.zon` is empty), no npm
+postinstall, no published releases, no `curl | bash`. Build-time execution is
+`glslc` (Vulkan shaders) and `bun` (tests) only. The one `base64 -d` in the tree
+is an inline `nvidia-smi` sampler deployed over SSH to ZINC's own benchmark
+fleet. The `shell` tool in `routes.zig` is a unit-test fixture, not an endpoint.
+`@embedFile` embeds only `chat.html` and test sources. The prebuilt CUDA cubins
+are NVIDIA sm89/sm120, unused on AMD. CI passes Tests + Socket Security Check.
+Author is a real 12-year GitHub account. **No malware found.** Caveats: v0.1.0,
+single author, agent-loop development, no security policy, no signed releases.
+
+**Built and ran it** (`zig 0.15.2` from ziglang.org, checksum-verified;
+`ROCM_PATH=/opt/rocm zig build -Dbackend=rocm -Doptimize=ReleaseFast`). It
+detects gfx1201, loads Qwen3.8-27B-Q6_K, and **does enable NextN/MTP on ROCm**:
+
+| prompt | decode | acceptance | prefill |
+|---|---:|---:|---:|
+| code | 50.4 / 44.8 t/s | 64/64 (100%) | 61.1 s then 6.4 s (23 tok) |
+| explain, ctx 32768 | 46.1 t/s | 149/212 (70.3%) | 2.0 s (46 tok) |
+
+Our llama.cpp b10902 Vulkan + `draft-mtp` n4 on the same Q6_K at 262k does
+**52.6 t/s**. ZINC is at parity or slightly slower, and every process pays a
+multi-second prefill warmup (61 s on the first-ever run).
+
+**The published benchmark overstates it.** ZINC's "beats llama.cpp on all six"
+runs llama.cpp with **speculation disabled** while ZINC uses NextN. On the ROCm
+target ZINC's own Qwen3.8 row shows `speculative_decoding: null` and decodes
+32.43 vs llama.cpp's 29.92 — 8%, not the 177% headline, and the ROCm row is
+stale relative to HEAD (which does enable ROCm NextN). Against our tuned
+llama.cpp+MTP it is not a win.
+
+**Other repos.** R9V needs **two** R9700 + 128 GiB RAM + ~170 GiB disk — not
+applicable. `kyuz0/amd-r9700-vllm-toolboxes` is a real single-R9700 vLLM
+container, but wants AWQ/MXFP4/FP8 safetensors, not GGUF, and carries the
+gfx1201 vLLM caveats. NInfer is CUDA-only; ik_llama's HIP is RDNA3-only;
+Zynfer is 3 stars and not running.
+
+**Recommendation.** Do not fork ZINC for a decode win; there is none for this
+model. Keep llama.cpp+MTP. The only materially different ceiling is vLLM with
+new weights, and that is a re-download, not a fork.
+
+## 2026-09-19: Q4_K_M is the Qwen win, and Bonsai's quality is settled
+
+Two results that close the Qwen/Bonsai question.
+
+**Measured bandwidth: 640.2 GB/s** (a HIP read probe, `bw_test.hip`), exactly
+spec. Decode ceilings: Q6_K 28.0 t/s, UD-Q4_K_M 38.9, Bonsai PQ2_0 88.8.
+
+**Switch Qwen to UD-Q4_K_M.** On the same held-out corpus it is
+perplexity-indistinguishable from Q6_K (3.0458 vs 3.0467) at 15.32 GiB instead
+of 22.9, and it decodes **30.9 t/s unspeculated** (q8_0/q4_0) against Q6_K's
+22.8 — Q6_K is already at 81.5% of its 28.0 t/s wall, so there is no kernel win
+to be had there. With MTP at 262k it is 50.4 t/s chat_code / 38.8 explain at
+25.17 GiB (Q6_K: 52.6 / 35.1 at 31.66 GiB). n4 is optimal (n2 40.3, n6 37.8);
+the built-in MTP head tops out around 50, not the 60 hoped for.
+
+**Bonsai's "98.2%" does not survive contact with agentic coding.** The vendor
+average excludes SWE-bench Verified (60.8 vs 80.6, ~75%) and Terminal-Bench 2.1
+(52.8 vs 69.7, ~76%), and independent reproduction is absent; HF community
+reports poor coding and broken tool calling. Measured here: Bonsai PQ2_0 and
+PTQ1_0 are both **3.8833 perplexity** vs Qwen Q6_K 3.0467 and Q4_K_M 3.0458 —
+**~27% worse than both**, so it is *not* "like Q4_K_M" either. The capability
+suites tie exactly (including the same two tool failures) because they are
+saturated and have no discriminating power at this scale. Bonsai is a niche
+co-resident/Mimir backend, not a Qwen replacement.
+
+**Profile for any future kernel work** (`harness/kernel_profile.py`): Bonsai
+prefill is 54% one ternary GEMM (compute-bound, not bandwidth), decode GEMV
+~18%, SSM 8.7%, FWHT 2.1%. That is where a fork would have to aim.
+
+## 2026-09-20: Qwen decode is context-bound, not weight-bound
+
+The PCIe ASPM policy was `default`, not `performance`; set to `performance`
+(volatile across reboot). The +10.8% RADV figure is not isolated here — no
+pre-change row was taken on this prompt. CPU governor was already `performance`.
+
+Qwen3.8-27B Q6_K, ctx 262144, q8_0/q8_0, MTP n3, `--mmproj`, b10902-vulkan-local,
+`--parallel 1`, R9700. One request at increasing **filled** context — the prompt
+repeated to length, not the window moved — n_predict 256, temperature 0:
+
+| filled ctx | decode t/s | prefill t/s | acceptance |
+|---|---:|---:|---:|
+| 42 | 60.96 | 115 | 187/203 |
+| ~8.9k | 46.78 | 650 | 171/249 |
+| ~35.9k | 41.69 | 552 | 171/252 |
+| ~72.5k | 37.97 | 464 | 175/238 |
+| ~183k | **28.04** | 324 | 177/232 |
+
+**Decode falls 2.2x as the context fills, and acceptance is flat.** The short
+row is not real operation: a 42-token prompt gives 0.921 acceptance and 61 t/s
+because the drafter nails a repetitive answer. At 64k the rate is 38, at 160k it
+is 28. The 47.96 t/s recorded as the served baseline on the same config is
+short-context and should not be quoted for the 262k operating point.
+
+**This relocates the bottleneck.** Short-context unspeculated decode is 81% of
+the 640 GB/s wall, and the 2026-08 conclusion that speculation is the lever
+holds there. Under MTP at realistic context the limiter is **attention over the
+filled KV**, not the weight GEMM. A rebuild aimed at weight kernels, a fresh
+master (identical decode to b10902, `FINDINGS.md:2219`), coopmat int8 MMQ
+(prefill only, PR #27952, unmerged), or an engine swap that keeps Q6_K (none
+measured) would not move it.
+
+`rm_kq` is not a one-line change on this source: there is **no RDNA4 enum**, and
+`ggml-vulkan.cpp:457-465` classifies RDNA4 as `AMD_RDNA3` via the int8-dot path.
+Anything RDNA4-specific needs the enum and a detection path first.
+
+**NOT verified:** whether ASPM contributed (no pre-change row); mean accepted
+draft length for the long rows; whether the ROCm backend's attention decays
+differently with depth.
+
+## 2026-09-20: build search, the two-build split, and RDNA4 rm_kq
+
+Same config as the entry above. Decode t/s at ~70k / ~176k filled context:
+
+| build | @70k | @176k |
+|---|---:|---:|
+| b10472 (60eeeb608) | 34.09 | 27.37 |
+| b10883 (91f6a6cf3) | 38.05 | 27.38 |
+| b10902 (df03399b8) | 37.97 | 28.04 |
+| master ce8caa6e6 | 37.30 | 27.98 |
+| r9700-qwen B1 (master + detection) | 37.63 | 26.13 |
+
+**No build moves depth decode.** b10883 and master are marginally best, b10472
+worst. The first r9700-qwen run read 9.84 t/s @176k while Valheim held the box
+and swap was 21/23 GiB -- a host-memory artifact, not a build result; a clean
+retry gave 26.13. **Do not run depth benchmarks while a game or a 22 GB load is
+in flight.**
+
+`power_dpm_force_performance_level=high` regressed decode (38.05 -> 35.70 @70k,
+27.38 -> 25.06 @176k) and prefill. Keep `auto`. ASPM is set to `performance`
+(volatile across reboot).
+
+**Two builds.** `mimir-general` = unpatched master `ce8caa6e6`; loads every text
+GGUF on the mount (qwen35, qwen35moe, llama). `diffusiongemma` and `minimax_h3`
+fail to load -- not LLMs, expected. `r9700-qwen` = private fork at
+`~/git/llama.cpp-r9700` (branch `r9700-qwen`), installed to
+`~/llama.cpp/r9700-qwen`.
+
+**RDNA4 detection added.** `AMD_RDNA4` in `ggml-vulkan-types.h`; detected by
+`integerDotProductAccumulatingSaturating4x8BitPackedMixedSignednessAccelerated`,
+which RDNA3 does not report. `is_rdna3` became `is_rdna3_4` so behaviour is
+unchanged; the coopmat switch includes RDNA4. Both cards now log `arch: RDNA4`.
+
+**`rm_kq = 1` for RDNA4 did not reproduce.** The community claim (+0.8-1.1% on
+RADV) measured 31.97 @70k against 37.63 for the same build at `rm_kq = 2` --
+a regression, reverted.
+
+**`rm_kq` is not an RDNA3 setting.** It is set only in the `AMD_GCN` branch
+(`rm_kq = 4`); every other architecture, RDNA4 included, takes the generic
+default of 2. RDNA4 has no value of its own. The B2 result refutes the claim
+that 1 helps; it does **not** establish 2 as the RDNA4 optimum, because 4 was
+never tested. Do not read the default as tuned.
+
+**Measurement caveat.** Build-to-build spread at 70k is ~1% (37.3-38.05), but at
+176k it is ~6% (26.1-28.0). Any depth effect below a few percent is not
+resolvable without multiple reps; the `rm_kq` result is large enough to read, a
+1% claim would not be.
+
+## 2026-09-21: the depth "noise floor" was contamination; n-gram is the only win, and it stops at depth
+
+**Method replaced.** `harness/depth.py` + `depth.sh` + `gpu_guard.sh` (promoted
+from the `/tmp/opencode` throwaways). It warms the prompt once with
+`cache_prompt` and takes R reps over the **same** filled context, so a rep costs
+only the decode, and it reports the spread rather than one number. Within-server
+spread is **0.10-0.21%** at 70k-234k, not the ~6% the 2026-09-20 entry assumed.
+
+**The "6% floor" was two confounders.** A `go test ./...` from a sibling session
+in `~/git/mimir`, and an ollama embedding runner actively using the R9700. With
+both excluded, server-to-server reproduces to ~0.4%: shmem-ON/OFF rounds read
+38.487/38.505 and 38.365/38.454, clean-base 38.439, the earlier clean 13:03
+baseline 38.807. `gpu_guard.sh` refuses to start unless `mem_busy_percent <= 12`
+and 1-min load `< 8` for three samples; a single-rep protocol would have recorded
+the contaminated 35.88 and 25.8 runs as build results.
+
+Fixed config throughout: Q6_K, ctx 262144, `q8_0/q8_0`, `-fa on -ngl 99`,
+MTP `draft-mtp` n3, `--mmproj`, `--parallel 1`, R9700 alone. "paragraph" is the
+established repeated-paragraph prompt; "code" is a slice of `ggml-vulkan.cpp`
+(diverse text, and the honest case for n-gram claims).
+
+| config | paragraph 70k | code 98k | code 234k |
+|---|---:|---:|---:|
+| **base** (MTP n3) | 38.44 | 41.56 | 28.24 |
+| `--spec-type ngram-mod,draft-mtp` | **41.94 (+9.1%)** | **48.69 (+17.2%)** | 28.19 (**0%**) |
+| n_max 4 | 38.71 (+0.7%) | 43.24 (+4.1%) | 27.31 (**-3.3%**) |
+| n_max 5 | 22.81 (**-41%**) | — | — |
+| `GGML_VK_DISABLE_COOPMAT=1` | 36.97 (-3.8%) | — | — |
+| PR #28507 shmem staging | 38.49 (0%) | — | — |
+| no speculation (control) | 17.46 (-55%) | — | — |
+
+Acceptance: base paragraph 0.7353 / code 0.9303 (98k) / 0.9073 (234k). ngram
+paragraph 0.4868, code 0.7009 (98k), and **0.9073 at 234k — bit-identical to
+base**, i.e. ngram drafts nothing there: `n_min=48` finds no >=48-token
+continuation in that region, so the chain falls back to MTP entirely.
+
+- **The n-gram chain is the only large win and it is depth-limited.** +17.2% on
+  code at 98k, +9.1% on the paragraph at 70k, and 0% at 234k. It never loses, so
+  `ngram-mod,draft-mtp` is a strict improvement where it engages. Tuning the
+  threshold down (`--spec-ngram-mod-n-min 8 --spec-ngram-mod-n-match 12`) drafts
+  714 tokens for 230 accepted (0.322) and reads 24.7 t/s — the defaults are
+  already the optimum. `ngram-map-k,draft-mtp` is worse and unstable at 98k
+  (42.49 t/s, 15.8% rep spread — the map mutates across reps), so `ngram-mod` is
+  the variant to use.
+- **n_max is depth-dependent.** 4 wins +4.1% at 98k and loses -3.3% at 234k
+  (acceptance 0.8448 vs 0.9073); 5 collapses -41% at 70k. n3, the shipped
+  default, is correct for the deep operating point.
+- **No available kernel change moves this card.** PR #28507's shmem staging is
+  38.487 vs 38.505 (noise). Disabling coopmat costs 3.8%, so coopmat1 is already
+  the better path. AMDVLK 2025.Q2.1, extracted locally and selected via
+  `VK_ICD_FILENAMES`, returns `VK_ERROR_INCOMPATIBLE_DRIVER` on gfx1201 — RDNA4
+  unsupported, so B4 is closed as not executable. ROCm was not rebuilt; the
+  independent same-card/same-commit measurement (NikoCloud `docs/05`) has Vulkan
+  decoding faster at both depths (37.6/34.5 vs 24.5/20.3) and ROCm page-faulting
+  at 32768.
+
+**Physics (`docs/2026-09-21-r9700-decode-physics.md`).** Step time is linear in
+filled context: `step_ms = 62.0 + 0.3068e-3 * ctx` (fits the 2026-09-20 rows to
+<1 ms). Only **17 of 65 blocks are full-attention** (`full_attention_interval 4`,
+48 SSM blocks), so the KV is 34,816 B/token at q8_0 = 6.37 GB at 183k — not the
+25 GiB a dense model implies. The context term is 56 ms/step against a ~10 ms
+one-forward KV-read floor. The all-bandwidth step floor at 183k is 77.5 ms
+(42.7 t/s) against 28.3 measured: **~1.5x exists on the same weights and
+precision, and no upstream or community patch found here reaches it.**
+
+**Trust.** llama.cpp is a clean clone of `github.com/ggml-org/llama.cpp` at
+`ce8caa6e6` (a maintainer commit); ROCm 7.2.4 is AMD's apt package; AMDVLK is
+GPUOpen-Drivers; the Q4_K_M GGUF is HuggingFace data (weights, not code). No
+malware in anything used.
+
+**Deliverable config:** add `--spec-type ngram-mod,draft-mtp`, keep n_max 3.
+Q4_K_M (15.33 GiB, PPL-equivalent) and `-ctv q4_0` are larger levers but are
+excluded by the fixed requirement of Q6_K + q8_0/q8_0.
+
+**NOT verified:** ROCm at depth on this exact build; whether a hand-written RDNA4
+FA kernel could close the 1.5x (no such patch exists upstream); the paragraph
+70k ngram result is n-gram's best case and should not be quoted for prose.
+
+**Per-node profile and revised maxima.** `GGML_VK_PERF_LOGGER=1` gives the deep
+verify forward at 183k = 108.6 ms: `FLASH_ATTN_EXT` 53.0 (49%), weight GEMVs
+45.6 (42%, 502 GB/s = 78% of the 640 wall), other ~10. Plus 3 MTP drafts ~9 =
+118 ms step. FA reads 6.0 GB of q8_0 KV at 113 GB/s (18% of bandwidth); it is
+**not** bandwidth-, dequant-, MMA-, parallelism- or version-bound (f16 KV is 5x
+slower; `split_k=1` is -51%; spec-constant sweeps lose or break; no upstream
+Vulkan change). Revised decode ceiling @183k: measured 28, realistic 40 (FA 3x),
+hard ceiling ~51 (FA at the KV floor). Prefill is bound by the same kernel (48%)
+plus matmul at 50-67% of peak: measured 524 @72k, estimated ceiling ~830.
+**Blast radius of any kernel edit is the llama.cpp binary only** — not the OS,
+kernel, RADV, or the 9060 XT; Build A is a separate binary. Real risk is silent
+numerical error, mitigated by an RDNA4 gate + `test-backend-ops` + keeping Build
+A. Next step: enable `LLAMA_BUILD_TESTS` and benchmark FA in isolation with
+`test-backend-ops perf -o FLASH_ATTN_EXT`; without it, shader work is blind.
+Full write-up: `docs/2026-09-21-r9700-depth-decode-findings.md`.
+
+
+
+## R9700 q8_0 FA: packed-GQA row tile (2026-09-21/22)
+
+**The 5.6x KV over-read in the decode profile is redundant *dequant*, not DRAM.**
+At 183k, `FLASH_ATTN_EXT` at n_rows=4 took 3211 us and at n_rows=1 911 us — 3.5x
+for 4x the rows. f16 KV at the same shape is only 1.49x for 4x the rows (L2 serves
+the shared reads), and reaches 625 GB/s (98% of the 640 wall) while q8_0 reaches
+432 GB/s. The gqa fold makes each workgroup handle one query position with the 6
+Q heads as rows; the KV is therefore dequantized once per position. Isolated
+evidence: q8_0 nb=4 at kv=131072 = 2331 us vs f16 nb=4 = 1281 us.
+
+**Fix: pack (position, head) pairs into the Br=16 row tile** so one workgroup
+covers `pos_per_tile = Br/gqa_ratio` query positions and shares one K/V dequant
+pass. Touches `flash_attn_cm1.comp` (row mapping for Q load, mask index, output
+and split_k stores; new `PACKED_GQA` flag bit 32) and the dispatch (grid.x =
+CEIL_DIV(n_pos, pos_per_tile); `n_pos` = real position count, `p.ne2`). Correctness
+via `test-backend-ops test -o FLASH_ATTN_EXT` (gqa-6 nb=1..8, ratios 3/7 that do
+not divide Br, prefill nb=512: all OK).
+
+| shape (kv=183296, q8_0) | pack off | pack on |
+|---|---:|---:|
+| nb=3 | 2881 us | **1943 us** |
+| nb=4 | 3581 us | **1981 us** |
+| nb=1 | 975 us | 975 us |
+
+**Model-level A/B on one binary** (`GGML_VK_FA_NO_PACK=1`), 176k, q8_0/q8_0,
+`draft-mtp` n_max 3: pack on **27.46 t/s [27.22-27.72]** vs off **26.75 t/s
+[26.36-26.96]** — +2.6%, same accept (0.7629). The absolute number is ~5% below
+the 2026-09-21 ledger because the box carried sibling `go test`/`session.test`
+load; the A/B is same-session and is the number to trust.
+
+**Why the model gain is small: FA is only ~28% of the step.** The verify is
+**n_rows=3** (not 4), and the per-node profile at 183k gives main verify 95.8 ms =
+FA 33.0 + weight GEMVs 43.8 + other 17.6; the step is ~117 ms, so drafts + CPU
+graph-build overhead is ~23 ms. `other` is ~1300 tiny ops at 13-17 us each (ADD
+176x, CPY 240x, RMS_NORM 305x, SSM family ~360x) — launch/latency-bound, not
+bandwidth. **With measured components the all-lever floor is ~91 ms = ~36 t/s at
+183k, so 40 t/s is not reachable by FA work alone.** The 2026-09-21 "realistic 40"
+used other ~10 + drafts 9; the measured values are 17.6 and 23.
+
+**Prefill:** extending the same fold to N>8 regressed prefill 30% (56085 -> 73035 us
+at nb=512/kv=71680) because it forces `use_mask_opt` off, and prefill needs it.
+Reverted; prefill is unchanged at 524 @72k.
+
+**`--spec-type ngram-mod,draft-mtp` is rejected here.** At 176k it drafted ~6/step
+(461/77) at accept 0.386, widening the verify to 7 rows without raising
+tokens/step (3.31), and cost -23% (22.3 vs 29.1 t/s). The 2026-09-21 "+9% para 70k"
+does not hold for this prompt/settings.
+
+## The deep decode step is latency-bound, not bandwidth-bound (2026-09-22)
+
+Isolated `test-backend-ops perf -o MUL_MAT` at the model's GEMV shapes (q6_K,
+n=3) runs at **710 GB/s** for m=17408 (73 MB, mostly L2-resident across reps) but
+only **605 GB/s** for m=248320 (1.04 GB, no L2 reuse) — and the latter matches the
+in-model lm_head exactly (1721.7 us isolated vs 1714.6 us profiled). The in-model
+FFN GEMV at m=17408 is 145.9 us (501 GB/s) against 103 us isolated, so the model
+loses ~40% of the kernel's throughput to inter-op dependency stalls rather than to
+bandwidth: the 640 GB/s wall is not what the 43.8 ms GEMV total is hitting.
+
+Corollaries:
+- `GGML_VK_DISABLE_MMVQ=1` is a **no-op** at these shapes (byte-identical times),
+  so the MMVQ/non-MMVQ choice is not a lever here.
+- RMS_NORM+MUL fusion (`device->add_rms_fusion`) is **already on** for
+  RADV/AMD subgroups; `GGML_VK_DISABLE_FUSION` only gates that one fusion.
+- The ~17.6 ms "other" tail is ~1300 ops at 13-17 us each (ADD 176x, CPY 240x,
+  RMS_NORM 305x, SSM family ~360x) on 61 KB tensors — pure launch/dependency
+  latency, ~65x the bandwidth time for each op.
+
+**Consequence:** neither the 43.8 ms GEMV nor the 17.6 ms op tail yields to a
+kernel or config knob; moving either needs backend work (barrier elimination,
+cross-op overlap/async submission, or graph-level op fusion), which is outside the
+FA kernel. This is why the "attack GEMV + op tail" route does not close the gap to
+40 t/s either.
+
+Caveat: the per-op profiler times may themselves be inflated by the
+`GGML_VK_PERF_LOGGER` timestamp wrappers, so the absolute split (FA 33 / GEMV 43.8
+/ other 17.6) should be treated as indicative; the same-binary `MUL_MAT` isolated
+vs profiled comparison above is the load-bearing evidence.
+
+## FA decode is row-tile-bound, not pass- or dequant-sharing-bound (2026-09-22)
+
+Implemented a two-MatBr row-tile variant of cm1 so Br can be 32 (packed-GQA
+`pos_per_tile = Br/gqa_ratio = 5`, so nb<=5 is a *single* KV dequant pass).
+Correct (`test-backend-ops` 14/14 packed, 1357/1357 GQA overall) but **no gain**:
+
+| kv=183296, q8_0 | Br=16 | Br=32 |
+|---|---:|---:|
+| nb=1 | 972 us | 1855 us |
+| nb=2 | 981 us | 1864 us |
+| nb=3 | 1810 us | 1878 us |
+| nb=4 | 1816 us | 1880 us |
+| nb=8 | 3487 us | 3637 us |
+
+FA time is linear in **16-row tiles**, independent of KV passes: 16 rows ~975 us,
+32 rows ~1810 us, 64 rows ~3487 us. Sharing one dequant across 2 position-tiles
+(which Br=32 does) changes nothing, so the decode FA is not dequant-throughput
+bound at the pass level. `GGML_VK_FA_CM1_SHMEM=1` (full-tile shared-memory
+staging, dropping ~32 workgroup barriers/KV-block to ~2, fits in 50.4 KB) is worth
+only +2% at nb=3/4 and −4% at nb=1. Rate check: q8_0 decode ~13 TFLOPS, q8_0
+prefill ~17, f16 prefill ~30.8 — so q8_0's per-element dequant caps the kernel,
+and at a fixed row count q8_0 costs 1.46x f16 (1306 vs 894 us at 131072 nb=4)
+regardless of pass count.
+
+**Corollary:** the decode ceiling is not moved by Br/passes/shmem. The remaining
+levers are the weight GEMV (43.8 ms at ~557 GB/s incl. lm_head) and the
+latency-bound tail (17.6 ms small ops + ~12 ms CPU graph build; the backend
+already fuses RMS_NORM and gate/up, and `max_nodes_per_submit=100` gives ~13
+fence-synced submissions per step).
+
+**Measurement caveat:** on 2026-09-22 the box was contended by sibling sessions
+for most of the window; two otherwise-identical 70k runs read 14 t/s against a
+clean ~38 t/s, with `mem_busy=0%` at the guard sample. Model-level numbers from
+this window are unusable; the isolated A/B tables above are same-process and hold.
+
+## Clean-machine decode results and the closed levers (2026-09-22/24)
+
+With the box quiet (load < 2, `mem_busy` 0 at the guard), same-binary A/B at 176k,
+q6_K, q8_0/q8_0, n_max 3:
+
+| config | decode | spread |
+|---|---:|---:|
+| packed-GQA **off** | 27.07 t/s | 0.15% |
+| packed-GQA **on** | **34.84 t/s** | 0.11% |
+
+So packing is **+28.7% at 176k** (and 42.2 vs ~38.4 at 70k, +10%). The earlier
++2.6% was contention noise. Step at 176k is 94 ms, not 117.
+
+Clean concurrent profile of the main verify graph = **75.1 ms**: FA **29.9**, weight
+GEMVs **39.3**, small-op tail **7.3** (the serialized profiler's 17.6 was inflated —
+it inserts `ggml_vk_sync_buffers` after every node). Per decode step there are also
+3 draft graphs (~3.5 ms each: full-KV FA at nb=1 ~1.2, lm_head ~1.64, one MTP layer
+~0.6) and ~7 ms of non-overlapped CPU/launch.
+
+Closed levers (all measured, none help the *model*):
+- **Br=32 two-MatBr row tile** (implemented, correct): FA is linear in 16-row
+  tiles, independent of KV passes — nb=3 1878 us vs 1810 (Br=16).
+- **split_k**: isolated optimum 64 (1736 vs 1810 us, −4%), but in-model A/B
+  **34.67 (mult=2) vs 34.07 (mult=8)** — the isolated win does not transfer;
+  reverted.
+- **SHMEM_STAGING** (`GGML_VK_FA_CM1_SHMEM`): decode +2% at nb=3/4, −4% at nb=1,
+  +26% *worse* on prefill. Off.
+- **mask_opt**: worth only ~5% on prefill (60426 vs 63439 us), so the prefill
+  head-fold regression was the fold's 1.33x MMA waste, not mask_opt.
+- **n_max 4/5**: 32.3 / 33.1 t/s vs 34.84 (acceptance drops to 0.709/0.676).
+- **`--spec-draft-p-min` 0.4/0.7**: 41.1 / 39.4 at 70k vs 42.2 — acceptance rises
+  (0.896 at 0.7) but tokens/step falls; net loss.
+- **submission batching** (32/200/4096) and **DISABLE_FUSION/DISABLE_ASYNC**:
+  neutral or worse.
+
+Remaining to 40 t/s: ~13 ms/step, of which FA q8_0 dequant ~9 ms (1.46x f16 at
+fixed rows), non-overlapped CPU ~7 ms, small-op tail ~7 ms. None yields to a
+shader or dispatch knob; all need backend-overlap/fusion work.
+
+## cm1 FA structural analysis and closed backend avenues (2026-09-24)
+
+Three parallel code investigations produced the following (no benchmark wins
+found beyond packed-GQA):
+
+**cm1 FA (why ~13 TFLOPS decode, ~975 us per 16-row tile at 183k):** the `for j`
+KV-tile body has ~46 workgroup barriers, of which **32 come from the per-d-chunk
+q8_0 K dequant** (16 d-chunks x 2 barriers, `flash_attn_cm1.comp:302-356`), with a
+single-buffered `kvsh` that WAR-serialises the next dequant against this chunk's
+MMA. Candidate fixes, none yet implemented: ping-pong `kvsh` and software-pipeline
+the dequant behind the MMA; stage V once per tile and defer the `row_split`
+cross-subgroup PV reduction out of the per-tile loop (`pvsh` round-trip at
+:553-575); skip the mask gather for KV blocks below every query position (needs a
+packed-aware `mask_opt`, since `use_mask_opt` is currently forced off by
+`packed_gqa`, and a naive skip would be wrong for sliding-window masks).
+Occupancy context: non-staging shmem is ~26 KB (2 WGs/CU); `SHMEM_STAGING` is
+~52 KB (1 WG/CU), which is why it did not help. `d_split` is dead for cm1;
+`row_split`/`workgroup_size` are only tunable as a bundle via `GGML_VK_FA_CM1_NS`.
+
+**Vulkan submission:** found one real bug — `flops_per_submit` is derived from the
+*previous* graph's flops (`ggml-vulkan.cpp:13910`, set at :14255), so in an MTP
+step the large verify graph follows a tiny draft graph and gets a tiny
+`flops_per_submit`, fragmenting into many submits (this is why raising
+`max_nodes_per_submit` did nothing). A running-max fix measured **neutral at 70k
+(42.02 vs 42.18)** and was reverted. Command buffers are re-recorded every submit
+(no replay); `ggml_vk_graph_cleanup` resets the command pool and churns
+semaphores/events on every `llama_synchronize` (~4-5x/step), and
+`common_sampler_sample` syncs per draft token — but these are risky to change
+blind and were not attempted.
+
+**Upstream:** no commits after `ce8caa6e6` touch `flash_attn_cm1.comp`,
+`flash_attn_base.glsl`, `flash_attn.comp`, `flash_attn_dequant.glsl`, the FA
+split_k logic, or `ggml_vk_graph_compute`. The only relevant post-base win is
+**#27952 `70c4e1582` (int8 coopmat1 matmul for RDNA3/RDNA4, merged 2026-09-24)**,
+reported +9% Qwen3.8-27B Q6_K pp512 on R9700 (matmul, i.e. prefill/GEMV, not FA).
+Issue #28752 (RDNA prompt-processing regression) is a Windows-Adrenalin / Mesa
+26.2.2 interaction; not reproducible on R9700 Linux per maintainers. No sourced
+RADV flag improves gfx1201 coopmat throughput.
+
+## #27952 int8 coopmat matmul port: +10% decode at 176k, from acceptance not kernel (2026-09-24)
+
+Ported upstream `70c4e1582` (int8 coopmat1 matmul for RDNA3/RDNA4, merged
+2026-09-24) onto the fork base `ce8caa6e6` (95 commits of drift; the new
+`mul_mmq_cm1.comp` / `mul_mmq_cm1_funcs.glsl` are additive, `ggml-vulkan.cpp`
+needed hand adaptation). It adds a `matmul_q6_k_q8_1` cm1-int pipeline for
+RDNA4 (Q6_K weights via integer dot with q8_1 activations, replacing the f16
+dequant+MMA path). Same 8-file tree as the FA work, uncommitted.
+
+Server A/B, Qwen3.8-27B-Q6_K, ctx 262144, **q8_0/q8_0**, MTP n-max 3, clean box
+(`harness/depth.sh`, depths=4000 reps=4):
+
+| config | decode | spread | accept | prefill rep0 |
+|---|---:|---:|---:|---:|
+| FA-only (base) | 34.846 t/s | 0.21% | 0.7629 | 349 |
+| **+ #27952 (forward)** | **38.162** | 0.50% | **0.881** | 357 |
+| **+ #27952 (reverse)** | **38.382** | 0.48% | **0.881** | 357 |
+
++9.5 to +10.1%, reproducible in both orders. Acceptance is deterministic per
+binary: base 0.7629 in 3 runs, port 0.881 in 4 runs.
+
+**The gain is acceptance, not kernel throughput.** Tokens/step 1+0.763*3 = 3.289
+-> 1+0.881*3 = 3.643 (+10.8%), while step time is unchanged (~95 ms both). Decode
+GEMV (batch 1) does not use the cm1 path, so the port cannot speed decode; the
+faster matmul changes the logits enough to raise MTP draft acceptance. The shift
+is depth-specific: at 70k the port's acceptance is unchanged (0.7629) and decode
+is **43.267** vs the handoff's base 42.2 (**+2.5%**, kernel only).
+
+llama-bench `-p 512,2048 -d 0`, 3 interleaved pairs (spread <2%): pp512
+943->972 (**+3.1%**), pp2048 930->963 (**+3.4%**). Correctness: `test-backend-ops`
+MUL_MAT 1128/1128, MUL_MAT_ID 937/937, FLASH_ATTN_EXT targeted GQA 1357/1357 all
+pass; greedy output at 8k is byte-identical to base. Note the FA-vector-quant
+fallback in the base used f16 for Q6_K, so the int8 path plausibly *reduces* a
+precision loss rather than adding one.
+
+## FA q8_0 K-dequant software pipeline regresses at depth (reverted, 2026-09-24)
+
+Implemented ping-pong `kvsh_dq` + one-chunk prefetch in `flash_attn_cm1.comp` so
+the q8_0 K dequant of chunk d+1 overlaps the MMA of chunk d (1 barrier/chunk
+instead of 2, WAR hazard removed). Correctness passes (`nb=75` filter 1304/1304;
+targeted GQA 1357/1357) and acceptance is unchanged, but:
+
+| depth | port (no pipe) | port+pipe |
+|---|---:|---:|
+| 70k | 43.267 | 43.914 (+1.5%) |
+| **176k** | **38.2** (same window) | **34.709 (-9.2%)** |
+
+176k was measured back-to-back and is decisive; the 70k "+1.5%" does not
+transfer. Reverted. Consistent with the earlier finding that barriers are not
+the cap (SHMEM_STAGING ~2%) — issuing the dequant before the MMA in program
+order serialises the global load ahead of the MMA instead of hiding it, and the
+extra 3 KB shmem likely costs occupancy at the deeper KV loop.
+
+## Re-checked under the int8 port: n_max 4/5 still lose (2026-09-24)
+
+The handoff closed n_max 4/5 under the lossy base. With the port's better
+logits, re-tested at 70k (port n_max 3 = 43.267, accept 0.7629):
+
+| n_max | decode 70k | accept |
+|---|---:|---:|
+| 4 | 29.641 | 0.7004 |
+| 5 | 13.056 | 0.6829 |
+
+Still a large regression; the fixed serving config (n-max 3) stands.
+
+## Measurement hazard: llama-bench `tg64 -d 16384` is bimodal (2026-09-24)
+
+The same binary reads either ~18.9 or ~23.4 t/s (+24%) across process runs,
+uncorrelated with the binary (both base and port hit both modes) and with
+`mem_busy_percent`; mclk sits at 1258 MHz throughout while sclk swings
+2.6-3.3 GHz. The server `depth.py` protocol is stable (spread <=0.5%), but one
+clean-guard base run (load 2.18, mem_busy 0%) still read 30.347 with a 4.12% rep
+spread against 34.846 in an adjacent run. **Do not use that llama-bench row, and
+treat single server runs as +/-a few percent unless rep spread is <1%.**
+
+## Not verified / open
+
+- Full `FLASH_ATTN_EXT` suite SIGFPEs (`hsk=320,hsv=256,nh=4,nr23=[4,1],kv=512,nb=75`,
+  type_K/V f16) and core-dumps. Reproduces on the port binary *without* the
+  pipeline, so not caused by it; the shared factor is the packed-GQA FA patch.
+  The targeted GQA test and all model runs pass, so it is latent. Needs a
+  pristine `ce8caa6e6` binary to confirm origin.
+- 40 t/s decode at 176k not reached: 38.2-38.4 with the port. The remaining gap
+  is not addressable by the FA/KV path (q8_0 dequant is the floor) and decode
+  GEMV is bandwidth-bound at ~557 GB/s of 640; no further safe lever tested.
+
+## Agnostic decode levers falsified (2026-09-24)
+
+Pushing past the #27952 port toward >40 t/s agnostically (real step-time
+reduction, not acceptance) — every cheap candidate was tested and rejected:
+
+**f16 KV cache** looks +24% at 16k decode (`llama-bench -n 128 -d 16384`,
+interleaved 3 pairs: q8_0 18.90/18.98/19.04, f16 23.44/23.36/23.66) but
+**collapses at depth**: 176k server, MTP n-max 3, f16/f16 =
+**7.982 t/s** [7.94-8.03] vs q8_0/f16 38.38 (rep1-3 wall 33 s vs 8 s; prefill
+197 vs 357). Acceptance 0.8426. So q8_0 KV is *required* for long-context
+decode on this box; the int8 KV path is not a dequant tax to remove but the
+thing that makes depth decode work at all. The 16k ranking inverts by 176k.
+
+**Vulkan backend CPU/launch overhead** (handoff's "~7 ms/step non-overlapped"):
+refuted by instrumentation. `ggml_vk_graph_cleanup`'s semaphore/event loops are
+dead code — `ggml_vk_create_binary_semaphore`/`_timeline_semaphore`/
+`_create_event` (`ggml-vulkan.cpp:1075-1097`) have zero call sites. Measured:
+cleanup 1.0 us/call, pool reset 1.0 us, inner sync 1.5 us/call; the real CPU cost
+is command-buffer recording in `ggml_vk_build_graph` (~2.4 us/node). Removing it
+needs command-buffer replay, a rewrite. No safe micro-win.
+
+**GEMV rows-per-shader (`rm_kq`)** swept 1/2/4/8 at d0: 24.62/24.42/19.45/19.77,
+but this is confounded by the per-process fast/slow mode (the same default
+config reads 19.2 and 24.5 in different processes). Not established as causal;
+no reliable GEMV win found. An env knob `GGML_VK_RM_KQ` / `GGML_VK_RM_STDQ` was
+added to `ggml-vulkan.cpp` for future tuning (inert by default).
+
+**Conclusion:** with weight and KV precision fixed (Q6_K, q8_0), decode at 176k
+is bounded by q8_0 FA (~30 ms) + bandwidth-bound GEMV (~39 ms at 542/640 GB/s),
+both near their constrained limits. >40 t/s agnostically needs either a KV/weight
+precision change (the f16 experiment above shows KV precision is not free to
+trade) or a kernel/backend rewrite (command-buffer replay, FA occupancy
+redesign). No cheap lever remains.
+
+## Where 176k decode time actually goes, and the batching answer (2026-09-24)
+
+**The 542 GB/s figure was a units slip** — it is `21.30 GiB / 39.3 ms`, not
+GB/s. The correct number is **582 GB/s** (22.87e9 B / 39.3 ms) against the
+R9700's 640 GB/s theoretical (256-bit GDDR6 @ 20 Gbps) = **91%**, i.e. at the
+practical GDDR6 ceiling (~90%). The verify graph reads all 22.87 GB of Q6_K
+weights per step; a perfect-bandwidth GEMV would save ~3.5 ms/step (step
+95 -> 91.5 ms, 38.4 -> ~39.8 t/s). Even 100% bandwidth does not clear 40 with
+the current FA: the floor is ~36 (weights) + 30 (q8_0 FA) + ~24 (drafts/tail/CPU)
+= ~90 ms => ~40.4 t/s at accept 0.881. GEMV is not the lever; there is no
+meaningful 542->640 reclaim.
+
+**FA tuning knobs are closed.** `GGML_VK_FA_CM1_BR` x `_NS` swept at 70k
+(server protocol): default BR=16/NS=4 is optimal. BR=32 is equal (−0.8%),
+BR=64 regresses ~15% and shifts acceptance (0.763->0.735, numerics differ),
+NS=1/2/8 all fail with HTTP 500. No win.
+
+**Batching (`--parallel N`) works but does not raise aggregate throughput with
+MTP.** `harness/throughput.py`, port binary, short prompts, n-predict 128:
+
+| server | c=1 agg | c=2 | c=4 | c=8 |
+|---|---:|---:|---:|---:|
+| parallel 4, MTP n-max 3 | 23.8 | 21.2 | 25.0 | — |
+| parallel 8, no spec | 13.0 | 18.7 | 21.0 | 26.4 |
+
+Per-request rate collapses (MTP: 27.2 -> 7.3 t/s) and MTP acceptance falls
+(0.871 -> 0.683) as slots fill. MTP single-stream (~38 t/s at depth) beats every
+batched aggregate, so for this workload batching is a latency/queueing feature,
+not a throughput win. Multi-slot serving is available and correct; the
+config choice is a trade, not a free speedup. (Caveat: these short runs are
+exposed to the per-process power mode below.)
+
+## FA cm1 redesign: occupancy is not the bottleneck — evidenced negative (2026-09-24)
+
+Before rewriting the FA kernel to chase >40 t/s, the limiter was measured
+directly with `RADV_DEBUG=shaderstats` on the hsk=hsv=256 / q8_0 / f32acc
+`flash_attn_cm1` variant:
+
+```
+Compute Shader: SGPRs 108  VGPRs 192  Spilled 0  Code size 26728
+                LDS size 26624  Subgroups per SIMD: 8
+                Instr 4726 (VALU 2204 / SALU 795 / VMEM 108 / SMEM 76 / Branch 131)
+```
+
+**Residency is LDS-capped, not register-capped**, and the cap is real:
+64 KiB/LDS = workgroups/CU — NS=4 (26624 B) -> 2, NS=2 (15360 B) -> 4,
+NS=8 (60416 B) -> 1; the `split_k` saturation sweep confirms it (NS=4 saturates
+at split_k=32 = the default; sk=64 adds nothing).
+
+**But occupancy does not convert to throughput.** NS=2 (4 WGs/CU) is *slower*
+than NS=4 (2 WGs/CU): 765 us vs 702 us at kv=131072 nb=1. And the kernel is not
+memory-bound (q8_0 nb=1: 101 GB/s, f16 156 GB/s — ~1/5 of 640) nor
+barrier-bound (removing ~30 barriers/tile via the already-reverted SHMEM staging
+moved decode +2%). At nb=4, q8_0 1311 us vs f16 891 us, and q8_0 scales 1.87x
+with nb while f16 scales 1.04x — the dequant sits on the per-tile path once the
+row tile is full.
+
+**The irreducible cost is per-workgroup serial work plus row waste:** Br=16
+against gqa_ratio=6 gives `pos_per_tile=2`; at nb=1 only 6 of 16 rows are valid
+(`cm1_row_valid`), and per-valid-row cost is 117 us (nb=1) vs 55 us (nb=4).
+The only LDS cut available (subgroup-local V staging, kvsh 8192->3072 B) targets
+residency, which NS=2 shows is not the lever; expected <2%, with real
+correctness risk in the V/PV coopmat layout. Not attempted.
+
+**Conclusion: FA cm1 at this shape is at its structural limit.** With the
+weight/KV precision fixed, the 176k decode ceiling is ~40 t/s and no configuration
+or shader-level change tested this session beats the 38.4 t/s already shipped.
+Exceeding 40 requires a precision change (rejected: f16 KV collapses at depth) or
+a from-scratch attention kernel; it is not a tuning problem.
+
+## The decode ceiling is DRAM traffic, not the FA kernel (2026-09-24, corrected)
+
+A devils-advocate review of the rewrite plan caught a real arithmetic error in
+this notebook: the "FA is 15x above its floor" claim compared a **per-layer**
+floor (0.4 GB) against an **all-layer** measured cost. Corrected accounting of
+the mandatory DRAM traffic per 176k decode step (Q6_K, q8_0/q8_0, 65 layers,
+4 KV heads, head_dim 256, 182889 tokens):
+
+- weights (verify reads all 22.87 GB once per step) = **22.87 GB**
+- verify KV = 4 heads x 256 x 2(K,V) x 34/32 B x 65 layers x 182889 = **25.87 GB**
+- draft lm_head/MTP reads ~= **2.5 GB**
+- **total ~= 51 GB/step**
+
+At the 640 GB/s theoretical peak that is 80 ms -> **~45.5 t/s absolute ceiling**;
+at the 582 GB/s the GEMV actually sustains, ~88 ms -> **~41 t/s**. Decode is
+80-85% of that already. **>55 t/s is physically impossible with Q6_K weights and
+q8_0 KV on this GPU** — 55 needs 66 ms, i.e. 773 GB/s, above peak. It requires
+fewer bytes (lower-precision KV/weights) or a cheaper step (more tokens/step).
+
+Counter-experiment: **q4_0/q4_0 KV at 176k = 38.391 t/s [38.366-38.423]**, vs
+38.382 for q8_0/q8_0 — **identical**, with acceptance 0.8762 vs 0.881. Halving
+KV bytes (25.87 -> 12.9 GB, total ~38 GB) changed nothing, so the current step is
+**not** bandwidth-bound; it is dominated by a serial cost (~95 ms) that the byte
+reduction does not touch. So the ceiling above is a hard cap only a rewrite can
+approach, and the current kernel has real room (38 -> ~45) but no room to 55.
+
+Consequence for the plan: the fixed serving config (Qwen3.8-27B-Q6_K, ctx
+262144, q8_0/q8_0, MTP, mmproj) caps decode at ~45 t/s. 55 t/s and that config
+are mutually exclusive; this is arithmetic, not a tuning outcome.
+
+## CORRECTION: Qwen3.8-27B is hybrid (17 full-attn + 48 linear), decode ceiling is ~70 t/s (2026-09-24)
+
+The preceding "DRAM ceiling ~45 t/s / 55 impossible" entry is WRONG and is
+retracted. It assumed 65 full-attention layers. GGUF metadata
+(`qwen35.full_attention_interval=4`, verified) shows:
+
+- **17 full-attention layers** (`attn_q` 5120->12288 gated, `attn_k/v` 5120->1024
+  = 4 KV heads x head_dim 256, `attn_output` 6144->5120).
+- **48 linear-attention / Gated-DeltaNet layers** (`attn_qkv` 5120->10240,
+  `attn_gate` 5120->6144, `ssm_a/alpha/beta/conv1d/dt/norm/out`).
+- 1 MTP layer (`nextn.*`). 17 + 48 = 65.
+
+Growing KV therefore exists in **17 layers only**: 4 x 256 x 2 x 1.0625 B x
+182889 x 17 = **6.77 GB** at 176k, not 25.87 GB. Step traffic ~= 22.87 (weights)
++ 6.77 (full-attn KV) + ~0.15 (SSM state) + ~2 (drafts) ~= **32 GB**.
+Ceiling = 32/640 = 50 ms -> **~72 t/s** theoretical; at the 582 GB/s the GEMV
+sustains, ~69 t/s. Short context (KV~0) ~23 GB -> ~100 t/s theoretical, ~60
+achieved. Current 176k = 32 GB / 95 ms = **324 GB/s, ~half the bound**.
+
+Implications: (a) >55 t/s is achievable under the fixed q8_0/q8_0 + Q6_K
+config; (b) the q4_0-KV "no change" result is consistent — KV is only ~21% of
+traffic, so halving it buys ~10% at best, lost in the serial bottleneck; (c) the
+**48 Gated-DeltaNet layers are 74% of the layers** and are the prime suspect for
+the serial cost, alongside the 17-layer FA. The plan must measure both.
+
+## Verified architecture and the corrected bottleneck (2026-09-24, deep research + adversarial check)
+
+Two independent sub-agents (one reading the fork + upstream PRs, one adversarial)
+verified the hybrid analysis. Corrections to the preceding entry:
+
+- **Layer split:** trunk `n_layer=64`; `qwen35.cpp:17-21` sets
+  `is_recr[i] = (i<64) && ((i+1)%4 != 0)` -> full attention at i=3,7,...,63 =
+  **16 trunk FA**, recurrent = **48**, plus the **1 MTP** layer at i=64 =
+  **17 KV-bearing FA layers**. The earlier "17 FA + 48 + 1" double-counted MTP.
+  KV arithmetic (6.77 GB at 176k, 17 layers x 4 x 256 x 2 x 1.0625 B x 182889)
+  is exact and confirmed.
+- **GDN is not the bottleneck (~5%).** Upstream RADV developer measured
+  Gated-DeltaNet at ~5% of a Qwen3.5-35B-A3B run (llama.cpp PR #20377); the
+  decode path is the fused `GATED_DELTA_NET` op (registers hold the state shard,
+  no workgroup barriers on the clustered path, no coopmat). It is
+  context-independent, so it cannot account for the ~45 ms that appears only at
+  depth. **The 17-layer FA path remains the supported suspect** (profile: FA
+  29.9 ms vs a ~11 ms KV floor).
+- **Draft traffic undercounted:** the MTP context has its *own* KV (not memory
+  shared; `llama-context.cpp:143-160`), and each of 3 draft graphs re-reads the
+  MTP block (~0.36 GB) + shared LM head (~1.0 GB) -> ~5-6 GB/step, not ~2 GB.
+  Step total ~= **34-35 GB**.
+- **The ~70 t/s bound is a loose upper limit, not a prediction.** The step is
+  not bandwidth-bound (q4_0 KV: 38.391 vs 38.382), so "currently at half the
+  bound, room to 70" is unsupported. The serial terms (FA issue latency, graph
+  build/CPU ~14 ms, ~1300 small ops) dominate the distance to the bound.
+- GDN-adjacent micro-optimizations exist but are small: write the GDN state
+  straight into the persistent cache (skip `ggml_cpy`, ~0.5 ms), fuse qkv+gate
+  GEMV, coalesce the strided state load/store.
+
+Conclusion: the plan's primary target is the **17-layer FA decode path**, then
+CPU/command-buffer replay; GDN is a minor workstream. >55 t/s is plausible
+(FA 29.9->~11 + CPU 14->~4 would put the step near 62-73 ms => ~50-58 t/s) but
+is not guaranteed and must be gated on measurement.
+
+## WS0 op budget: FA is the target, GDN is a non-issue (2026-09-24)
+
+Built the op-budget harness the plan asked for: `harness/op_perf.sh` wraps
+`test-backend-ops perf` on the R9700 (`-b Vulkan1`), repeats the suite and prints
+`op= us= spread= gbps=`; the model shapes are already in the perf list (Q6_K GEMV
+widths; FA hsk=hsv=256 nh=4 gqa=6 q8_0 at kv 71680/183296 nb 1..512). Added the
+missing **model GDN shape** (16 K heads / 48 V heads, d=128, v_repeat=3) to eval
+and perf.
+
+Measured on the idle R9700 (spread <0.25%):
+
+| op | shape | us/op | ×layers | ms/step |
+|---|---|---:|---:|---:|
+| FLASH_ATTN_EXT | 256/256, 4 KV, gqa 6, q8_0, kv=183296, **nb=4** | 1821 | 17 | **30.96** |
+| GATED_DELTA_NET | 16K/48V, d=128, v_repeat 3, AR | 5.33 | 48 | **0.26** |
+| MUL_MAT q6_K | FFN/qkv/qkvo/gate widths at n=3 | — | ~65 | ~39 (bytes/582 GB/s) |
+
+**Reconciliation.** Step = GEMV ~39 + FA 31.0 + GDN 0.26 + drafts/tail/CPU ~24
+~= 94–102 ms vs the measured 94.9 ms (3.643 tok @ 38.4 t/s) — within 8%.
+**Top-2 contributors: weights GEMV (~39 ms, already at 91% of GDDR6 peak, no
+headroom) and FA (~31 ms, 219 GB/s of ~640, i.e. 2.7× above its KV floor).**
+GDN is **0.26 ms — 0.3% of the step, not a workstream.** WS0 confirms the plan's
+FA hypothesis and closes WS2/GDN as a priority; the only large context-dependent
+kernel is FA.
+
+## WS1 FA decode rewrite: direction falsified, mask-opt adopted (+3.4% @176k) (2026-09-24)
+
+The plan's WS1 rewrite (all nb<=8 verify positions in one workgroup pass, so K/V
+dequant happens once) was implemented as its implied tiling (Br=32/48/64 =
+one-pass multi-position) and **falsified**: at kv=183296 nb=4 q8_0, Br=16 1830us
+vs Br=32 1892 (+3.4%), Br=48 2182, Br=64 3449. Shader stats explain it: Br=32
+uses 256 VGPRs / 43 KB LDS / 40 KB code vs Br=16's 192 / 18 KB / 20 KB.
+
+Two hard floors measured, both above the plan's <900us target:
+- `GGML_VK_FA_SPLIT_K` sweep at nb=4/183296: sk=1 28877us, sk=32 1815, **sk=64
+  1754**, sk=128 2029 -> hardware throughput floor ~1754us.
+- Even with the q8_0 dequant entirely absent (f16 K/V, same shape): **1251us**,
+  still 1.4x above 900us. nb=4 needs 24 valid rows (4 positions x 6 heads) = two
+  irreducible MatBr=16 MMA tiles.
+So the kernel is throughput-bound, not latency-bound; <900us needs int8 QK
+(quantising Q = a precision change, rejected) or f16 KV (collapses at depth).
+**The 2x rewrite is infeasible under the fixed serving config.**
+
+**Adopted small win — packed-GQA mask-opt.** The mask-opt bitmask row-block was
+selected by the always-zero packed tile index; it is now selected by the
+position-tile index and sized `pos_per_tile`, so causal all-zero KV blocks skip
+the per-block mask gather + slope add. Byte-identical outputs, enabled by
+default for (q8_0 K/V, RDNA4, n_rows<=8); kill switch `GGML_VK_FA_NO_DECODE_V2=1`.
+Verified A/B (3 reps, spread <0.3%, accept identical):
+
+| | 70k | 176k |
+|---|---:|---:|
+| off | 43.98 | 38.57 |
+| **on** | **44.69 (+1.6%)** | **39.90 (+3.4%)** |
+
+Correctness: target shape 22/22, broad GQA 1224/1224, new large-KV packed 5/5.
+Plan kill gate: 70k 44.69 < 50 -> WS1 rewrite is killed; the mask-opt is kept.
+
+## WS2 prefill: P0>=1800 is infeasible under Q6_K (kill criterion fires) (2026-09-24)
+
+Reproduced prefill on the R9700 (llama-bench `-dev Vulkan1`, q8_0/q8_0, -fa on,
+r3): pp2048 **981 t/s** (d0) / 916 (d4096) / 794 (d16384) — matches the plan's
+978/889/797. (Note: llama-bench defaults to Vulkan0 = the 9060 XT; `-dev Vulkan1`
+is mandatory or every number is ~3.6x low.)
+
+FLOPs = 2 x 27.32e9 = 54.6 GFLOP/token, so 981 t/s = **53.6 TFLOPS achieved**.
+At the representative prefill GEMM shape (m=4096,k=14336,n=512, spread <1%):
+
+| weight type | us | TFLOPS |
+|---|---:|---:|
+| q6_K (the model) | 1159 | **51.9** |
+| q8_0 | 834 | 72.1 |
+| f16 | 861 | 69.8 |
+| q4_0 | 746 | 80.6 |
+
+So prefill is GEMM-bound, and the q6_K dequant+int8-coopmat path is 1.35x slower
+than f16 and 1.55x slower than q4_0. **The best case without a precision change
+is f16 weights at 69.8 TFLOPS -> ~1270 t/s, still far below the P0 gate of 1800**
+(which needs ~98 TFLOPS, at the card's fp16 peak). The plan's own kill criterion
+("prefill headroom is dequant-bound, not compute -> <1.3x -> drop P0 stretch")
+fires: **P0>=1800 cannot be reached with Q6_K weights; reaching it requires a
+weight-precision change, which the serving config forbids.** Same ceiling applies
+to P1/P2 at depth (attention-dominated, and FA is at its measured floor per WS1).
+
+## Verdict: D0>=55 is arithmetically impossible under the immutable serving config (2026-09-24)
+
+Summing the measured floors of a 176k decode step (Q6_K, q8_0/q8_0, 17 FA + 48
+GDN, MTP n_max 3), none of which the serving config permits changing:
+
+| term | floor | source |
+|---|---:|---|
+| weight GEMV (22.87 GB @ 582 GB/s = 91% GDDR6) | 39.3 ms | WS0 |
+| FA, 17 x q8_0 split_k floor (1754 us) | 29.8 ms | WS1 |
+| GDN, 48 x 5.33 us | 0.26 ms | WS0 |
+| MTP drafts (~5-6 GB @ 582 GB/s) | ~9 ms | FINDINGS |
+| **mandatory floor** | **~78 ms** | = **46.7 t/s** |
+
+D0>=55 needs 66 ms. The mandatory traffic+FA floor is 78 ms, i.e. **12 ms (9
+t/s) beyond what is physically available**, before any CPU/launch overhead
+(~14 ms) is even counted. q4_0 KV is identical (not bandwidth-bound), f16 KV
+collapses at depth (forbidden), and int8 QK needs quantising Q (forbidden). The
+only levers left are CPU/command-buffer replay and the small-op tail, worth a
+few ms each — enough to approach ~42-44 t/s, never 55.
+
+**Same for P0>=1800** (WS2). Both headline ship gates require changing the
+weight/KV precision or context, which the plan declares OUT OF SCOPE. The
+honest disposition of the plan under the fixed config: WS0 done, WS1 rewrite
+falsified (mask-opt +3.4% @176k adopted), WS2/P0 infeasible, WS3/WS4 small and
+unable to close a 9-12 t/s gap. **The gates and the config are mutually
+exclusive; a decision to relax one is the user's, not the session's.**
+
+## GEMV win: q6_K n>=4 rm_kq 2->4 on RDNA4 (+3.8% @176k) (2026-09-25)
+
+A per-node Vulkan profile (`GGML_VK_PERF_LOGGER=1`) of the real 176k verify
+graph corrects WS0's synthetic budget: the verify graph is **86.2 ms**, split
+GEMV **48.98 ms (57%, 467 GB/s = 73% of 640)** / FA 28.72 (33%) / GDN 0.77 /
+other 7.71; three draft graphs add 10.7 ms -> step ~96.9 ms. **The weight GEMV,
+which the plan dismissed as "at the ceiling", is the single largest cost.**
+
+The q6_K GEMV is latency/issue-bound at the small MTP batch, not DRAM-bound
+(isolated m=4096 n=4 k=14336: n=1 61 us vs n=4 101 us; L2-resident; every quant
+plateaus 410-550 GB/s there, while a large grid like lm_head m=248320 n=1 hits
+631 GB/s = 98.6%). Fix adopted: on RDNA4, q6_K GEMV pipelines for **n>=4** use
+`rm_kq=4` rows/workgroup (2 was the default). Kill switch `GGML_VK_RM_KQ_Q6K=2`.
+
+| | isolated q6_K n=4 | 70k | 176k |
+|---|---:|---:|---:|
+| baseline (no wins) | 101 us | 43.98 | 38.57 |
+| + mask-opt (WS1) | — | 44.69 | 39.90 |
+| **+ rm_kq4 (WS-GEMV)** | **94 us** | **46.68** | **41.42** |
+
+Cumulative **+6.1% @70k, +7.4% @176k**, accept unchanged (0.7629 / 0.881).
+Correctness: `test-backend-ops MUL_MAT` 1128/1128. A further lead not shipped:
+forcing the int8 MMVQ dot path for AMD q6_K (`GGML_VK_FORCE_MMVQ=1`) measured
+-7.7% e2e but q6_K MMVQ is deliberately Intel-only (2-byte alignment caveat).
+
+## WS1b int8-QK FA: no-win; the q8_0 FA wall is V-dequant + PV, not K-dequant (2026-09-25)
+
+Implemented the plan's "new int8 coopmat FA" (K staged raw q8_0, Q quantised to
+q8_1, int8 16x16x16 QK^T, float softmax/PV) — correct (22/22 target, 23/23 GQA)
+but **not faster** at the model shape:
+
+| nb=4/kv=183296 | mask=1 | mask=0 |
+|---|---:|---:|
+| f16-dequant baseline | 1830-1836 us | 1616-1622 |
+| int8 QK | 1846-1849 | 1464-1465 |
+| int8 QK, scale-fold stubbed (diagnostic) | 1782 | 1397 |
+
+**Mechanism:** removing K dequant buys only ~157 us; the int8 MMAs + per-block
+scale fold consume it, and the packed-GQA mask path costs ~2x more under int8
+(register/LDS pressure). Even a zero-cost fold is 1782 us. The q8_0 FA is
+**dequant-bound** (399 MB in 1834 us = 217 GB/s), whereas f16 K/V is
+**bandwidth-bound** (750 MB in 1251 us = 600 GB/s = 94% of peak) — so the
+≤1000 us target needs int8 **PV** as well (V-dequant removal), which the plan
+deferred as unproven. Left opt-in (`GGML_VK_FA_INT8_QK=1`), default-off
+(`GGML_VK_FA_NO_DECODE_V3=1` forces off); default-off costs +0.3% from the
+always-declared int8 shared buffers. Kept only as a scaffold for int8 PV.
+
+## Consolidated ceiling vs the 55 t/s goal (2026-09-25)
+
+Two adopted, verified wins this session:
+
+| | 70k | 176k | correctness |
+|---|---:|---:|---|
+| start of session | 43.98 | 38.57 | — |
+| + packed-GQA mask-opt | 44.69 | 39.90 | FA 138/138 |
+| + q6_K rm_kq4 (GEMV) | **46.68** | **41.42** | MUL_MAT 1128/1128 |
+
+(+6.1% / +7.4%, acceptance unchanged; nothing committed in the fork beyond the
+baseline `a702ea697`.)
+
+The real 176k verify graph is 86 ms: GEMV 49 / FA 28.7 / GDN 0.8 / other 7.7,
+plus 10.7 ms of drafts. **55 t/s needs a 66 ms step — 28 ms below the current
+93-97 ms.** Every identified lever, at its measured best:
+
+- FA: current 28.7 ms is at the algorithm's floor (split_k bottoms at 29.8 ms;
+  Br 32/48/64 worse; int8 QK no-win). Reaching ~17 ms needs int8 PV (unproven)
+  and a much better int8 QK; the pure q8_0-read floor is ~10.6 ms.
+- GEMV: 49 -> ~42 ms via the int8 MMVQ path (lead: -7.7% e2e, but q6_K MMVQ is
+  Intel-only for a 2-byte-alignment reason and needs AMD enablement).
+- drafts 10.7 / other 7.7 ms: small.
+
+Best case (FA -> 17, GEMV -> 42) gives step ~74 ms = **~49 t/s**. Reaching 55
+would require FA at ~0.62 ms/layer (the raw KV-read floor) with zero overhead —
+i.e. a from-scratch attention kernel that the two attempts here did not find.
+**The 2026-09-21 deep dive's own revised ceiling was ~45-51 t/s at 183k, not
+55.** This session moved 38.6 -> 41.4 and located the remaining wall precisely;
+55 is not supported by any measurement on this card at this precision.
+
+## WS1c int8 PV: fails correctness; FA wall is mask+barrier, not dequant (2026-09-25)
+
+Implemented int8 PV (P quantised per 32-KV-block, V raw q8_0, int8 coopmat,
+scales folded after). **Fails the correctness gate: nmse 0.015-0.998 vs 5e-4
+tolerance.** Fundamental, not a bug: V's q8_0 scale `d_V[k][nb]` runs along HSV
+(the PV *output* dim), not the contraction dim, so it cannot be folded after the
+MMA; folding it into P forces per-block quantisation of a huge-dynamic-range
+quantity (error 30-2000x tolerance). Per-16 blocks worse. Reverted (no net code).
+
+Decisive accounting of the FA wall (isolated, nb=4/kv=183296, mask=1):
+q8_0 1828 us; int8-QK 1849 (no gain at mask=1 - the int8 mask path costs ~2x);
+f16 K/V 1251 (bandwidth-bound, 600 GB/s); q8_0+`CM1_SHMEM=1` 1773 (-3%).
+K+V dequant is only ~310 us at mask=0; the target needs ~580 us, so **even a
+perfect int8 PV could not reach f16 parity at mask=1.** The residual is the
+mask=1 overhead (~219 us) plus the per-16-chunk barrier structure, which int8
+arithmetic does not touch. The int8-QK scaffold stays as an opt-in
+(`GGML_VK_FA_INT8_QK=1`), default-off (+0.3% from declared LDS).
+
+## FINAL VERDICT: 55 t/s is the perfect-implementation ceiling, not a target (2026-09-25)
+
+Step floor at 176k, every component at its measured best:
+`GEMV 35.7 (640 GB/s) + FA 10.6 (raw q8_0 read) + GDN 0.8 + other 7.7 + drafts
+10.7 = **65.5 ms -> 55.6 t/s**`. That is *all* mandatory DRAM work at 100% of
+peak with zero overhead. 55 t/s is therefore the theoretical ceiling of this
+config — the top of the 2026-09-21 doc's 51-57 range — and it requires BOTH the
+GEMV (currently 87% of peak) and the FA (currently at 217 GB/s, dequant+mask+
+barrier-bound) to simultaneously reach bandwidth, which four independent kernel
+attempts did not achieve. The realistic optimized range is ~45-50 t/s.
+
+**Delivered this session (verified, adopted): 38.57 -> 41.42 t/s @176k (+7.4%),
+43.98 -> 46.68 @70k (+6.1%)**, from packed-GQA mask-opt and q6_K `rm_kq=4`.
+Nothing further is available from tuning, int8 QK, int8 PV, MMVQ, or `-ub`/n_max
+(all measured). Reaching 55 needs a from-scratch FA kernel (mask+barrier
+restructure) *and* a perfect GEMV — a multi-day research project.
+
+## WS-TG / TG-1a decode FA barrier+mask restructure: KILLED (2026-09-25)
+
+Tried software-pipelined (double-buffered) q8 K staging and a register-fused mask
+in `flash_attn_cm1.comp`, aiming at f16 parity (1251 us/layer). Reverted.
+
+| config (isolated nb=4/183296) | mask=1 | mask=0 |
+|---|---:|---:|
+| baseline | 1826.5 | 1613.9 |
+| K pipeline (halve staging barriers + overlap dequant/MMA) | 1803.3 (-23) | 1595.3 (-19) |
+| + register-fused mask | 1803.3 (0) | 1595.3 (0) |
+| `CM1_SHMEM=1` (whole-K staging) | 1776.3 (-50) | 1529.1 (-85) |
+| f16 K/V | 1254.4 | — |
+| int8-QK scaffold | 1851.3 | 1463.1 |
+
+**Measured reason the kill fires:** barriers are not the bottleneck (halving them
+= -1.3%; removing ~all via whole-K staging = -50 us and hurts f16 occupancy); the
+mask=1 cost is the `data_m` **gather**, not the apply (fusing the apply = 0 us)
+and is already skipped by `mask_opt` for the real causal mask. The irreducible
+gap is that q8 must dequant each element into LDS then `coopMatLoad` it; with
+KHR_coopmat there is no register-feed path for quant operands, so **f16 parity is
+not reachable for a q8 cache by this route.** The only sub-1500 config is
+int8-QK at mask=0 (1463) — that is TG-1b/PP-2, addressed at prefill.
+
+Incidental blocker: adding a new `Flags` bit / specialization constant as a kill
+switch makes `vkCreateComputePipelines` SIGSEGV inside `libvulkan_radeon.so` for
+the switch-off variant (RADV compiler bug; reproduced after shader-cache clear
+and `RADV_DEBUG=noopt`). A future new FA path must be a **separate shader module**,
+not a specialized branch. Tree clean at `26bd56621`.
+
+## WS-PP / PP-1 (FA slow state) + PP-2 (q8-direct int8 prefill FA): both KILLED (2026-09-25)
+
+**PP-1 — the 17.9<->33.4 TFLOPS "toggle" is a perf-logger artifact.** Isolated
+nb=512 q8_0 FA is **stable at ~15.0 TFLOPS in-process** (kv=49152: 15.10/15.00/
+15.49; across 6 processes 14.69-15.02) while **native f16 KV is 30.0-30.5** — the
+q8 deficit is the intrinsic dequant, and it is stable. Clocks under load:
+3098-3193 MHz, 205-293 W, 100% use (full boost) — not a downclock. The live
+dispatch (`GGML_VK_LOG_FA`) shows **exactly one** prefill state
+(`N=512 dequant_kv=1 path=COOPMAT1 Br=16 ... mask_opt=1`); nothing to toggle to.
+The logger's ~32.5k entries are ~2x inflated (the known "ratios only" hazard).
+End-to-end arbiter: pp2048 d0->d16384 = 500 ms; FA FLOPs predict 474 ms at 15 TF
+or 218 at 32.5 — the live FA is ~15 TF. **No holdable fast state exists; P2>=500
+has no PP-1 support.**
+
+**PP-2 — q8-direct int8-coopmat prefill FA regresses.** Enabled `USE_INT8_QK` for
+prefill (n_rows>=64) and bypassed `use_dequant_kv` so q8_0 K feeds int8 coopmat
+directly (opt-in `GGML_VK_FA_INT8_QK=1`, kill `GGML_VK_FA_NO_PREFILL_Q8=1`, default
+= baseline; reused the existing Flags bit -> no RADV SIGSEGV).
+
+| | isolated nb=512 q8 | pp2048 d0 | pp2048 d16384 |
+|---|---:|---:|---:|
+| before (f16 scratch) | 15.10-15.18 TF | 977/983 | 756/788 |
+| after (int8-direct) | **12.33-12.64 TF** | 848/968 | 700/704 |
+
+Correctness 138/138 (140/140 with the temporary prefill eval cases), MUL_MAT
+1128/1128, decode unchanged (70k 46.14, accept 0.7629). Acceptance (>=40 TF,
+>=950) fails: the f16 scratch already reaches f16-QK throughput, and int8 QK adds
+staging/scale-fold cost rather than winning MMA occupancy at n=512. Same failure
+mode as the decode nb=4 attempt. **Prefill q8 FA is dequant-bound at ~15 TF; the
+only 2x is native f16 KV, which is a forbidden precision change.**
+
+## WS-PP minor candidates: PP-4 (BK_STEP) and PP-5 (Br=32) KILLED (2026-09-26)
+
+- **PP-4 BK_STEP** (cm1-int prefill GEMM, `mul_mmq_cm1.comp:93` + host
+  `ggml-vulkan.cpp:1607`): BK_STEP=2 -> 3692 us / **16.3 TF**; BK_STEP=8 -> 4025 us
+  / **14.9 TF**; both correct (MUL_MAT 1128/1128) but far below BK_STEP=4's
+  **52.5 TF**. 4 is optimal — no win, reverted.
+- **PP-5 Br=32** (prefill FA): pp2048 **974.9** vs 987.1 default (-1.2%),
+  d16384 **796.4** vs 807.7 (-1.4%). Worse — killed.
+- **TG-4 n_max=4 re-test with mask-opt active**: 70k **45.07 t/s** (accept 0.7004)
+  vs 46.68 (accept 0.7629). The prior rejection holds; killed.
+
+## WS-PP PP-3 (prefill-only ubatch) and TG-3 (CPU replay): KILLED / not pursued (2026-09-26)
+
+**PP-3 KILLED — premise does not reproduce.** `-ub 1024` prefill on the current
+build: pp2048 **980.3** (vs 985.0 at -ub 512), d16384 **791.3** (vs 805.4) —
+i.e. no gain, slightly worse. The earlier "+7-16% prefill" no longer holds (the
+cm1-int port changed the balance), so there is no prefill win to protect from the
+decode regression; the allocator work is unjustified.
+
+**TG-3 not pursued (dead by the profile bound).** The 176k step is ~88 ms; the
+per-node verify graph plus three drafts already account for it (the logger
+inflates GPU times, so the true GPU sum is <= that), leaving no material positive
+CPU/launch gap to replay or fuse. The plan's kill is CPU <5 ms; the bound is
+below that. This is the one plan item not directly instrumented (would need a
+temporary steady_clock build + two depth runs for a <5 ms answer).
+
+## rev6.1 plan execution — outcome (2026-09-26)
+
+Every candidate dispositioned, all negative; no new win beyond the committed
++7.4%:
+
+| candidate | result |
+|---|---|
+| TG-1a barrier+mask restructure | KILL: op 1803 us vs 1250 target; barriers/mask-apply not the cost |
+| TG-1b / PP-2 int8-QK (decode+prefill) | KILL: mask=1 no gain; prefill int8 12.3-12.6 vs f16-scratch 15.1 TF |
+| TG-2 GEMV | no win (prior investigation; ~86% peak) |
+| TG-3 CPU replay/tail | dead by profile bound |
+| TG-4 n_max=4 + mask-opt | KILL: 45.07 vs 46.68 t/s, accept 0.700 |
+| PP-1 prefill FA fast state | KILL: perf-logger artifact; q8 FA stable ~15 TF, f16 30 |
+| PP-3 prefill-only ubatch | KILL: no prefill gain to protect |
+| PP-4 BK_STEP | KILL: 2 -> 16.3 TF, 8 -> 14.9 TF vs 4 optimal |
+| PP-5 Br=32 / packed mask_opt | KILL: -1.2/-1.4%; packed variant decode-only |
+
+Final state = checkpoint `26bd56621`: decode **70k 46.68 / 176k 41.42 t/s**
+(+7.4% @176k), prefill **pp2048 981.8 / d16384 791** t/s. Targets D0>=48,
+P1>=1000, P2>=500 are not reachable: the q8 FA is dequant-bound (~15 TF; the
+only 2x is native f16 KV, forbidden), the GEMV is ~86% of peak, and the DRAM
+floor (46 ms = ~79 t/s) is not the limiter — the non-DRAM serial costs (drafts,
+masks, barriers, dequant) are.

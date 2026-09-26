@@ -1,0 +1,42 @@
+=== baseline none ===
+Running as unit: bonsai-spec.service; invocation ID: b2ac930656b74ce6b3b41f97cadcc5f6
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "code", "n_predict": 256, "tps_median": 40.2, "tps_all": [40.2, 37.01, 43.06], "draft_n": 0, "draft_accepted": 0, "acceptance": null}
+Running as unit: bonsai-spec.service; invocation ID: a083b62b326d47e184dcf7f0a699b9a8
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "repeat", "n_predict": 256, "tps_median": null, "tps_all": [], "draft_n": 0, "draft_accepted": 0, "acceptance": null}
+=== ngram-mod default ===
+Running as unit: bonsai-spec.service; invocation ID: 583d28aab9aa452ca7c1d0dda0754290
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "code", "n_predict": 256, "tps_median": 92.73, "tps_all": [44.52, 92.73, 111.23], "draft_n": 128, "draft_accepted": 128, "acceptance": 1.0}
+Running as unit: bonsai-spec.service; invocation ID: 4b555eaaac0b4d65bc89b6687a5fa790
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "repeat", "n_predict": 256, "tps_median": null, "tps_all": [], "draft_n": 0, "draft_accepted": 0, "acceptance": null}
+=== ngram-mod tuned ===
+Running as unit: bonsai-spec.service; invocation ID: 77f450f0120745a3875eaa52f4dc605f
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "code", "n_predict": 256, "tps_median": 108.39, "tps_all": [41.46, 108.39, 109.22], "draft_n": 210, "draft_accepted": 145, "acceptance": 0.69}
+Running as unit: bonsai-spec.service; invocation ID: 68a523c0214d4dd5b0584be79088d57f
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "repeat", "n_predict": 256, "tps_median": null, "tps_all": [], "draft_n": 0, "draft_accepted": 0, "acceptance": null}
+=== ngram-cache ===
+Running as unit: bonsai-spec.service; invocation ID: bf8826cee2a1495a8b5d685e2fe23ec4
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "code", "n_predict": 256, "tps_median": 44.47, "tps_all": [44.47, 44.61, 29.3], "draft_n": 0, "draft_accepted": 0, "acceptance": null}
+Running as unit: bonsai-spec.service; invocation ID: 8c7cffddf7ef41f6bc711a8338f50829
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "repeat", "n_predict": 256, "tps_median": null, "tps_all": [], "draft_n": 0, "draft_accepted": 0, "acceptance": null}
+=== ngram-simple ===
+Running as unit: bonsai-spec.service; invocation ID: e0638f9496904dee8c92d29fa6a56d55
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "code", "n_predict": 256, "tps_median": 44.44, "tps_all": [44.18, 44.44, 44.59], "draft_n": 0, "draft_accepted": 0, "acceptance": null}
+Running as unit: bonsai-spec.service; invocation ID: 2bf6b975b78a482f801fb5a41a08429c
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "repeat", "n_predict": 256, "tps_median": null, "tps_all": [], "draft_n": 0, "draft_accepted": 0, "acceptance": null}
+=== ngram-map-k ===
+Running as unit: bonsai-spec.service; invocation ID: ec62bc32cfb74b36b705ce2d2505b657
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "code", "n_predict": 256, "tps_median": 44.54, "tps_all": [44.25, 44.54, 44.56], "draft_n": 0, "draft_accepted": 0, "acceptance": null}
+Running as unit: bonsai-spec.service; invocation ID: 2f0ca8a9a49c462fa84e76e8b1d5db13
+server bonsai-spec up on 8096 (ctx=16384 kv=q8_0/q8_0 parallel=1)
+{"mode": "repeat", "n_predict": 256, "tps_median": null, "tps_all": [], "draft_n": 0, "draft_accepted": 0, "acceptance": null}

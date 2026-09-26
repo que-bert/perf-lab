@@ -1,0 +1,35 @@
+{
+  "date": "2026-09-19",
+  "topic": "Qwen Q4_K_M, Bonsai quality verdict, measured bandwidth, wrap-up/unwrap skills",
+  "measured_bandwidth": {"read_GBps": 640.2, "spec_GBps": 640, "probe": "/tmp/opencode/bw_test.hip", "note": "card reaches full spec bandwidth; clock ramp is not the bottleneck"},
+  "decode_ceiling_unspec": {"qwen_q6k_22.884GB": 28.0, "qwen_q4km_16.46GB": 38.9, "bonsai_pq2_0_7.206GB": 88.8},
+  "qwen_ud_q4_k_m": {
+    "file": "~/models-fast/qwen-q4km/Qwen3.8-27B-UD-Q4_K_M.gguf (16.46 GB, 15.32 GiB)",
+    "perplexity_same_corpus": 3.0458,
+    "perplexity_q6k": 3.0467,
+    "ppl_verdict": "indistinguishable from Q6_K; Bonsai PQ2_0 is 3.8833 (27.5% worse)",
+    "unspeculated_tg64_d0_vulkan": {"q8_0/q8_0": 23.66, "q8_0/q4_0": 30.94, "q4_0/q8_0": 29.97, "q4_0/q4_0": 30.53},
+    "mtp_vulkan_262k_q8q4_mmproj": {
+      "n2": {"chat_code": 40.3, "chat_explain": 32.2, "acceptance": 0.775},
+      "n4": {"chat_code": 50.4, "chat_explain": 38.8, "acceptance": 0.584, "vram_GiB": 25.17},
+      "n6": {"chat_code": 37.8, "chat_explain": 24.7, "acceptance": 0.437},
+      "note": "n4 optimal; high-50s/60s not reachable with the built-in MTP head"
+    },
+    "vs_q6k": {"q6k_unspec": 22.8, "q4km_unspec": 30.9, "q6k_mtp_code": 52.6, "q4km_mtp_code": 50.4, "q6k_vram": 31.66, "q4km_vram": 25.17},
+    "conclusion": "Q4_K_M is the better default: same quality, +35% unspeculated decode, 6.5 GiB less VRAM. MTP speed is similar to Q6_K."
+  },
+  "bonsai_quality_verdict": {
+    "claim": "98.2% of FP16 intelligence retained",
+    "finding": "vendor average excludes agentic coding: SWE-bench Verified 60.8 vs 80.6 (~75.4%), Terminal-Bench 2.1 52.8 vs 69.7 (~75.8%). Independent reproduction absent. HF community reports poor coding and broken tool calling.",
+    "measured": {"ppl_PQ2_0": 3.8833, "ppl_PTQ1_0": 3.8833, "ppl_qwen_q6k": 3.0467, "ppl_qwen_q4km": 3.0458, "suites": "code/math/instruct/extract/research/tools all tied with Qwen; suites are saturated"},
+    "closer_to": "neither Q6_K nor Q4_K_M; ~27% worse than both on heldout perplexity",
+    "recommendation": "not a replacement for Qwen; viable as a niche co-resident/Mimir backend where extraction/format/tool JSON matter, but agentic coding degrades ~25% and long-context is untested"
+  },
+  "kernel_profile": {"top": "mul_mat_q PQ2_0 prefill GEMM 54.1% of GPU time (compute-bound); decode GEMV ~17.6%; SSM 8.7%; FWHT 2.1%", "tool": "harness/kernel_profile.py"},
+  "opencode_skills": {
+    "wrap-up": "~/.config/opencode/skill/wrap-up/SKILL.md",
+    "unwrap": "~/.config/opencode/skill/unwrap/SKILL.md",
+    "commands": "~/.config/opencode/command/{wrap-up,unwrap}.md",
+    "note": "opencode dedupes by name and the global config wins over ~/.claude/skills; verified with `opencode debug skill`"
+  }
+}

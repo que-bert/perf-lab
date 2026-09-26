@@ -1,0 +1,35 @@
+### ROCm PTQ1_0 shallow d0 p2048 n64 r3
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 32624 MiB):
+  Device 0: AMD Radeon AI PRO R9700, gfx1201 (0x1201), VMM: no, Wave Size: 32, VRAM: 32624 MiB
+load_backend: loaded ROCm backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-hip.so
+load_backend: loaded RPC backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-rpc.so
+load_backend: loaded CPU backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-cpu-haswell.so
+| model                          |       size |     params | backend    | ngl | threads | type_k | type_v |  fa |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ------: | -----: | -----: | --: | --------------: | -------------------: |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q8_0 |   1 |          pp2048 |        935.23 ± 2.20 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q8_0 |   1 |            tg64 |         32.25 ± 0.28 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q4_0 |   1 |          pp2048 |         92.54 ± 0.49 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q4_0 |   1 |            tg64 |         30.84 ± 0.26 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q4_0 |   q8_0 |   1 |          pp2048 |        165.23 ± 1.32 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q4_0 |   q8_0 |   1 |            tg64 |         30.54 ± 0.29 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q4_0 |   q4_0 |   1 |          pp2048 |        920.20 ± 1.44 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q4_0 |   q4_0 |   1 |            tg64 |         31.32 ± 0.24 |
+
+build: 7dffb158d (10685)
+### ROCm PTQ1_0 deep d16384 p512 n64 r3
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 32624 MiB):
+  Device 0: AMD Radeon AI PRO R9700, gfx1201 (0x1201), VMM: no, Wave Size: 32, VRAM: 32624 MiB
+load_backend: loaded ROCm backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-hip.so
+load_backend: loaded RPC backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-rpc.so
+load_backend: loaded CPU backend from /home/bbuckham/llama.cpp/prism-b10685-rocm/libggml-cpu-haswell.so
+| model                          |       size |     params | backend    | ngl | threads | type_k | type_v |  fa |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ------: | -----: | -----: | --: | --------------: | -------------------: |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q8_0 |   1 |  pp512 @ d16384 |       622.02 ± 12.18 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q8_0 |   1 |   tg64 @ d16384 |         28.17 ± 0.20 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q4_0 |   1 |  pp512 @ d16384 |          4.82 ± 0.01 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q4_0 |   1 |   tg64 @ d16384 |          3.77 ± 0.02 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q4_0 |   q8_0 |   1 |  pp512 @ d16384 |          8.24 ± 0.06 |
+### ROCm PTQ1_0 deep d16384 p512 n64 r3 (fast pair only)
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q4_0 |   q4_0 |   1 |  pp512 @ d16384 |       629.27 ± 11.92 |
+| qwen35 27B PTQ1_0 - 1.75 bpw ternary (group 128) |   5.53 GiB |    26.90 B | ROCm       |  99 |       8 |   q4_0 |   q4_0 |   1 |   tg64 @ d16384 |         24.94 ± 0.18 |
+build: 7dffb158d (10685)

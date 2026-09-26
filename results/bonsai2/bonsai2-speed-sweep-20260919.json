@@ -1,0 +1,31 @@
+{
+  "date": "2026-09-19",
+  "topic": "Qwen decode jump, further speed levers, own-backend question",
+  "qwen_decode_jump_explained": {
+    "old_finding": "b10472 Vulkan, q8_0/q8_0 at ctx 262144: 20-23 t/s with MTP",
+    "new_measurement": "b10902 Vulkan (411+ builds newer) and a rebuilt current-master Vulkan: 52.6 t/s chat_code",
+    "cause": "upstream Vulkan progress between b10472 and b10902, plus q8_0/q8_0 now allocating at 262k. Not a model/config trick. MTP n4 was already in the old config.",
+    "not_the_cause": "no change to weights, KV type, prompt, or sampling"
+  },
+  "qwen_sweep_262k_mmproj_newmaster_vulkan": {
+    "fixed_n4_q8q8": {"chat_code": [52.31, 52.78, 52.71], "chat_explain": 35.24, "vram_GiB": 31.34},
+    "adaptive_q8q8": {"chat_code": [51.67, 52.2, 52.16], "chat_explain": 36.45, "vram_GiB": 31.20},
+    "fixed_n4_q4q4": {"chat_code": [52.59, 53.42, 52.97], "chat_explain": 35.75, "vram_GiB": 28.21},
+    "adaptive_q4q4": {"chat_code": [49.39, 51.91, 51.9], "chat_explain": 37.99, "vram_GiB": 28.06},
+    "conclusion": "q4_0/q4_0 KV frees ~3.1 GiB at identical decode. draft-mtp-adaptive adds ~1.3-2.7 t/s on chat_explain only, and is slightly less stable on code. Ceiling for code is ~52-53 t/s."
+  },
+  "bonsai_sweep_262k_rocm_mtp_build": {
+    "mtp_n2_q8q8": {"chat_code": [70.83, 70.91, 70.23], "chat_explain": 57.0, "vram_GiB": 18.89},
+    "mtp_n2_q4q4": {"chat_code": [65.08, 69.28, 68.9], "chat_explain": 58.43, "vram_GiB": 14.96},
+    "mtp_plus_ngram_q8q8": {"chat_code": [69.97, 280.77, 352.85], "chat_explain": 39.74, "acceptance_last": 1.0, "note": "the 280-353 t/s reps are a cross-request ngram-cache artifact from identical temperature-0 requests; first rep is 70. Not a real gain."},
+    "dflash2_nmax3": {"chat_code": [66.41, 70.19, 70.1], "chat_explain": 55.84},
+    "dflash2_nmax4": {"chat_code": [68.47, 69.86, 69.6], "chat_explain": 51.82},
+    "dflash2_nmax5": {"chat_code": [66.87, 59.94, 68.59], "chat_explain": 47.68},
+    "conclusion": "q4_0/q4_0 KV frees ~3.9 GiB at the same decode. MTP n2 (~70/57) beats DFlash2 at every depth tested. No further llama.cpp lever found."
+  },
+  "own_backend": {
+    "to_go_faster_no": "both models are now speculation-limited; llama.cpp MTP integration is the ceiling. Config + KV choice is all that remains.",
+    "to_go_much_faster": "yes, but adopt rather than write: ZINC (Vulkan+ROCm, 1 R9700, ~7-8% decode + up to 1.9x prefill over llama.cpp), or the vLLM radiance fork (single R9700 MXFP4+MTP, 137.7 t/s, needs MXFP4/FP8 weights). NInfer is CUDA-only sm_120a.",
+    "from_scratch": "6+ months; not worth it for a single card when ZINC exists."
+  }
+}

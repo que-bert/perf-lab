@@ -1,0 +1,222 @@
+{
+  "bin": "/home/bbuckham/llama.cpp/b10902-vulkan-local",
+  "model": "Qwen3.8-27B-Q6_K",
+  "label": "qwen38-Q6K-research-tools",
+  "ctx": 32768,
+  "api": "llama",
+  "prompt_mode": "chat",
+  "thinking": true,
+  "budget": 1024,
+  "results": {
+    "research": [
+      {
+        "task": "multihop_revenue",
+        "passes": true,
+        "anywhere": false,
+        "said": "700,400",
+        "raw_tail": "culate: 41,200*10=412,000; *7=288,400; sum=700,400. Need final number only. Ensure no other complications. D6 restates Vance only. D3 Kell closure irrelevant. Answer only final number.\n</think>700,400",
+        "truncated": false
+      },
+      {
+        "task": "multihop_above_avg",
+        "passes": true,
+        "anywhere": false,
+        "said": "Marrow",
+        "raw_tail": "are depots: Marrow 41,200 > 31,000. Kell 18,650 <. Vance original 27,150 <, restated 26,400 <. So only Marrow. Need reply only depot names comma separated. So \"Marrow\". Ensure no extra.\n</think>Marrow",
+        "truncated": false
+      },
+      {
+        "task": "abstain_vance_year",
+        "passes": true,
+        "anywhere": false,
+        "said": "NOT STATED",
+        "raw_tail": "ing year for Vance. Since Marrow oldest, Vance opened after 2009, but exact year not stated. Need reply exactly NOT STATED if docs do not say. So final: NOT STATED. Ensure no extra.\n</think>NOT STATED",
+        "truncated": false
+      },
+      {
+        "task": "conflict_vance",
+        "passes": true,
+        "anywhere": true,
+        "said": "Vance: 27,150 containers and 26,400 containers.",
+        "raw_tail": "ance handled 27,150 containers. D6 restated Vance 2024 throughput as 26,400. So answer: Vance, 27,150 and 26,400. Need concise. Ensure no extra.\n</think>Vance: 27,150 containers and 26,400 containers.",
+        "truncated": false
+      },
+      {
+        "task": "cite_fee_2023",
+        "passes": true,
+        "anywhere": true,
+        "said": "14|D4",
+        "raw_tail": "and which document states it? Reply form number|document id. D4 says Ardent's per-container handling fee was 14 dollars in 2023. So answer 14|D4. Need final only likely. Ensure no extra.\n</think>14|D4",
+        "truncated": false
+      },
+      {
+        "task": "aggregate_throughput",
+        "passes": true,
+        "anywhere": false,
+        "said": "87000",
+        "raw_tail": " formatting. Maybe 87000. Let's choose 87,000? In many evals expect exact? The question asks final number. I'd output 87,000. But if only number, comma might be okay. To minimize, 87000.\n</think>87000",
+        "truncated": false
+      }
+    ],
+    "tools": [
+      {
+        "task": "single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/etc/hostname\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_files_not_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\"TODO\",\"directory\":\"/srv/app\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_memory_not_files",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_memory"
+        ],
+        "arguments": [
+          "{\"query\":\"retry policy decision\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "pick_url_not_file",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "fetch_url"
+        ],
+        "arguments": [
+          "{\"url\":\"https://example.com/spec.txt\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "enum_constraint",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "set_log_level"
+        ],
+        "arguments": [
+          "{\"level\":\"error\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "integer_type",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/var/log/app.log\",\"max_bytes\":500}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "abstain_no_tool_needed",
+        "passes": true,
+        "truncated": false,
+        "calls": [],
+        "arguments": [],
+        "said": "408"
+      },
+      {
+        "task": "abstain_no_such_tool",
+        "passes": false,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\".\",\"directory\":\"/srv/app\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "lexical_decoy_memory",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "search_files"
+        ],
+        "arguments": [
+          "{\"pattern\":\"memory allocator\",\"directory\":\"/srv/app/docs\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "no_invented_argument",
+        "passes": false,
+        "truncated": false,
+        "calls": [
+          "read_file",
+          "read_file",
+          "read_file",
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/app/config.yaml\"}",
+          "{\"path\":\"/app/config.json\"}",
+          "{\"path\":\"/app/config.toml\"}",
+          "{\"path\":\"/config.yaml\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "ordering_dependency",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/srv/app/target.txt\"}"
+        ],
+        "said": ""
+      },
+      {
+        "task": "plural_single_call",
+        "passes": true,
+        "truncated": false,
+        "calls": [
+          "read_file"
+        ],
+        "arguments": [
+          "{\"path\":\"/etc/hostname\"}"
+        ],
+        "said": ""
+      }
+    ]
+  },
+  "score": {
+    "research": {
+      "pass": 6,
+      "of": 6,
+      "skipped": 0
+    },
+    "tools": {
+      "pass": 10,
+      "of": 12,
+      "skipped": 0
+    }
+  }
+}

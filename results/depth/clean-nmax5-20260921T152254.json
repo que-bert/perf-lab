@@ -1,0 +1,102 @@
+[
+  {
+    "label": "short",
+    "reps_requested": 1,
+    "prompt_n": 4,
+    "decode_mean": 37.671,
+    "decode_steady_mean": 37.858,
+    "decode_steady_min": 37.71,
+    "decode_steady_max": 37.975,
+    "decode_spread_pct": 0.7,
+    "prefill": 122.94182217343578,
+    "accept_frac": 0.3986,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 37.1108058807966,
+        "prefill": 122.94182217343578,
+        "prompt_n": 42,
+        "accepted": 169,
+        "drafted": 424,
+        "wall": 7.27149510383606
+      },
+      {
+        "rep": 1,
+        "decode": 37.97549225545682,
+        "prefill": 21.23502930434044,
+        "prompt_n": 4,
+        "accepted": 169,
+        "drafted": 424,
+        "wall": 7.088360548019409
+      },
+      {
+        "rep": 2,
+        "decode": 37.8883781634567,
+        "prefill": 21.397583142983997,
+        "prompt_n": 4,
+        "accepted": 169,
+        "drafted": 424,
+        "wall": 6.919729948043823
+      },
+      {
+        "rep": 3,
+        "decode": 37.70982746201179,
+        "prefill": 21.210257280420812,
+        "prompt_n": 4,
+        "accepted": 169,
+        "drafted": 424,
+        "wall": 6.953359365463257
+      }
+    ]
+  },
+  {
+    "label": "~70k",
+    "reps_requested": 1600,
+    "prompt_n": 4,
+    "decode_mean": 22.742,
+    "decode_steady_mean": 22.805,
+    "decode_steady_min": 22.79,
+    "decode_steady_max": 22.831,
+    "decode_spread_pct": 0.18,
+    "prefill": 554.8382810476446,
+    "accept_frac": 0.5969,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 22.55081361566834,
+        "prefill": 554.8382810476446,
+        "prompt_n": 72489,
+        "accepted": 191,
+        "drafted": 320,
+        "wall": 142.08270859718323
+      },
+      {
+        "rep": 1,
+        "decode": 22.794704012556217,
+        "prefill": 8.460415829438016,
+        "prompt_n": 4,
+        "accepted": 191,
+        "drafted": 320,
+        "wall": 11.791507244110107
+      },
+      {
+        "rep": 2,
+        "decode": 22.789863604900624,
+        "prefill": 8.467938268730022,
+        "prompt_n": 4,
+        "accepted": 191,
+        "drafted": 320,
+        "wall": 11.791267395019531
+      },
+      {
+        "rep": 3,
+        "decode": 22.831434533950432,
+        "prefill": 8.436202274821943,
+        "prompt_n": 4,
+        "accepted": 191,
+        "drafted": 320,
+        "wall": 11.771365404129028
+      }
+    ]
+  }
+]

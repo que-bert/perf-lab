@@ -1,0 +1,58 @@
+{
+  "date": "2026-09-18",
+  "followup": "decode-parity, speculation, slots, intelligence",
+  "decode_parity": {
+    "question": "why does Bonsai PQ2_0 f16 decode match Qwen3.8-27B Q6_K q8/q8?",
+    "answer": "It does not, against unspeculated Qwen. It matches Qwen WITH draft-mtp speculation.",
+    "qwen38_q6k_unspeculated_rocm_q8q8_tg64_d0": 22.78,
+    "qwen38_q6k_unspeculated_rocm_q4q4_tg64_d0": 22.6,
+    "qwen38_q6k_with_draft_mtp_n4_tok_s": 46.15,
+    "qwen38_q6k_with_draft_mtp_acceptance": 0.7708,
+    "bonsai_pq2_0_f16_tg64_d0": 46.44,
+    "bonsai_pq2_0_q8q8_tg64_d0": 45.11,
+    "bonsai_pq2_0_q8q8_tg64_d16384": 38.62,
+    "ratio_bonsai_vs_qwen_unspeculated": 1.98,
+    "bandwidth": {
+      "card_peak_GBps": 640,
+      "qwen_file_GB": 22.884,
+      "bonsai_pq2_0_file_GB": 7.206,
+      "qwen_effective_GBps_at_22.78": 521.3,
+      "qwen_pct_of_peak": 81.4,
+      "bonsai_effective_GBps_at_45.11": 325.1,
+      "bonsai_pct_of_peak": 50.8,
+      "bandwidth_bound_bonsai_if_qwen_efficiency": 72.3,
+      "conclusion": "Qwen is near bandwidth-bound (81% of 640 GB/s); Bonsai's ternary kernel reaches only ~51%, so a 3.2x smaller file yields only ~2x decode. The parity is with Qwen's speculated 46 t/s, not its 22.8 unspeculated."
+    }
+  },
+  "speculation": {
+    "draft-mtp": {"available": false, "detail": "llama-server fails to load (exit 1) - Bonsai 2 has no MTP heads"},
+    "draft-dspark": {"available": false, "detail": "server starts, but no drafter exists; draft_n null, no speculation"},
+    "ngram": {
+      "note": "ngram needs no drafter; tested with the chat template, fresh server per rep, 3 reps, n_predict 256, PQ2_0 q8_0/q8_0 ctx 16384",
+      "baseline_chat_code_tps": [39.39, 43.4, 44.09],
+      "baseline_chat_explain_tps": [44.05, 43.63, 44.06],
+      "ngram_mod_default_chat_code_tps": [43.97, 43.94, 43.89],
+      "ngram_mod_default_chat_explain_tps": [41.77, 42.05, 42.05],
+      "ngram_mod_tuned_chat_code_tps": [43.2, 43.11, 43.32],
+      "ngram_mod_tuned_chat_explain_tps": [42.76, 45.78, 45.84],
+      "acceptance": {"ngram_mod_default_chat_explain": 0.031, "ngram_mod_tuned_chat_code": 0.263, "ngram_mod_tuned_chat_explain": 0.781},
+      "conclusion": "No real speedup in normal chat serving (within noise, sometimes slower). A raw-prompt continuation produced 92-108 t/s with acceptance 1.0, but that is an artifact of highly repetitive output, not representative."
+    }
+  },
+  "slots": {
+    "note": "PQ2_0, ctx 262144 total, slots share the context pool (n_ctx_slot = 262144/N)",
+    "q4_0/q4_0": {"1": 13.45, "2": 13.47, "4": 13.70, "8": 14.26, "16": 15.41, "32": 17.74, "64": 22.41, "128": 31.76},
+    "q8_0/q8_0": {"1": 17.39, "2": 17.41, "4": 17.64, "8": 18.19, "16": 19.34, "32": 21.67, "64": 26.35},
+    "f16/f16": {"1": 23.93, "2": 23.96},
+    "units": "GiB used of 31.86 GiB (34208743424 B)",
+    "conclusion": "64 slots fit with q8_0/q8_0 (26.35 GiB, 82.7%); 128 slots fit with q4_0/q4_0 at 99.7% but leave only 2048 ctx/slot. The binding constraint is context-per-slot, not VRAM.",
+    "max_slots_by_min_ctx_per_slot": {"32768": 8, "16384": 16, "8192": 32, "4096": 64, "2048": 128},
+    "separate_instances": {"q4_0/q4_0_131k_PQ2_0_per_instance_GiB": 9.86, "two_instances_measured_GiB": 19.73, "three_instances_projected_GiB": 29.6}
+  },
+  "intelligence": {
+    "bonsai_pq2_0_q8q8_chat_measured": {"code": "5/5 (1 trunc)", "math": "8/8", "instruct": "6/6", "extract": "5/5", "total_scored": "24/24"},
+    "qwen38_q6k_q8q8_chat": "BLOCKED - host swap exhausted (23/23 GiB) and no passwordless sudo; 22.9 GB model load ran 40 min without finishing twice",
+    "architecture_note": "Bonsai 2 is a ternary quantization of Qwen/Qwen3.8-27B, the same base as Qwen3.8-27B-Q6_K. The comparison isolates weight quantization (2.13 vs 6.56 bpw); KV is q8_0/q8_0 in both.",
+    "model_card_claim": "98.2% of FP16 intelligence retained; 84.78 avg across 14 thinking benchmarks vs 72.59 for IQ2_XXS and within 0.4 of UD-Q4_K_XL"
+  }
+}

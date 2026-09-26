@@ -1,0 +1,18 @@
+### from-source gfx1201 HIP build: PQ2_0 q8q8 shallow
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 32624 MiB):
+  Device 0: AMD Radeon AI PRO R9700, gfx1201 (0x1201), VMM: no, Wave Size: 32, VRAM: 32624 MiB
+| model                          |       size |     params | backend    | ngl | threads | type_k | type_v |  fa |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ------: | -----: | -----: | --: | --------------: | -------------------: |
+| qwen35 27B PQ2_0 - 2.13 bpw (group 128) |   6.70 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q8_0 |   1 |          pp2048 |       1019.58 ± 1.31 |
+| qwen35 27B PQ2_0 - 2.13 bpw (group 128) |   6.70 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q8_0 |   1 |            tg64 |         45.41 ± 0.71 |
+
+build: unknown (0)
+### from-source gfx1201 HIP build: PQ2_0 q8q8 deep
+ggml_cuda_init: found 1 ROCm devices (Total VRAM: 32624 MiB):
+  Device 0: AMD Radeon AI PRO R9700, gfx1201 (0x1201), VMM: no, Wave Size: 32, VRAM: 32624 MiB
+| model                          |       size |     params | backend    | ngl | threads | type_k | type_v |  fa |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ------: | -----: | -----: | --: | --------------: | -------------------: |
+| qwen35 27B PQ2_0 - 2.13 bpw (group 128) |   6.70 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q8_0 |   1 |  pp512 @ d16384 |       664.89 ± 12.63 |
+| qwen35 27B PQ2_0 - 2.13 bpw (group 128) |   6.70 GiB |    26.90 B | ROCm       |  99 |       8 |   q8_0 |   q8_0 |   1 |   tg64 @ d16384 |         38.93 ± 0.45 |
+
+build: unknown (0)

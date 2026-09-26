@@ -1,0 +1,38 @@
+[
+  {
+    "label": "~70k",
+    "reps_requested": 1600,
+    "prompt_n": 4,
+    "decode_mean": 36.54,
+    "decode_steady_mean": 34.97,
+    "decode_steady_min": 34.97,
+    "decode_steady_max": 34.97,
+    "decode_spread_pct": null,
+    "prefill": 520.1183460992853,
+    "accept_frac": 0.7629,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 38.10886192441981,
+        "prefill": 520.1183460992853,
+        "prompt_n": 72489,
+        "accepted": 177,
+        "drafted": 232,
+        "wall": 146.27589416503906
+      },
+      {
+        "rep": 1,
+        "decode": 34.97043900792019,
+        "prefill": 7.983761030064848,
+        "prompt_n": 4,
+        "accepted": 177,
+        "drafted": 232,
+        "wall": 7.930858135223389
+      }
+    ],
+    "prefill_mean": 264.1,
+    "prefill_min": 8.0,
+    "prefill_max": 520.1,
+    "prefill_spread_pct": 193.95
+  }
+]

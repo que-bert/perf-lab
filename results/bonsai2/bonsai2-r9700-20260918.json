@@ -1,0 +1,143 @@
+{
+  "model": "prism-ml/Ternary-Bonsai-2-27B-gguf",
+  "base_model": "Qwen/Qwen3.8-27B",
+  "bands": {
+    "PTQ1_0": {"file_bytes": 5946648928, "file_GiB": 5.53, "bpw": 1.75, "sha256": "3907dc1658db1f78a9826bf8d5bcb8dc65db0d466388937af57f2294fae62ec1"},
+    "PQ2_0": {"file_bytes": 7206168928, "file_GiB": 6.70, "bpw": 2.13, "sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3"}
+  },
+  "runtime": {
+    "repo": "PrismML-Eng/llama.cpp",
+    "branch": "prism",
+    "release": "prism-b10685-7dffb15",
+    "build": "b10685-7dffb158d",
+    "why_fork": "stock llama.cpp refuses PTQ1_0/PQ2_0 as unknown types; Bonsai 2 needs the Hadamard activation transform only this fork has",
+    "rocm_backend_sha256": "a4d328db5786a0215abfbe49082ef58d7ab105b35ef9fdea8b8cbbd1d70bf30c",
+    "vulkan_backend_sha256": "d6edf2d317ca34154c279c7c011c9679bfaecac3240597a92310f6e94e5144d2"
+  },
+  "gpu": {
+    "name": "AMD Radeon AI PRO R9700",
+    "pci": "0000:0c:00.0",
+    "gfx": "gfx1201",
+    "vram_total_bytes": 34208743424,
+    "vram_total_GiB": 31.86,
+    "vram_idle_bytes": 59912192,
+    "rocm": "7.2.53211-97f5574fe2",
+    "mesa_radv": "26.0.8"
+  },
+  "sanity": {
+    "prompt": "The capital of France is",
+    "PTQ1_0": "Paris. (coherent, thinking block emitted)",
+    "PQ2_0": "Paris. (coherent, thinking block emitted)"
+  },
+  "rocm_llama_bench": {
+    "flags": "-ngl 99 -fa on -t 8 -r 3",
+    "shallow": {"depth": 0, "n_prompt": 2048, "n_gen": 64},
+    "deep": {"depth": 16384, "n_prompt": 512, "n_gen": 64},
+    "PTQ1_0": {
+      "shallow": {
+        "q8_0/q8_0": {"pp2048": 935.23, "tg64": 32.25},
+        "q8_0/q4_0": {"pp2048": 92.54, "tg64": 30.84},
+        "q4_0/q8_0": {"pp2048": 165.23, "tg64": 30.54},
+        "q4_0/q4_0": {"pp2048": 920.20, "tg64": 31.32}
+      },
+      "deep": {
+        "q8_0/q8_0": {"pp512_at_d16384": 622.02, "tg64_at_d16384": 28.17},
+        "q8_0/q4_0": {"pp512_at_d16384": 4.82, "tg64_at_d16384": 3.77},
+        "q4_0/q8_0": {"pp512_at_d16384": 8.24, "tg64_at_d16384": null},
+        "q4_0/q4_0": {"pp512_at_d16384": 629.27, "tg64_at_d16384": 24.94}
+      }
+    },
+    "PQ2_0": {
+      "shallow": {
+        "f16/f16": {"pp2048": 1012.67, "tg64": 46.44},
+        "q8_0/q8_0": {"pp2048": 1010.37, "tg64": 45.11},
+        "q8_0/q4_0": {"pp2048": 96.10, "tg64": 42.31},
+        "q4_0/q8_0": {"pp2048": 177.93, "tg64": 41.81},
+        "q4_0/q4_0": {"pp2048": 997.48, "tg64": 43.80}
+      },
+      "deep": {
+        "f16/f16": {"pp512_at_d16384": 665.60, "tg64_at_d16384": 43.32},
+        "q8_0/q8_0": {"pp512_at_d16384": 658.10, "tg64_at_d16384": 38.62},
+        "q8_0/q4_0": {"pp512_at_d16384": 4.83, "tg64_at_d16384": 3.83},
+        "q4_0/q4_0": {"pp512_at_d16384": 669.13, "tg64_at_d16384": 31.81}
+      }
+    }
+  },
+  "vulkan_llama_bench": {
+    "flags": "-ngl 99 -fa on -t 8 -r 3",
+    "PTQ1_0": {
+      "shallow": {
+        "q8_0/q8_0": {"pp2048": 532.55, "tg64": 8.27},
+        "q8_0/q4_0": {"pp2048": 522.86, "tg64": 8.21},
+        "q4_0/q8_0": {"pp2048": 522.23, "tg64": 8.20},
+        "q4_0/q4_0": {"pp2048": 521.84, "tg64": 8.20}
+      },
+      "deep": {
+        "q8_0/q8_0": {"pp512_at_d16384": 467.68, "tg64_at_d16384": 8.11}
+      },
+      "note": "No KV-type sensitivity at all (~522 pp / ~8.2 tg for every pair) — consistent with perf-lab's finding that Vulkan has no fallback cliff. But decode is ~4x below ROCm: the ternary weight path is not optimized on Vulkan."
+    },
+    "PQ2_0": {
+      "feasibility_pp64": 0.73,
+      "feasibility_tg16": 0.62,
+      "note": "Loads but runs the generic fallback at ~0.6 t/s — unusable. Matches the fork's MODEL-FORMATS: Vulkan PQ2_0 kernels 'not yet (port planned)'."
+    }
+  },
+  "vram": {
+    "total_bytes": 34208743424,
+    "total_GiB": 31.86,
+    "idle_GiB": 0.06,
+    "note": "llama-server resident, read from /sys/class/drm/card0/device/mem_info_vram_used after health=200",
+    "PTQ1_0": {
+      "ctx_32768_q8_0/q8_0": {"used_GiB": 7.50, "pct": 23.5},
+      "ctx_262144_q8_0/q8_0": {"used_GiB": 16.03, "pct": 50.3},
+      "ctx_262144_q8_0/q4_0": {"used_GiB": 12.82, "pct": 40.2},
+      "ctx_262144_q4_0/q4_0": {"used_GiB": 12.10, "pct": 38.0}
+    },
+    "PQ2_0": {
+      "ctx_32768_q8_0/q8_0": {"used_GiB": 8.61, "pct": 27.0},
+      "ctx_262144_q8_0/q8_0": {"used_GiB": 17.14, "pct": 53.8},
+      "ctx_262144_q8_0/q4_0": {"used_GiB": 13.93, "pct": 43.7},
+      "ctx_262144_q4_0/q4_0": {"used_GiB": 13.20, "pct": 41.4},
+      "ctx_262144_f16/f16": {"used_GiB": 23.69, "pct": 74.3}
+    }
+  },
+  "concurrency": {
+    "one_server_parallel_2": {
+      "PTQ1_0": {
+        "ctx": 131072, "kv": "q4_0/q4_0", "n_predict": 128, "reps": 2,
+        "c1": {"agg_tps": 27.89, "per_req_tps": 32.16},
+        "c2": {"agg_tps": 23.11, "per_req_tps": 14.13},
+        "c4": {"agg_tps": 23.81, "per_req_tps": 13.97}
+      },
+      "PQ2_0": {
+        "ctx": 131072, "kv": "q4_0/q4_0", "n_predict": 128, "reps": 2,
+        "c1": {"agg_tps": 40.26, "per_req_tps": 44.23},
+        "c2": {"agg_tps": 66.64, "per_req_tps": 38.14},
+        "c4": {"agg_tps": 64.64, "per_req_tps": 37.98}
+      }
+    },
+    "two_instances_parallel_1": {
+      "PTQ1_0": {
+        "ctx": 131072, "kv": "q4_0/q4_0",
+        "vram_used_GiB": 17.51, "vram_pct": 55.0,
+        "agg_tps": 32.65, "per_req_tps": [20.11, 18.47, 18.56, 18.39]
+      },
+      "PQ2_0": {
+        "ctx": 131072, "kv": "q4_0/q4_0",
+        "vram_used_GiB": 19.73, "vram_pct": 61.9,
+        "agg_tps": 25.24, "per_req_tps": [14.99, 15.16, 12.25, 12.17]
+      }
+    }
+  },
+  "tuning": {
+    "PQ2_0_q4q4_shallow": {
+      "ubatch": {"128": {"pp2048": 776.53, "tg64": 44.61}, "256": {"pp2048": 923.92, "tg64": 44.45}, "512": {"pp2048": 997.54, "tg64": 44.56}, "1024": {"pp2048": 1015.84, "tg64": 44.38}},
+      "threads": {"6": {"pp2048": 999.85, "tg64": 44.50}, "8": {"pp2048": 997.26, "tg64": 44.56}, "12": {"pp2048": 996.26, "tg64": 44.58}}
+    }
+  },
+  "spec_decode": {
+    "available": false,
+    "note": "Bonsai 2 has no paired dspark drafter; the demo downloader says so explicitly. No MTP heads either. Speculative decoding is unavailable for this model."
+  }
+}

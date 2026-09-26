@@ -1,0 +1,87 @@
+{
+  "date": "2026-09-19",
+  "topic": "tuning/fork, MTP, NInfer, quality",
+  "builds": {
+    "from_source_gfx1201": {
+      "path": "~/git/llama.cpp-prism-mtp/llama/build/bin",
+      "source": "ProCreations/Ternary-Bonsai-2-27B-MTP runtime/prism-dflash2-source.tar.gz",
+      "base": "Prism d8f26eec76da6d09bb708bcba51ef64b8cd868a3 (prism branch) + 12-line qwen35.cpp MTP-embedding Hadamard patch",
+      "cmake": "-DGGML_HIP=ON -DGPU_TARGETS=gfx1201 -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF -DGGML_NATIVE=ON, ROCm clang 22.0.0",
+      "note": "gfx1201-only (not a fat binary)"
+    },
+    "prebuilt": "~/llama.cpp/prism-b10685-rocm (official release)"
+  },
+  "from_source_vs_prebuilt_nonspec": {
+    "note": "PQ2_0 q8_0/q8_0, r3",
+    "prebuilt": {"pp2048": 1010.4, "tg64_d0": 45.11, "pp512_d16384": 658.1, "tg64_d16384": 38.62},
+    "from_source": {"pp2048": 1019.6, "tg64_d0": 45.41, "pp512_d16384": 664.9, "tg64_d16384": 38.93},
+    "delta_pct": "0.7-1.0% (within noise)",
+    "conclusion": "A gfx1201-only from-source build does not meaningfully beat the prebuilt. The prebuilt is already fine for raw throughput."
+  },
+  "mtp": {
+    "model": "ProCreations/Ternary-Bonsai-2-27B-MTP :: Ternary-Bonsai-2-27B-PQ2_0-MTP-Q8_0.gguf (7.66 GB, head embedded)",
+    "requires_patched_build": true,
+    "prebuilt_rejection": "llama_init_from_model: failed to initialize the context: Hadamard-latent table 'token_embd.weight' is read without the inverse transform",
+    "server_flags": "--spec-type draft-mtp --spec-draft-n-max 2 (head trained for draft_tokens=2)",
+    "measured_from_source_rocm_q8q8": {
+      "ctx_16384": {
+        "off": {"chat_code": 44.83, "chat_explain": 40.35, "raw_code": 45.0},
+        "on_nmax2": {"chat_code": 72.1, "chat_explain": 58.35, "raw_code": 78.25,
+                     "acceptance": {"chat_code": 0.71, "chat_explain": 0.468, "raw_code": 0.801}},
+        "speedup": {"chat_code": 1.61, "chat_explain": 1.45, "raw_code": 1.74}
+      },
+      "ctx_262144": {"chat_code_tps": [70.27, 71.81, 72.0], "acceptance": 0.71, "vram_GiB": 19.41, "vram_pct": 60.9},
+      "nmax_sweep_chat_code": {"1": {"tps": 61.98, "accept": 0.764}, "2": {"tps": 69.23, "accept": 0.71}, "3": {"tps": 65.74, "accept": 0.585}}
+    }
+  },
+  "qwen_mtp_reference": {
+    "build": "~/llama.cpp/b10902-vulkan-local (Vulkan, RADV)",
+    "config": "Qwen3.8-27B-Q6_K, 262144 ctx, q8_0/q8_0, --spec-type draft-mtp --spec-draft-n-max 4 --mmproj mmproj-F16",
+    "tps": {"chat_code": [52.32, 52.61, 52.61], "chat_explain": 35.12, "raw_code": 63.19},
+    "acceptance": {"chat_code": 0.655, "chat_explain": 0.356, "raw_code": 0.824},
+    "vram_GiB": 31.66,
+    "vram_pct": 99.4,
+    "note": "The older b10472 Vulkan build measured q8_0/q8_0 at 262k at 20-23 t/s; b10902 fixes it. The user's 45-46 t/s claim is real (and conservative)."
+  },
+  "head_to_head_262k_q8q8_mtp": {
+    "chat_code": {"bonsai": 71.8, "qwen": 52.6, "bonsai_advantage": 1.37},
+    "chat_explain": {"bonsai": 58.35, "qwen": 35.12, "bonsai_advantage": 1.66, "note": "bonsai at 16k; context-independent"},
+    "raw_code": {"bonsai": 78.25, "qwen": 63.19, "bonsai_advantage": 1.24, "note": "bonsai at 16k"},
+    "vram_GiB": {"bonsai": 19.41, "qwen": 31.66},
+    "conclusion": "With MTP, Bonsai 2 beats Qwen3.8-27B Q6_K by 1.24-1.66x at 262k while using 61% vs 99% of the card."
+  },
+  "quality": {
+    "perplexity_same_corpus_ctx4096_5chunks": {
+      "corpus": "~/.perf-lab/heldout/corpus.txt (79 KB)",
+      "bonsai_PQ2_0_rocm": 3.8833,
+      "bonsai_PQ2_0_stderr": 0.08665,
+      "bonsai_PTQ1_0_rocm": 3.8833,
+      "bonsai_PTQ1_0_stderr": 0.08665,
+      "qwen38_Q6K_vulkan": 3.0467,
+      "qwen38_Q6K_stderr": 0.06322,
+      "gap_pct": 27.5,
+      "caveat": "Bonsai measured on ROCm, Qwen on Vulkan; backend ppl effect is typically <1%, so the gap is quantization loss."
+    },
+    "capability_suites_chat_ctx32768": {
+      "code": {"bonsai": "5/5 (1 trunc)", "qwen": "5/5 (1 trunc)"},
+      "math": {"bonsai": "8/8", "qwen": "8/8"},
+      "instruct": {"bonsai": "6/6", "qwen": "6/6"},
+      "extract": {"bonsai": "5/5", "qwen": "5/5"},
+      "research": {"bonsai": "6/6", "qwen": "6/6"},
+      "tools": {"bonsai": "10/12", "qwen": "10/12", "same_failures": ["abstain_no_such_tool", "no_invented_argument"]},
+      "conclusion": "Tied on pass/fail suites; the 27.5% perplexity gap is the sensitive signal. Bonsai does not preserve Q6_K quality."
+    }
+  },
+  "ninfer_bespoke": {
+    "ninfer_repo": "https://github.com/Neroued/ninfer",
+    "ninfer_status": "CUDA-only, hard-coded sm_120a (RTX 5090). No AMD/HIP/ROCm port, branch, or PR.",
+    "from_scratch_effort": "6+ months to parity; NInfer took ~3 months on a mature CUDA stack",
+    "r9700_options": {
+      "ZINC": "https://github.com/zolotukhin/zinc - Vulkan+ROCm, measured on one R9700, beats llama.cpp ~7-8% decode and up to 1.9x prefill",
+      "R9V": "https://github.com/Dyluhn/R9V - shape-specialized gfx1201 kernels, dual-R9700, experimental, MTP4",
+      "vllm_radiance": "single-R9700 vLLM fork, MXFP4 + MTP, 137.7 t/s combined decode (needs MXFP4/FP8 weights, no safetensors on the mount)",
+      "Zynfer": "https://github.com/thanos/zynfer - NInfer-inspired Zig, R9700 target, Phase R not yet running"
+    },
+    "conclusion": "NInfer itself is not portable to the R9700. The pragmatic path is ZINC (R9700-native, beats llama.cpp) or the radiance vLLM fork, not a from-scratch engine. llama.cpp already sits near the decode bandwidth wall."
+  }
+}
