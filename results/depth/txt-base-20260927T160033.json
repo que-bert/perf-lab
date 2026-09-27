@@ -1,0 +1,50 @@
+[
+  {
+    "label": "~64kB",
+    "reps_requested": 64,
+    "prompt_n": 16128,
+    "decode_mean": 57.706,
+    "decode_steady_mean": 57.706,
+    "decode_steady_min": 57.706,
+    "decode_steady_max": 57.706,
+    "decode_spread_pct": null,
+    "prefill": 751.7803742251576,
+    "accept_frac": 0.9029,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 57.705559082006395,
+        "prefill": 751.7803742251576,
+        "prompt_n": 16128,
+        "accepted": 186,
+        "drafted": 206,
+        "wall": 27.831337690353394,
+        "content": " `<minimax:tool_call>` wrapper |\n| Apriel-8B-Instruct | JSON_NATIVE | `<tool_call>` wrapper |\n| Apriel-8B-Instruct-Reasoning | JSON_NATIVE | `<tool_call>` wrapper + reasoning |\n| Apriel-8B-Instruct-Reasoning-2512 | JSON_NATIVE | `<tool_call>` wrapper + reasoning |\n| Apriel-8B-Instruct-Reasoning-2601 | JSON_NATIVE | `<tool_call>` wrapper + reasoning |\n| Apriel-8B-Instruct-Reasoning-2602 | JSON_NATIVE | `<tool_call>` wrapper + reasoning |\n| Apriel-8B-Instruct-Reasoning-2603 | JSON_NATIVE | `<tool_call>` wrapper + reasoning |\n| Apriel-8B-Instruct-Reasoning-2604 | JSON_NATIVE | `<tool_call>` wrapper + reasoning |\n| Apriel-8B-Instruct-Reasoning-2605 | JSON_NATIVE | `<tool_call>` wrapper + reasoning |\n| Apriel-8B-Instruct-Reasoning-2606 | JSON_NATIVE | `<tool_call>` wrapper + reasoning |\n| Apriel-8B-Instruct-"
+      }
+    ]
+  },
+  {
+    "label": "~650kB",
+    "reps_requested": 650,
+    "prompt_n": 168791,
+    "decode_mean": 34.858,
+    "decode_steady_mean": 34.858,
+    "decode_steady_min": 34.858,
+    "decode_steady_max": 34.858,
+    "decode_spread_pct": null,
+    "prefill": 341.31638074921176,
+    "accept_frac": 0.8679,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 34.85796609099078,
+        "prefill": 341.31638074921176,
+        "prompt_n": 168791,
+        "accepted": 184,
+        "drafted": 212,
+        "wall": 503.14419317245483,
+        "content": "ualt\", \"module\", \"once\"}:\n        raise ValueError(f\"invalid action: {action!r}\")\n    if not isinstance(category, type) or not issubclass(category, Warning):\n        raise TypeError(\"category must be a class\")\n    if not isinstance(lineno, int):\n        raise TypeError(\"lineno must be an int\")\n    if lineno < 0:\n        raise ValueError(\"lineno must be an int >= 0\")\n    _wm._add_filter(action, None, category, None, lineno, append=append)\n\n\ndef _add_filter(*item, append=False):\n    \"\"\"Add a filter to the list of filters.  For internal use only.\"\"\"\n    with _lock:\n        filters = _wm._get_context()._filters\n        if append:\n            filters.append(item)\n        else:\n            filters.insert(0, item)\n        _wm._filters_mutated_lock_held()\n\n\ndef resetwarnings():\n    \"\"\"Clear the list of warnings filters and the 'once' registry.\"\"\"\n    with _lock:\n        _wm._get_context()._filters.clear()\n        _wm._filters_mutated_lock_held()\n        _wm.oncereg"
+      }
+    ]
+  }
+]

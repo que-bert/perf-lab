@@ -3410,3 +3410,23 @@ and/or small-op numerics. PPL and decode KLD are unchanged, so this looks like
 trajectory sensitivity of a single 256-token greedy run on a degenerate prompt,
 **not verified**: acceptance must be measured on the code corpus and several
 prompts before `r9700-integrate` replaces the serving build.
+
+## MTP acceptance on `r9700-integrate` is unchanged — the paragraph-prompt shift was trajectory noise (2026-09-27)
+
+Pooled over 15 code-corpus prompts (24 kB slices at 90 kB offsets of
+`harness/corpus/decode_kld.txt`, 256 tokens greedy, fixed serving config; a 16th
+prompt returned no draft stats on base and is excluded from all three):
+
+| build | accepted / drafted | acceptance | per-prompt identical to base |
+|---|---:|---:|---:|
+| `26bd56621` | 2604 / 3642 | 0.7150 | — |
+| integrate `dfb7b9f30` | 2606 / 3631 | **0.7177** | 9 of 15 |
+| integrate, `GGML_VK_NO_FA_PREFILL_RDNA4=1` | 2602 / 3640 | 0.7148 | 6 of 15 |
+
+Integrate is within +0.003 of base; the gate (±0.01) passes. Individual prompts
+move by up to ±0.04 in either direction as greedy trajectories diverge, which is
+what the single repeated-paragraph prompt measured (0.763 → 0.722). The corpus
+depth runs agree: at ~168k tokens integrate's continuation is the same code as
+base's with slightly different wording (`results/depth/txt-*.json`). Rule: judge
+acceptance pooled over ≥ 10 prompts, never on one trajectory. `depth.py` now
+saves each response's text in its JSON.

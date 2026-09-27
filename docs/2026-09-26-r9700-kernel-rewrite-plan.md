@@ -351,3 +351,24 @@ parallel, but every benchmark is serialized (one GPU user at a time, gated by
 - Mesa 26.0-devel had a coopmat-related 25× codegen regression for dot4
   kernels elsewhere; if a new shader is inexplicably slow, check the ISA
   (`RADV_DEBUG=shaders`) before redesigning.
+
+## Rev 3 — follow-ups after the integrate merge (2026-09-27)
+
+Base for all tasks: fork branch `r9700-integrate` @ `dfb7b9f30`. Each task works
+on its own branch/worktree off it and is merged into `r9700-integrate` only after
+its gates pass. Gates are unchanged (section "Gates"); MTP acceptance is judged on
+the code corpus (`CORPUS=harness/corpus/decode_kld.txt`, `DEPTHS` in **kB**, e.g.
+8,64,260,650), not on the repeated-paragraph prompt.
+
+| id | task | acceptance | kill |
+|---|---|---|---|
+| R1 | Acceptance check: corpus depth.sh on base / integrate / integrate with `GGML_VK_NO_FA_PREFILL_RDNA4=1` | integrate within ±0.01 of base on the corpus, else bisect to the op | — |
+| R2 | Q6_K GEMM 81 → ≥ 90 TF: Q6_K repack to a WMMA-friendly layout at load (weights unchanged in content), split-K for the m=5120 (K=17408) shapes, then FFN gate+up swiglu fusion if budget | MUL_MAT all pass; prefill numerics gate; isolated 17408×512×5120 ≥ 90 TF; pp2048 d0 ≥ 1,389 +5% | < +3% pp2048 after two designs |
+| R3 | Prefill FA 51 → ≥ 80 TF (stretch 100): Br > 16 rows per KV head, double-buffered K/V LDS, dequant fused into load | FA (`-p hsk=256,`) all pass; prefill numerics gate; MTP gate; pp512 @ d131072 improves ≥ 10% | < 60 TF after two designs |
+| R4 | Decode FA q8r 933 → ≤ 800 µs (nb=4 kv=183296): VGPR/occupancy (256 VGPR → ≤ 128), split count, combine | FA pass; decode KLD gate @70k/176k b4+b1; MTP gate; depth.sh 176k ≥ +2% | > 900 µs after two designs |
+| R5 | Decode non-kernel time: the ~10 ms/step with no GPU work (CPU/launch/sync) and the ~12 ms "other GPU" small ops | instrumented breakdown recorded; depth.sh 176k ≥ +3% or a measured reason it cannot move | no lever > 2% after instrumentation |
+
+Bundling: R2, R3, R4 are separate shader loops (one agent each, ≤ 3 concurrent);
+R5 is host-side and starts when the first of them finishes. R1 and every
+merged-build gate run stay in the main session. Decode speed A/Bs only at
+loadavg < 4, back to back.

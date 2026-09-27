@@ -70,7 +70,8 @@ def run(port, depths, reps, npred, corpus=None, reprefill=False):
                  "prefill": first.get("prompt_per_second"),
                  "prompt_n": first.get("prompt_n"),
                  "accepted": first.get("draft_n_accepted"),
-                 "drafted": first.get("draft_n"), "wall": wall}]
+                 "drafted": first.get("draft_n"), "wall": wall,
+                 "content": d.get("content")}]
         for rep in range(1, reps):
             d, wall = req(port, prompt, npred, cache=not reprefill)
             t = d.get("timings", {})
@@ -78,7 +79,8 @@ def run(port, depths, reps, npred, corpus=None, reprefill=False):
                          "prefill": t.get("prompt_per_second"),
                          "prompt_n": t.get("prompt_n"),
                          "accepted": t.get("draft_n_accepted"),
-                         "drafted": t.get("draft_n"), "wall": wall})
+                         "drafted": t.get("draft_n"), "wall": wall,
+                         "content": d.get("content")})
         ds = [r["decode"] for r in rows if r["decode"]]
         ps = [r["prefill"] for r in rows if r["prefill"]]
         # Exclude the cold rep from the spread: its decode is fine, but the

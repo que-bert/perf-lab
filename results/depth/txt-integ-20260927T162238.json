@@ -1,0 +1,50 @@
+[
+  {
+    "label": "~64kB",
+    "reps_requested": 64,
+    "prompt_n": 16128,
+    "decode_mean": 57.876,
+    "decode_steady_mean": 57.876,
+    "decode_steady_min": 57.876,
+    "decode_steady_max": 57.876,
+    "decode_spread_pct": null,
+    "prefill": 1127.3861013593364,
+    "accept_frac": 0.8512,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 57.87583431987043,
+        "prefill": 1127.3861013593364,
+        "prompt_n": 16128,
+        "accepted": 183,
+        "drafted": 215,
+        "wall": 19.360883235931396,
+        "content": " `<minimax:tool_call>` with JSON args |\n| Apriel-8B-Instruct | JSON_NATIVE | `<tool_call>` wrapper, function name as JSON key |\n| Apriel-8B-Instruct-Reasoning | JSON_NATIVE | `<tool_call>` wrapper, function name as JSON key |\n| Apriel-8B-Instruct-Reasoning-2507 | JSON_NATIVE | `<tool_call>` wrapper, function name as JSON key |\n| Apriel-8B-Instruct-Reasoning-2509 | JSON_NATIVE | `<tool_call>` wrapper, function name as JSON key |\n| Apriel-8B-Instruct-Reasoning-2511 | JSON_NATIVE | `<tool_call>` wrapper, function name as JSON key |\n| Apriel-8B-Instruct-Reasoning-2512 | JSON_NATIVE | `<tool_call>` wrapper, function name as JSON key |\n| Apriel-8B-Instruct-Reasoning-2601 | JSON_NATIVE | `<tool_call>` wrapper, function name as JSON key |\n| Apriel-8B-Instruct-Reasoning-2602 | JSON_NATIVE | `<tool_call>` wrapper, function name as JSON key |\n|"
+      }
+    ]
+  },
+  {
+    "label": "~650kB",
+    "reps_requested": 650,
+    "prompt_n": 168791,
+    "decode_mean": 45.626,
+    "decode_steady_mean": 45.626,
+    "decode_steady_min": 45.626,
+    "decode_steady_max": 45.626,
+    "decode_spread_pct": null,
+    "prefill": 397.9901313273825,
+    "accept_frac": 0.8512,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 45.62565385587769,
+        "prefill": 397.9901313273825,
+        "prompt_n": 168791,
+        "accepted": 183,
+        "drafted": 215,
+        "wall": 430.76083874702454,
+        "content": "ualt\", \"module\", \"once\"}:\n        raise ValueError(f\"invalid action: {action!r}\")\n    if not (isinstance(category, type) and issubclass(category, Warning)):\n        raise TypeError(\"category must be a Warning subclass\")\n    if not isinstance(lineno, int):\n        raise TypeError(\"lineno must be an int\")\n    if lineno < 0:\n        raise ValueError(\"lineno must be an int >= 0\")\n    _wm._add_filter(action, None, category, None, lineno, append=append)\n\n\ndef _add_filter(*item, append=False):\n    \"\"\"Add a filter to the list of filters.  For internal use only.\"\"\"\n    context = _wm._get_context()\n    if append:\n        context._filters.append(item)\n    else:\n        context._filters.insert(0, item)\n    _wm._filters_mutated_lock_held()\n\n\ndef resetwarnings():\n    \"\"\"Clear the list of warnings filters and the 'once' registry.\"\"\"\n    context = _wm._get_context()\n    context._filters.clear()\n    _wm._filters_mutated_lock_held()\n    _wm.onceregistry"
+      }
+    ]
+  }
+]
