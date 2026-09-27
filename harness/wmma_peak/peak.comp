@@ -1,0 +1,28 @@
+#version 450
+#extension GL_EXT_control_flow_attributes : require
+// Register-resident coopMatMulAdd chains: NACC independent accumulators per subgroup,
+// operands built from a push constant (no memory traffic in the loop).
+// Defines: A_T (operand type), C_T (accumulator type), NACC, WG (threads per workgroup).
+#extension GL_KHR_cooperative_matrix : require
+#extension GL_KHR_memory_scope_semantics : require
+#extension GL_EXT_shader_explicit_arithmetic_types : require
+#ifdef FP8
+#extension GL_EXT_float_e4m3 : require
+#endif
+layout(local_size_x = WG) in;
+layout(binding = 0) buffer O { C_T o[]; };
+layout(push_constant) uniform P { float x; uint iters; } pc;
+#define MAT(T, U) coopmat<T, gl_ScopeSubgroup, 16, 16, U>
+void main() {
+    MAT(A_T, gl_MatrixUseA) a = MAT(A_T, gl_MatrixUseA)(A_T(pc.x));
+    MAT(A_T, gl_MatrixUseB) b = MAT(A_T, gl_MatrixUseB)(A_T(pc.x + 1.0));
+    MAT(C_T, gl_MatrixUseAccumulator) acc[NACC];
+    [[unroll]] for (int i = 0; i < NACC; ++i) acc[i] = MAT(C_T, gl_MatrixUseAccumulator)(C_T(i));
+    for (uint it = 0; it < pc.iters; ++it) {
+        [[unroll]] for (int i = 0; i < NACC; ++i) acc[i] = coopMatMulAdd(a, b, acc[i]);
+    }
+    [[unroll]] for (int i = 1; i < NACC; ++i) acc[0] = MAT(C_T, gl_MatrixUseAccumulator)(acc[0] + acc[i]);
+    // only a data-dependent, practically-never-true store keeps the chain alive
+    if (pc.x == 12345.0)
+        coopMatStore(acc[0], o, 0, 16, gl_CooperativeMatrixLayoutRowMajor);
+}

@@ -1,0 +1,90 @@
+#version 450
+#extension GL_EXT_control_flow_attributes : require
+// Tiled GEMM: C[n][m] (m contiguous) = sum_k A[m][k] * B[n][k]  (both K-contiguous, like ggml).
+// Tiles staged global -> LDS (double-buffered, one barrier per K step) -> coopMatLoad.
+// Defines: S8 (int8->int32, else f16->f32), BM BN BK, WM_WARPS WN_WARPS, SG, PAD_U (LDS row pad in uint32s).
+#extension GL_KHR_cooperative_matrix : require
+#extension GL_KHR_memory_scope_semantics : require
+#extension GL_EXT_shader_explicit_arithmetic_types : require
+#extension GL_KHR_shader_subgroup_basic : require
+#ifdef S8
+#define A_T int8_t
+#define C_T int32_t
+#define EB 1
+#else
+#define A_T float16_t
+#define C_T float
+#define EB 2
+#endif
+#define NT (WM_WARPS * WN_WARPS * SG)
+layout(local_size_x = NT) in;
+layout(binding = 0) readonly buffer A { uvec4 a[]; };
+layout(binding = 1) readonly buffer B { uvec4 b[]; };
+layout(binding = 2) writeonly buffer C { C_T c[]; };
+layout(push_constant) uniform P { uint M; uint N; uint K; } pc;
+
+#define ROW_U (BK * EB / 4)            // uint32s per K-row of a tile
+#define STR_U (ROW_U + PAD_U)          // LDS row stride in uint32s
+#define ROW_V (BK * EB / 16)           // uvec4s per K-row
+#define A_V (BM * ROW_V)               // uvec4 loads per A tile
+#define B_V (BN * ROW_V)
+#define A_PER ((A_V + NT - 1) / NT)
+#define B_PER ((B_V + NT - 1) / NT)
+shared uint shA[2][BM * STR_U];
+shared uint shB[2][BN * STR_U];
+
+#define WTM (BM / WM_WARPS)
+#define WTN (BN / WN_WARPS)
+#define TM (WTM / 16)
+#define TN (WTN / 16)
+#define MAT(T, U) coopmat<T, gl_ScopeSubgroup, 16, 16, U>
+
+void main() {
+    const uint tid = gl_LocalInvocationID.x;
+    const uint warp = gl_SubgroupID;
+    const uint wm = warp % WM_WARPS, wn = warp / WM_WARPS;
+#ifdef N_FAST
+    // N tiles vary fastest: the N/BN workgroups sharing one A (weight) tile run together, so A
+    // is read from DRAM once and re-hit in L2 instead of being streamed N/BN times.
+    const uint m0 = gl_WorkGroupID.y * BM, n0 = gl_WorkGroupID.x * BN;
+#else
+    const uint m0 = gl_WorkGroupID.x * BM, n0 = gl_WorkGroupID.y * BN;
+#endif
+    const uint kv = pc.K * EB / 16;    // uvec4 per global row
+
+    MAT(C_T, gl_MatrixUseAccumulator) acc[TM * TN];
+    [[unroll]] for (int i = 0; i < TM * TN; ++i) acc[i] = MAT(C_T, gl_MatrixUseAccumulator)(C_T(0));
+
+    uvec4 ra[A_PER], rb[B_PER];
+    // global -> regs for K tile kt
+#define GLOAD(kt) \
+    [[unroll]] for (uint i = 0; i < A_PER; ++i) { uint v = tid + i * NT; if (A_V % NT == 0 || v < A_V) { uint r = v / ROW_V, c = v % ROW_V; ra[i] = a[(m0 + r) * kv + (kt) * ROW_V + c]; } } \
+    [[unroll]] for (uint i = 0; i < B_PER; ++i) { uint v = tid + i * NT; if (B_V % NT == 0 || v < B_V) { uint r = v / ROW_V, c = v % ROW_V; rb[i] = b[(n0 + r) * kv + (kt) * ROW_V + c]; } }
+#define SSTORE(buf) \
+    [[unroll]] for (uint i = 0; i < A_PER; ++i) { uint v = tid + i * NT; if (A_V % NT == 0 || v < A_V) { uint r = v / ROW_V, c = v % ROW_V; uint o = r * STR_U + c * 4; shA[buf][o] = ra[i].x; shA[buf][o+1] = ra[i].y; shA[buf][o+2] = ra[i].z; shA[buf][o+3] = ra[i].w; } } \
+    [[unroll]] for (uint i = 0; i < B_PER; ++i) { uint v = tid + i * NT; if (B_V % NT == 0 || v < B_V) { uint r = v / ROW_V, c = v % ROW_V; uint o = r * STR_U + c * 4; shB[buf][o] = rb[i].x; shB[buf][o+1] = rb[i].y; shB[buf][o+2] = rb[i].z; shB[buf][o+3] = rb[i].w; } }
+
+    const uint nk = pc.K / BK;
+    GLOAD(0)
+    SSTORE(0)
+    barrier();
+    for (uint kt = 0; kt < nk; ++kt) {
+        const uint cur = kt & 1;
+        if (kt + 1 < nk) { GLOAD(kt + 1) }
+        [[unroll]] for (uint kk = 0; kk < BK / 16; ++kk) {
+            MAT(A_T, gl_MatrixUseA) ma[TM];
+            [[unroll]] for (uint i = 0; i < TM; ++i)
+                coopMatLoad(ma[i], shA[cur], (wm * WTM + i * 16) * STR_U + kk * (16 * EB / 4), STR_U, gl_CooperativeMatrixLayoutRowMajor);
+            [[unroll]] for (uint j = 0; j < TN; ++j) {
+                MAT(A_T, gl_MatrixUseB) mb;
+                coopMatLoad(mb, shB[cur], (wn * WTN + j * 16) * STR_U + kk * (16 * EB / 4), STR_U, gl_CooperativeMatrixLayoutColumnMajor);
+                [[unroll]] for (uint i = 0; i < TM; ++i) acc[j * TM + i] = coopMatMulAdd(ma[i], mb, acc[j * TM + i]);
+            }
+        }
+        if (kt + 1 < nk) { SSTORE(cur ^ 1) }
+        barrier();
+    }
+    [[unroll]] for (uint j = 0; j < TN; ++j)
+        [[unroll]] for (uint i = 0; i < TM; ++i)
+            coopMatStore(acc[j * TM + i], c, (n0 + wn * WTN + j * 16) * pc.M + m0 + wm * WTM + i * 16, pc.M, gl_CooperativeMatrixLayoutColumnMajor);
+}

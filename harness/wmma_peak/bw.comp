@@ -1,0 +1,28 @@
+#version 450
+#extension GL_EXT_control_flow_attributes : require
+// MODE_DRAM: grid-stride vec4 reads over a large buffer.
+// MODE_LDS : repeated vec4 reads from a 32 KiB shared array (conflict-free stride).
+layout(local_size_x = 256) in;
+layout(binding = 0) readonly buffer I { vec4 src[]; };
+layout(binding = 1) buffer O { vec4 dst[]; };
+layout(push_constant) uniform P { uint n_vec4; uint iters; } pc;
+#ifdef MODE_LDS
+shared vec4 sh[2048];
+#endif
+void main() {
+    vec4 s = vec4(0);
+    const uint gid = gl_GlobalInvocationID.x, tid = gl_LocalInvocationID.x;
+#ifdef MODE_DRAM
+    const uint stride = gl_NumWorkGroups.x * 256;
+    for (uint i = gid; i < pc.n_vec4; i += stride) s += src[i];
+#else
+    for (uint j = tid; j < 2048; j += 256) sh[j] = src[j];
+    barrier();
+    uint idx = tid;
+    for (uint it = 0; it < pc.iters; ++it) {
+        [[unroll]] for (uint u = 0; u < 8; ++u) { s += sh[idx]; idx = (idx + 256) & 2047u; }
+        idx = (idx + 1) & 2047u;
+    }
+#endif
+    if (s.x == 1.2345e-30) dst[gid] = s;
+}

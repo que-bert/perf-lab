@@ -1,0 +1,139 @@
+# P0.1/P0.2 wmma_peak, R9700 (Vulkan dev 1), RADV Mesa 26.0.8. harness/wmma_peak (m-fast tile order sweep).
+# Gate: f16 GEMM >=110 TF or s8 >=180 TOPS at both shapes.
+  guard: clean (mem_busy=1% load=6.52)
+Sun Sep 27 02:31:53 AM PDT 2026
+device 1: AMD Radeon AI PRO R9700 (RADV GFX1201) (driver 26.0.8)
+cooperative matrix properties (20):
+  16x16x16  A=fp8e4m3 B=fp8e4m3 C=f32 R=f32  scope=subgroup sat=0
+  16x16x16  A=fp8e4m3 B=fp8e5m2 C=f32 R=f32  scope=subgroup sat=0
+  16x16x16  A=fp8e5m2 B=fp8e4m3 C=f32 R=f32  scope=subgroup sat=0
+  16x16x16  A=fp8e5m2 B=fp8e5m2 C=f32 R=f32  scope=subgroup sat=0
+  16x16x16  A=u8 B=u8 C=u32 R=u32  scope=subgroup sat=0
+  16x16x16  A=u8 B=u8 C=s32 R=s32  scope=subgroup sat=0
+  16x16x16  A=u8 B=u8 C=s32 R=s32  scope=subgroup sat=1
+  16x16x16  A=u8 B=s8 C=u32 R=u32  scope=subgroup sat=0
+  16x16x16  A=u8 B=s8 C=s32 R=s32  scope=subgroup sat=0
+  16x16x16  A=u8 B=s8 C=s32 R=s32  scope=subgroup sat=1
+  16x16x16  A=s8 B=u8 C=u32 R=u32  scope=subgroup sat=0
+  16x16x16  A=s8 B=u8 C=s32 R=s32  scope=subgroup sat=0
+  16x16x16  A=s8 B=u8 C=s32 R=s32  scope=subgroup sat=1
+  16x16x16  A=s8 B=s8 C=u32 R=u32  scope=subgroup sat=0
+  16x16x16  A=s8 B=s8 C=s32 R=s32  scope=subgroup sat=0
+  16x16x16  A=s8 B=s8 C=s32 R=s32  scope=subgroup sat=1
+  16x16x16  A=f16 B=f16 C=f16 R=f16  scope=subgroup sat=0
+  16x16x16  A=bf16 B=bf16 C=bf16 R=bf16  scope=subgroup sat=0
+  16x16x16  A=f16 B=f16 C=f32 R=f32  scope=subgroup sat=0
+  16x16x16  A=bf16 B=bf16 C=f32 R=f32  scope=subgroup sat=0
+VK_EXT_shader_float8: yes
+peak f16       wave32 nacc=4 :    174.6 TFLOPS
+peak f16       wave32 nacc=8 :    178.7 TFLOPS
+peak f16       wave64 nacc=4 :    171.5 TFLOPS
+peak f16       wave64 nacc=8 :    183.7 TFLOPS
+peak f16acc16  wave32 nacc=4 :    111.2 TFLOPS
+peak f16acc16  wave32 nacc=8 :    114.2 TFLOPS
+peak f16acc16  wave64 nacc=4 :    135.0 TFLOPS
+peak f16acc16  wave64 nacc=8 :    134.1 TFLOPS
+peak s8        wave32 nacc=4 :    342.6 TOPS
+peak s8        wave32 nacc=8 :    356.3 TOPS
+peak s8        wave64 nacc=4 :    311.3 TOPS
+peak s8        wave64 nacc=8 :    334.9 TOPS
+peak fp8       wave32 nacc=4 :    368.9 TFLOPS
+peak fp8       wave32 nacc=8 :    371.0 TFLOPS
+peak fp8       wave64 nacc=4 :    324.0 TFLOPS
+peak fp8       wave64 nacc=8 :    344.1 TFLOPS
+lds read   groups=1024  : 12245.6 GB/s (81.4 B/clk/CU at 2.35 GHz)
+EXIT 0
+Sun Sep 27 02:31:58 AM PDT 2026
+(dram line above omitted: first run used 256 MiB-BAR host-visible memory = PCIe 26 GB/s; rerun with pure VRAM below)
+  guard: clean (mem_busy=1% load=3.30)
+Sun Sep 27 02:51:43 AM PDT 2026
+dram read  groups=512   :   640.7 GB/s
+dram read  groups=2048  :   640.6 GB/s
+dram read  groups=8192  :   640.6 GB/s
+lds read   groups=1024  : 12214.0 GB/s (81.2 B/clk/CU at 2.35 GHz)
+gemm f16 17408x512 x5120  tile=128x128 bk=32 wave32 warps=2x4 pad=0 :    48.8 TFLOPS  (1.870 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=32 wave32 warps=2x4 pad=2 :    61.1 TFLOPS  (1.493 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=32 wave32 warps=2x4 pad=4 :    56.1 TFLOPS  (1.628 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=64 wave32 warps=2x4 pad=0 :    28.4 TFLOPS  (3.214 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=32 wave64 warps=2x2 pad=0 :    56.1 TFLOPS  (1.627 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=32 wave64 warps=2x2 pad=2 :    58.1 TFLOPS  (1.570 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=32 wave64 warps=2x2 pad=4 :    59.8 TFLOPS  (1.527 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=64 wave64 warps=2x2 pad=0 :    42.2 TFLOPS  (2.162 ms)
+gemm f16 17408x512 x5120  tile=256x128 bk=32 wave32 warps=4x2 pad=0 :    47.7 TFLOPS  (1.915 ms)
+gemm f16 17408x512 x5120  tile=256x128 bk=32 wave32 warps=4x2 pad=2 :    47.1 TFLOPS  (1.936 ms)
+gemm f16 17408x512 x5120  tile=256x128 bk=32 wave32 warps=4x2 pad=4 :    47.4 TFLOPS  (1.927 ms)
+gemm f16 17408x512 x5120  tile=256x128 bk=32 wave64 warps=2x2 pad=0 :    49.8 TFLOPS  (1.831 ms)
+gemm f16 17408x512 x5120  tile=256x128 bk=32 wave64 warps=2x2 pad=2 :    48.3 TFLOPS  (1.891 ms)
+gemm f16 17408x512 x5120  tile=256x128 bk=32 wave64 warps=2x2 pad=4 :    48.4 TFLOPS  (1.886 ms)
+BEST gemm f16 17408x512x5120: tile=128x128 bk=32 wave32 pad=2 -> 61.1 TFLOPS
+gemm f16  4096x512 x14336 tile=128x128 bk=32 wave32 warps=2x4 pad=0 :    52.5 TFLOPS  (1.144 ms)
+gemm f16  4096x512 x14336 tile=128x128 bk=32 wave32 warps=2x4 pad=2 :    78.9 TFLOPS  (0.762 ms)
+gemm f16  4096x512 x14336 tile=128x128 bk=32 wave32 warps=2x4 pad=4 :    71.5 TFLOPS  (0.841 ms)
+gemm f16  4096x512 x14336 tile=128x128 bk=64 wave32 warps=2x4 pad=0 :    29.6 TFLOPS  (2.032 ms)
+gemm f16  4096x512 x14336 tile=128x128 bk=32 wave64 warps=2x2 pad=0 :    66.1 TFLOPS  (0.909 ms)
+gemm f16  4096x512 x14336 tile=128x128 bk=32 wave64 warps=2x2 pad=2 :    82.5 TFLOPS  (0.729 ms)
+gemm f16  4096x512 x14336 tile=128x128 bk=32 wave64 warps=2x2 pad=4 :    81.5 TFLOPS  (0.738 ms)
+gemm f16  4096x512 x14336 tile=128x128 bk=64 wave64 warps=2x2 pad=0 :    43.4 TFLOPS  (1.385 ms)
+gemm f16  4096x512 x14336 tile=256x128 bk=32 wave32 warps=4x2 pad=0 :    63.4 TFLOPS  (0.949 ms)
+gemm f16  4096x512 x14336 tile=256x128 bk=32 wave32 warps=4x2 pad=2 :    91.0 TFLOPS  (0.661 ms)
+gemm f16  4096x512 x14336 tile=256x128 bk=32 wave32 warps=4x2 pad=4 :    89.7 TFLOPS  (0.670 ms)
+gemm f16  4096x512 x14336 tile=256x128 bk=32 wave64 warps=2x2 pad=0 :    72.2 TFLOPS  (0.833 ms)
+gemm f16  4096x512 x14336 tile=256x128 bk=32 wave64 warps=2x2 pad=2 :   105.2 TFLOPS  (0.572 ms)
+gemm f16  4096x512 x14336 tile=256x128 bk=32 wave64 warps=2x2 pad=4 :   101.2 TFLOPS  (0.594 ms)
+BEST gemm f16 4096x512x14336: tile=256x128 bk=32 wave64 pad=2 -> 105.2 TFLOPS
+gemm s8  17408x512 x5120  tile=128x128 bk=32 wave32 warps=2x4 pad=0 :   111.8 TOPS  (0.816 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=32 wave32 warps=2x4 pad=2 :   105.5 TOPS  (0.865 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=32 wave32 warps=2x4 pad=4 :    89.1 TOPS  (1.024 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=64 wave32 warps=2x4 pad=0 :    91.7 TOPS  (0.995 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=64 wave32 warps=2x4 pad=2 :   111.0 TOPS  (0.822 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=64 wave32 warps=2x4 pad=4 :   113.8 TOPS  (0.802 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=32 wave64 warps=2x2 pad=0 :   110.1 TOPS  (0.829 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=32 wave64 warps=2x2 pad=2 :   104.8 TOPS  (0.871 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=32 wave64 warps=2x2 pad=4 :    87.4 TOPS  (1.044 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=64 wave64 warps=2x2 pad=0 :   107.0 TOPS  (0.853 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=64 wave64 warps=2x2 pad=2 :   111.3 TOPS  (0.820 ms)
+gemm s8  17408x512 x5120  tile=128x128 bk=64 wave64 warps=2x2 pad=4 :   106.6 TOPS  (0.856 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=32 wave32 warps=4x2 pad=0 :   102.6 TOPS  (0.890 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=32 wave32 warps=4x2 pad=2 :   102.2 TOPS  (0.893 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=32 wave32 warps=4x2 pad=4 :    79.7 TOPS  (1.146 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=64 wave32 warps=4x2 pad=0 :    85.9 TOPS  (1.063 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=64 wave32 warps=4x2 pad=2 :    94.1 TOPS  (0.970 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=64 wave32 warps=4x2 pad=4 :    92.4 TOPS  (0.988 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=32 wave64 warps=2x2 pad=0 :   100.8 TOPS  (0.906 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=32 wave64 warps=2x2 pad=2 :    98.0 TOPS  (0.932 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=32 wave64 warps=2x2 pad=4 :    77.7 TOPS  (1.175 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=64 wave64 warps=2x2 pad=0 :    94.0 TOPS  (0.970 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=64 wave64 warps=2x2 pad=2 :    92.4 TOPS  (0.988 ms)
+gemm s8  17408x512 x5120  tile=256x128 bk=64 wave64 warps=2x2 pad=4 :    92.1 TOPS  (0.991 ms)
+BEST gemm s8 17408x512x5120: tile=128x128 bk=64 wave32 pad=4 -> 113.8 TOPS
+gemm s8   4096x512 x14336 tile=128x128 bk=32 wave32 warps=2x4 pad=0 :   143.9 TOPS  (0.418 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=32 wave32 warps=2x4 pad=2 :   142.6 TOPS  (0.422 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=32 wave32 warps=2x4 pad=4 :   141.9 TOPS  (0.424 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=64 wave32 warps=2x4 pad=0 :   102.3 TOPS  (0.588 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=64 wave32 warps=2x4 pad=2 :   177.7 TOPS  (0.338 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=64 wave32 warps=2x4 pad=4 :   153.1 TOPS  (0.393 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=32 wave64 warps=2x2 pad=0 :   140.0 TOPS  (0.429 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=32 wave64 warps=2x2 pad=2 :   138.5 TOPS  (0.434 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=32 wave64 warps=2x2 pad=4 :   139.0 TOPS  (0.433 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=64 wave64 warps=2x2 pad=0 :   134.9 TOPS  (0.446 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=64 wave64 warps=2x2 pad=2 :   188.5 TOPS  (0.319 ms)
+gemm s8   4096x512 x14336 tile=128x128 bk=64 wave64 warps=2x2 pad=4 :   189.4 TOPS  (0.317 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=32 wave32 warps=4x2 pad=0 :   168.5 TOPS  (0.357 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=32 wave32 warps=4x2 pad=2 :   165.5 TOPS  (0.363 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=32 wave32 warps=4x2 pad=4 :   168.1 TOPS  (0.358 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=64 wave32 warps=4x2 pad=0 :   124.9 TOPS  (0.481 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=64 wave32 warps=4x2 pad=2 :   190.5 TOPS  (0.316 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=64 wave32 warps=4x2 pad=4 :   188.1 TOPS  (0.320 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=32 wave64 warps=2x2 pad=0 :   150.2 TOPS  (0.400 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=32 wave64 warps=2x2 pad=2 :   137.4 TOPS  (0.438 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=32 wave64 warps=2x2 pad=4 :   156.0 TOPS  (0.386 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=64 wave64 warps=2x2 pad=0 :   156.3 TOPS  (0.385 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=64 wave64 warps=2x2 pad=2 :   207.9 TOPS  (0.289 ms)
+gemm s8   4096x512 x14336 tile=256x128 bk=64 wave64 warps=2x2 pad=4 :   207.5 TOPS  (0.290 ms)
+BEST gemm s8 4096x512x14336: tile=256x128 bk=64 wave64 pad=2 -> 207.9 TOPS
+Sun Sep 27 03:01:51 AM PDT 2026
+
+[exited with code 0]
+
+verification: every config in the 17408 sweeps PASSED vs CPU reference at 512x256x512 (f16 max abs err 2.45e-5; s8 exact).
+PENDING: n-fast tile-order resweep (/tmp/claude-1000/wmma-sweep2.out) queued on gpu_lock at handback.
