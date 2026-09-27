@@ -3325,3 +3325,36 @@ P1>=1000, P2>=500 are not reachable: the q8 FA is dequant-bound (~15 TF; the
 only 2x is native f16 KV, forbidden), the GEMV is ~86% of peak, and the DRAM
 floor (46 ms = ~79 t/s) is not the limiter — the non-DRAM serial costs (drafts,
 masks, barriers, dequant) are.
+
+## CORRECTION: the "~45 t/s ceiling" and "no prefill lever" verdicts are withdrawn (2026-09-27)
+
+The verdicts above were limits of the kernels tried, not of the hardware. P0 of
+`docs/2026-09-26-r9700-kernel-rewrite-plan.md` measured the card directly
+(`harness/wmma_peak/`, `results/p0/`):
+
+| quantity | measured | old assumption |
+|---|---:|---|
+| coopmat f16→f32 (register-resident) | **184 TFLOPS** (wave64) | "~96 TFLOPS fp16 peak" (that is the VALU packed-f16 rate) |
+| coopmat s8→s32 | **356 TOPS** | not considered |
+| coopmat fp8→f32 | **371 TFLOPS** (`VK_EXT_shader_float8` exposed) | — |
+| DRAM read | 640.6 GB/s | 640 |
+| LDS-fed s8 GEMM 17408×512×5120 / 4096×512×14336 | **169 / 206 TOPS** | current q6_K kernel 55 TF |
+| LDS-fed f16 GEMM, same shapes | 101 / 105 TF | "f16 best case 69.8 TF" |
+
+- Prefill at depth 0 is 85% GEMM at 49–68 TFLOPS: a third of what a plain int8
+  LDS-fed GEMM reaches on the same card. Tile order matters: scheduling the N
+  tiles of one weight tile adjacently lifted 17408×512×5120 from 114 to 169 TOPS
+  (weight re-streaming from DRAM).
+- Prefill at depth 131k is 59% FA (49.7 ms/layer, ~33 TFLOPS). The q8→f16
+  scratch is only 1.5 ms/layer (2.9% of FA); the cost is the kernel (GQA not
+  packed at prefill, Br=16).
+- Decode 176k DRAM floor ≈ 53 ms/step (≈ 68 t/s); the q6_K GEMV is at 35.75 ms,
+  near its floor; the FA (28.7 ms vs ~10 ms floor) is the decode headroom.
+- The MMVQ "−7.7%" lead is withdrawn: it forced every weight type; q6_K MMVQ
+  alone is a measured loss (`ggml-vulkan.cpp:6522-6529`).
+- `VK_VALVE_shader_mixed_float_dot_product` is not exposed (no f16 dot2 in GLSL).
+- **Measurement hazard:** decode at depth is CPU-sensitive. With sibling
+  sessions' `go test` load (loadavg 13–18) 176k decode read 31.5 t/s vs 40.1 at
+  lower load, same build; prefill at 176k also dropped 357 → 310. gpu_guard only
+  samples at start; `harness/contam_mon.sh` logs load during a run. Compare A/B
+  only back-to-back in one quiet window.
