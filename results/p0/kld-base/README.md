@@ -11,5 +11,7 @@ Files are ~254 MB each and are not committed (header + int32 next tokens + fp16 
 |---|---|---|---|
 | base-d176000-b4.dkld | 176000 | 4 | f6aa1952c5ce9a7bf9e87e4677fa59b5d695f99284765ccf999dfb2cf52ce2c9 |
 | base-d70000-b4.dkld | 70000 | 4 | 2b8116229e53ee7878fe8d4342351a31d1b2d223680957d3a822e2efb50f6781 |
+| base-d176000-b1.dkld | 176000 | 1 | 923fb1cc0d1e8ec25d911921a646f0a2a545c101d1db7e1748c49039692f66d9 |
+| base-d70000-b1.dkld | 70000 | 1 | 57d1825836854d3e9768b0fe3525e131d37f23b56bdf8b22a9404fb94ad36576 |
 
-Missing files at time of writing are being re-recorded by a queued retry (guard refusals); append their rows when present.
+Self-check (base-d70000-b4 vs itself): mean KLD 0, 0/512 top-1 flips.
