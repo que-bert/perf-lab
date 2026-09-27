@@ -255,6 +255,37 @@ static void peak(Ctx & c, const std::string & type, uint32_t iters, uint32_t sg_
     free_buf(c, o);
 }
 
+// Prints, for each (type, use, load layout, wave size), which (row,col) each
+// invocation's m[i] holds, compressed to one line per lane.
+static void layout_probe(Ctx & c) {
+    Buf ih = make_buf(c, 512, true), ib = make_buf(c, 256, true), iff = make_buf(c, 1024, true), o = make_buf(c, 64 * 17 * 4, true);
+    for (int e = 0; e < 256; ++e) {
+        const float v = (float) e; uint32_t u; memcpy(&u, &v, 4);
+        const uint32_t s = (u >> 16) & 0x8000u, ex = ((u >> 23) & 0xFF) - 127 + 15, mt = (u >> 13) & 0x3FF;
+        ((uint16_t *) ih.p)[e] = e == 0 ? 0 : (uint16_t) (s | (ex << 10) | mt);
+        ((uint8_t *) ib.p)[e] = (uint8_t) e; ((float *) iff.p)[e] = v;
+    }
+    const char * tys[] = { "f16", "s8", "f32" };
+    const char * uses[] = { "gl_MatrixUseA", "gl_MatrixUseB", "gl_MatrixUseAccumulator" };
+    for (int ty = 0; ty < 3; ++ty) for (int u = 0; u < 3; ++u) for (uint32_t sg : {32u, 64u}) for (uint32_t cm : {0u, 1u}) {
+        if ((ty == 2) != (u == 2)) continue;
+        std::string defs = "-DCM=" + std::to_string(cm) + " -DTY=" + std::to_string(ty) + " -DUSE=" + uses[u] + " -DWG=" + std::to_string(sg);
+        Pipe P = make_pipe(c, "layout.comp", defs, 4, 4, sg);
+        bind(c, P, { &ih, &ib, &iff, &o });
+        memset(o.p, 0xFF, o.size);
+        run(c, P, &cm, 4, 1, 1, 1);
+        const int32_t * r = (const int32_t *) o.p;
+        printf("== %s %s wave%u %s: len=%d\n", tys[ty], uses[u], sg, cm ? "colmajor" : "rowmajor", r[0]);
+        for (uint32_t l = 0; l < sg; ++l) {
+            printf("  lane %2u:", l);
+            for (int i = 0; i < r[l * 17]; ++i) printf(" (%d,%d)", r[l * 17 + 1 + i] / 16, r[l * 17 + 1 + i] % 16);
+            printf("\n");
+        }
+        free_pipe(c, P);
+    }
+    free_buf(c, ih); free_buf(c, ib); free_buf(c, iff); free_buf(c, o);
+}
+
 static void bw(Ctx & c) {
     const size_t bytes = size_t(1) << 30;
     Buf src = make_buf(c, bytes), dst = make_buf(c, 64 << 20);
@@ -367,11 +398,11 @@ static double gemm(Ctx & c, const GemmCfg & g, uint32_t M, uint32_t N, uint32_t 
 int main(int argc, char ** argv) {
     bool nfast = true;
     int dev = 1; std::string type, gemm_t; uint32_t iters = 4096, M = 17408, N = 512, K = 5120, bm = 128, bn = 128, bk = 32, sg = 0, pad = 4;
-    bool do_bw = false, sweep = false, verify = false;
+    bool do_bw = false, sweep = false, verify = false, do_layout = false;
     for (int i = 1; i < argc; ++i) {
         std::string a = argv[i]; auto nx = [&]() { return std::string(argv[++i]); };
         if (a == "--device") dev = std::stoi(nx()); else if (a == "--type") type = nx(); else if (a == "--iters") iters = std::stoul(nx());
-        else if (a == "--bw") do_bw = true; else if (a == "--gemm") gemm_t = nx();
+        else if (a == "--bw") do_bw = true; else if (a == "--layout") do_layout = true; else if (a == "--gemm") gemm_t = nx();
         else if (a == "--m") M = std::stoul(nx()); else if (a == "--n") N = std::stoul(nx()); else if (a == "--k") K = std::stoul(nx());
         else if (a == "--tile") { std::string t = nx(); sscanf(t.c_str(), "%ux%u", &bm, &bn); }
         else if (a == "--bk") bk = std::stoul(nx()); else if (a == "--sg") sg = std::stoul(nx()); else if (a == "--pad") pad = std::stoul(nx());
@@ -386,6 +417,7 @@ int main(int argc, char ** argv) {
     Ctx c; init(c, dev);
     if (!type.empty()) peak(c, type, iters, sg);
     if (do_bw) bw(c);
+    if (do_layout) layout_probe(c);
     if (!gemm_t.empty()) {
         const bool s8 = gemm_t == "s8";
         if (!sweep) {

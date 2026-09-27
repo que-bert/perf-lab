@@ -1,0 +1,36 @@
+#version 450
+// Coopmat element->(row,col) layout probe: loads a 16x16 matrix whose element
+// (r,c) holds r*16+c and writes m[i] per invocation. See wmma_peak --layout.
+#extension GL_KHR_cooperative_matrix : require
+#extension GL_KHR_memory_scope_semantics : require
+#extension GL_EXT_shader_explicit_arithmetic_types : require
+#extension GL_EXT_shader_16bit_storage : require
+#extension GL_EXT_shader_8bit_storage : require
+layout(local_size_x = WG) in;
+layout(binding = 0) readonly buffer IH { float16_t ih[]; };
+layout(binding = 1) readonly buffer IB { int8_t ib[]; };
+layout(binding = 2) readonly buffer IF { float iff[]; };
+layout(binding = 3) writeonly buffer O { int o[]; };
+layout(push_constant) uniform PC { uint colmajor; } pc;
+void main() {
+    const uint inv = gl_LocalInvocationID.x;
+    const int lay = CM != 0 ? gl_CooperativeMatrixLayoutColumnMajor : gl_CooperativeMatrixLayoutRowMajor;
+#if TY == 0
+    coopmat<float16_t, gl_ScopeSubgroup, 16, 16, USE> m;
+    coopMatLoad(m, ih, 0, 16, lay);
+#elif TY == 1
+    coopmat<int8_t, gl_ScopeSubgroup, 16, 16, USE> m;
+    coopMatLoad(m, ib, 0, 16, lay);
+#else
+    coopmat<float, gl_ScopeSubgroup, 16, 16, USE> m;
+    coopMatLoad(m, iff, 0, 16, lay);
+#endif
+    o[inv * 17] = m.length();
+    for (int i = 0; i < m.length(); ++i) {
+#if TY == 1
+        o[inv * 17 + 1 + i] = int(m[i]) & 0xFF;
+#else
+        o[inv * 17 + 1 + i] = int(m[i]);
+#endif
+    }
+}

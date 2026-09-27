@@ -3358,3 +3358,55 @@ The verdicts above were limits of the kernels tried, not of the hardware. P0 of
   lower load, same build; prefill at 176k also dropped 357 → 310. gpu_guard only
   samples at start; `harness/contam_mon.sh` logs load during a run. Compare A/B
   only back-to-back in one quiet window.
+
+## Kernel rewrite results, fork branch `r9700-integrate` @ dfb7b9f30 (2026-09-27)
+
+Merged: prefill FA (`r9700-p2-prefa`), Q6_K f16-WMMA GEMM (`r9700-p1-gemm`),
+no-ReBAR memory fix + small ops (`r9700-p5-smallops`), decode FA q8r
+(`r9700-p3-decodefa`), decode-kld tool (`r9700-p0-tools`). All A/Bs are
+back-to-back vs `26bd56621` at low load.
+
+| metric | 26bd56621 | integrate | change |
+|---|---:|---:|---:|
+| pp2048 @ d0 | 975 | **1,389** | +42% |
+| pp2048 @ d16384 | 803 | **1,138** | +42% |
+| pp512 @ d131072 (FA+GEMM only, before small-ops merge) | 378 | 436 | +15% |
+| mmproj encode, 1024² image, ctx 262144 | 1,433 ms | **257 ms** | 5.6× |
+| decode ~70k / ~176k (decode-FA branch alone) | 47.1 / 41.3 | **49.3 / 46.6** | +5% / +13% |
+| decode ~70k / ~176k (full integrate) | 46.6 / 41.1 | 47.1 / 43.1 | acceptance changed, see below |
+| PPL (4096×8) | 2.2881 | 2.2881 | 0 |
+| decode KLD @176k, batch 4 / 1 | — | 0.00027 / 0.00019 mean; 0 / 1 flips of 512 | pass |
+
+Correctness: MUL_MAT 1147/1147, FA `hsk=256,` 183/183, CONCAT 201/201,
+RMS_NORM 51/51. The unfiltered FA suite SIGFPEs inside RADV's compiler on a
+pre-existing hsk=320 case on the baseline too — use `-p` filters.
+
+Per-component:
+- **Prefill FA** (`flash_attn_prefill_rdna4.comp`): GQA-packed rows, one WG per
+  (KV head, 16 positions), f16 scratch tiles in LDS, O in coopmat accumulators.
+  Isolated N=512 KV=131584: 50.9 TF (was 27.5). Target 100 TF not reached.
+- **Q6_K GEMM** (`mul_mm_q6k_rdna4_f16.comp`): Q6_K→f16 with d·sc folded at the
+  global→LDS load, f16 WMMA f32-acc over all K, 128×128 BK32 wave64,
+  single-buffered LDS, n-fast order. 81 TF at 17408×5120 (was 54). The int8
+  variant with a per-32 epilogue topped out at 61 TF (epilogue + occupancy).
+- **No-ReBAR fix**: DEVICE_LOCAL|HOST_VISIBLE is requested first; without
+  ReBAR that heap is the 256 MiB BAR, so the 248 MiB clip compute buffer spilled
+  to GTT and every encoder op ran over PCIe (~30 GB/s). Now auto-disabled when
+  the host-visible device heap is < half the device heap.
+- **Decode FA q8r** (`flash_attn_decode_q8r.comp`): q8_0 K/V loaded to
+  registers, dequantized there, assigned element-wise into coopmat B operands
+  (RADV gfx12 lane mapping probed and documented in the shader). nb=4
+  kv=183296 in the server's interleaved layout: 933 µs vs 1,613 (cm1).
+  `VK_VALVE_shader_mixed_float_dot_product` is not exposed (no f16 dot2).
+- **Decode profile @176k** (per ~94 ms step): q6_K GEMV 43 ms incl. draft
+  lm_head (~89% of DRAM; P4 closed), verify FA 25 ms (now ~15), draft FA 3.6,
+  other GPU ~12, and **~10 ms with no GPU work** (CPU/launch) — a lever the
+  2026-09-26 "TG-3 dead" verdict missed.
+
+**Open: MTP acceptance on the repeated-paragraph prompt moved** with the full
+merge (0.7629/0.881 → 0.722/0.796; with the new GEMM disabled 0.742/0.781). The
+decode-FA branch alone keeps it exact, so the change comes from the prefill FA
+and/or small-op numerics. PPL and decode KLD are unchanged, so this looks like
+trajectory sensitivity of a single 256-token greedy run on a degenerate prompt,
+**not verified**: acceptance must be measured on the code corpus and several
+prompts before `r9700-integrate` replaces the serving build.

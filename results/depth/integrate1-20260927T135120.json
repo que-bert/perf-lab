@@ -1,0 +1,92 @@
+[
+  {
+    "label": "~70k",
+    "reps_requested": 1600,
+    "prompt_n": 4,
+    "decode_mean": 46.76,
+    "decode_steady_mean": 47.085,
+    "decode_steady_min": 47.082,
+    "decode_steady_max": 47.088,
+    "decode_spread_pct": 0.01,
+    "prefill": 791.4010367245497,
+    "accept_frac": 0.722,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 46.11139862924374,
+        "prefill": 791.4010367245497,
+        "prompt_n": 72489,
+        "accepted": 174,
+        "drafted": 241,
+        "wall": 97.31491255760193
+      },
+      {
+        "rep": 1,
+        "decode": 47.08759529929153,
+        "prefill": 8.762878693279529,
+        "prompt_n": 4,
+        "accepted": 174,
+        "drafted": 241,
+        "wall": 5.998785734176636
+      },
+      {
+        "rep": 2,
+        "decode": 47.08221366905598,
+        "prefill": 8.774566042868143,
+        "prompt_n": 4,
+        "accepted": 174,
+        "drafted": 241,
+        "wall": 5.997047662734985
+      }
+    ],
+    "prefill_mean": 269.6,
+    "prefill_min": 8.8,
+    "prefill_max": 791.4,
+    "prefill_spread_pct": 290.25
+  },
+  {
+    "label": "~176k",
+    "reps_requested": 4000,
+    "prompt_n": 4,
+    "decode_mean": 42.988,
+    "decode_steady_mean": 43.116,
+    "decode_steady_min": 43.088,
+    "decode_steady_max": 43.145,
+    "decode_spread_pct": 0.13,
+    "prefill": 367.70860179912484,
+    "accept_frac": 0.7956,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 42.73038084834385,
+        "prefill": 367.70860179912484,
+        "prompt_n": 182889,
+        "accepted": 179,
+        "drafted": 225,
+        "wall": 503.65781712532043
+      },
+      {
+        "rep": 1,
+        "decode": 43.14476252192134,
+        "prefill": 4.648146900034629,
+        "prompt_n": 4,
+        "accepted": 179,
+        "drafted": 225,
+        "wall": 7.082820177078247
+      },
+      {
+        "rep": 2,
+        "decode": 43.087920309989705,
+        "prefill": 4.7176264677715345,
+        "prompt_n": 4,
+        "accepted": 179,
+        "drafted": 225,
+        "wall": 7.074803829193115
+      }
+    ],
+    "prefill_mean": 125.7,
+    "prefill_min": 4.6,
+    "prefill_max": 367.7,
+    "prefill_spread_pct": 288.85
+  }
+]
