@@ -3430,3 +3430,72 @@ depth runs agree: at ~168k tokens integrate's continuation is the same code as
 base's with slightly different wording (`results/depth/txt-*.json`). Rule: judge
 acceptance pooled over ≥ 10 prompts, never on one trajectory. `depth.py` now
 saves each response's text in its JSON.
+
+## Rev 3 kernel round: `r9700-integrate2` @ 2d2be1961 is the serving build (2026-09-28)
+
+`r9700-qwen` fast-forwarded to `r9700-integrate2`; the old serving commit is tagged
+`r9700-qwen-pre-rewrite` (= `26bd56621`). All numbers are one quiet window
+(loadavg < 2), back to back, fixed serving config; raw output
+`results/p0/final-integrate2-20260928.txt`.
+
+| metric | 26bd56621 | integrate dfb7b9f30 | **integrate2** | vs 26bd56621 |
+|---|---:|---:|---:|---:|
+| pp2048 @ d0 | 978 | 1,370 | **1,507** | +54% |
+| pp2048 @ d16384 | 791 | 1,125 | **1,321** | +67% |
+| pp512 @ d131072 | 378 | 503 | **712** | +88% |
+| decode ~70k (depth.sh, 3 reps) | 47.04 | 46.14 | **49.48** (49.48 repeat) | +5.2% |
+| decode ~176k | 41.54 | 41.74 | **46.79** (46.74 repeat) | +12.6% |
+| pooled MTP acceptance, 15 corpus prompts | 0.7150 | 0.7177 | 0.7058 | −0.009 |
+
+Acceptance: the whole −0.009 is one prompt (#11: 159/286 → 149/316); the other
+14 pool to 0.7286 vs 0.7279. Gate (±0.01) passes. Numerics: PPL 2.2879 (base
+2.2881); decode KLD 70k b4/b1 0.00108/0.00086 (flips 0.39%/0.20%), 176k b4/b1
+0.00022/0.00016 (0%/0.20%). Tests: MUL_MAT 1147, MUL_MAT_VEC_FUSION 1271,
+RMS_NORM 51, SCALE 4, RMS_NORM_SCALE 16, CPY 252, CONCAT 201, GET_ROWS 240,
+FA (`-p hsk=256,`) 183 — all pass.
+
+What each task delivered (fork branches, each with env kill switches):
+
+- **R2 Q6_K GEMM** (`r9700-r2-gemm` b7abb209b, `r9700-r2d-glu` 8b3f39d2e): split-K
+  for small tile grids (ffn_down 71→80 TF, m=1024 40→65), unconditional
+  loads in the parity path, 128×256 tiles, and a fused FFN gate+up+swiglu GEMM
+  (removes GLU and both f32 intermediates, +2.2%). Headline 17408×512×5120 ends
+  at ~86 TF (target 90/95 missed). DIAG ablation: skipping global loads reaches
+  only ~90 TF, dequant is ~3 TF, LDS bank conflicts are 2–3-way and padding them
+  away was −0.7%. Not built: Q6_K repack at load (every weight reader changes;
+  dequant isn't the limiter), BK=64 (bounded by ~90 TF). Double-buffered and
+  256×128 variants measured slower (kept opt-in).
+- **R3 prefill FA** (`flash_attn_prefill_rdna4_rs.comp`, a06e3de0f): 49.5 → **79.3 TF**
+  isolated. Three causes, in order of size: (1) an **LDS bank conflict** in the
+  V-transpose staging stores (all 32 lanes on one bank, 8–16-way) — lane remap
+  +16%; (2) **ACO serialises "prefetch" written as `x=0; if (ok) x=load`**: it
+  emits `s_wait_loadcnt 0` straight after the load because the else-write aliases
+  the destination; unconditional loads with clamped indices +21%; (3) QK(j+1)
+  interleaved with PV(j) to hide the dependent WMMA chain +13%. Softmax in
+  registers (via the probed gfx12 accumulator layout) was −2.6% on its own — the
+  S round trip through LDS was not a limiter.
+- **R4 decode FA** (q8r/q8w, 9da1bc3b9): nb=4 kv=183296 920 → **723 µs/layer**
+  (DRAM floor ~620), nb=1 754 → 700. The largest piece was the same ACO pattern:
+  the mask load sat behind 64 V loads under a branch; moving it up and making it
+  unconditional 920 → 781. Then 2 WGs per CU instead of 512 WGs (split-K
+  partials 125 → 32 splits), and q8w (8 waves × 32 d, 192 VGPRs) for the 1-row
+  draft shape.
+- **R5 decode host time** (94c753bb4): the KQ mask was refilled over all ~176k
+  cells every decode (0.35–0.5 ms each, ~2.5 ms/step). Incremental fill (only
+  changed cells and new columns; `LLAMA_KQ_MASK_VERIFY=1` byte-checks it) −2.1
+  ms host/step, bit-identical output. Async input upload measured slower (opt-in);
+  a second graph-cache slot is worth ≤0.35 ms (not built).
+- **R6 decode small ops** (2d8f1be06): non-GEMV, non-FA GPU work in the verify
+  graph is **~6 ms/step, not 12** (~1,300 dispatches of 3–7 µs). Wider f32
+  mat-vec for m=48 −0.1 ms. RMS_NORM→SCALE fusion built but inactive (graph
+  reorder separates the pair). Remaining levers: GDN state gather+CPY ~1.2 ms,
+  5120-wide RMS_NORM_MUL 0.78 ms, dispatch count.
+- **R7 GPU-resident MTP draft chain** (`r9700-r5-decodehost` 2fc6d40aa, opt-in
+  `LLAMA_MTP_GPU_CHAIN=1`, not merged): identical drafts, but 12.3 vs 11.1 ms per
+  draft phase — `token_embd` lives in host memory, so every step still splits
+  GPU→CPU→GPU. It needs ~1 GB of token embeddings on the GPU; peak VRAM while
+  serving is **32,581 of 32,624 MiB**, so that is closed at this ctx.
+
+Rules learned: check ISA for `s_wait_loadcnt 0` directly after a prefetch in
+any RDNA4 shader; compute LDS bank mapping for staging stores before tuning
+anything else; judge MTP acceptance pooled over ≥ 10 prompts.
