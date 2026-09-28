@@ -2,7 +2,7 @@
 #extension GL_EXT_control_flow_attributes : require
 // Tiled GEMM: C[n][m] (m contiguous) = sum_k A[m][k] * B[n][k]  (both K-contiguous, like ggml).
 // Tiles staged global -> LDS (double-buffered, one barrier per K step) -> coopMatLoad.
-// Defines: S8 (int8->int32, else f16->f32), BM BN BK, WM_WARPS WN_WARPS, SG, PAD_U (LDS row pad in uint32s).
+// Defines: SINGLE_BUF (one LDS buffer, two barriers per K step; lets BK=64 f16 fit with pad), S8 (int8->int32, else f16->f32), BM BN BK, WM_WARPS WN_WARPS, SG, PAD_U (LDS row pad in uint32s).
 #extension GL_KHR_cooperative_matrix : require
 #extension GL_KHR_memory_scope_semantics : require
 #extension GL_EXT_shader_explicit_arithmetic_types : require
@@ -30,8 +30,13 @@ layout(push_constant) uniform P { uint M; uint N; uint K; } pc;
 #define B_V (BN * ROW_V)
 #define A_PER ((A_V + NT - 1) / NT)
 #define B_PER ((B_V + NT - 1) / NT)
-shared uint shA[2][BM * STR_U];
-shared uint shB[2][BN * STR_U];
+#ifdef SINGLE_BUF
+#define NBUF 1
+#else
+#define NBUF 2
+#endif
+shared uint shA[NBUF][BM * STR_U];
+shared uint shB[NBUF][BN * STR_U];
 
 #define WTM (BM / WM_WARPS)
 #define WTN (BN / WN_WARPS)
@@ -69,7 +74,11 @@ void main() {
     SSTORE(0)
     barrier();
     for (uint kt = 0; kt < nk; ++kt) {
+#ifdef SINGLE_BUF
+        const uint cur = 0;
+#else
         const uint cur = kt & 1;
+#endif
         if (kt + 1 < nk) { GLOAD(kt + 1) }
         [[unroll]] for (uint kk = 0; kk < BK / 16; ++kk) {
             MAT(A_T, gl_MatrixUseA) ma[TM];
@@ -81,7 +90,12 @@ void main() {
                 [[unroll]] for (uint i = 0; i < TM; ++i) acc[j * TM + i] = coopMatMulAdd(ma[i], mb, acc[j * TM + i]);
             }
         }
+#ifdef SINGLE_BUF
+        barrier();
+        if (kt + 1 < nk) { SSTORE(0) }
+#else
         if (kt + 1 < nk) { SSTORE(cur ^ 1) }
+#endif
         barrier();
     }
     [[unroll]] for (uint j = 0; j < TN; ++j)

@@ -1,0 +1,209 @@
+#version 450
+#extension GL_EXT_control_flow_attributes : require
+// s8 x s8 -> int32 WMMA GEMM with a Q6_K-shaped epilogue (plan v2 P0 (a)).
+//   out[n][m] = sum_blk256 d[m][blk] * sa[n][blk] * sum_j16 sc[m][j] * sum_k q[m][k] * a[n][k]
+// Weights are the coopmat B operand (columns = weight rows m) so every lane's accumulator
+// elements share one m column (RDNA4 layout: lane owns column lane%16): the per-16 sub-scale
+// is then ONE value per lane per 16x16 tile, and the epilogue is one integer mad per element.
+// Activations (s8, one f32 scale per row per 256-K block) are the A operand (rows = tokens).
+// Defines: BW (weight rows / tile), BT (tokens / tile), BK (16..256, divides 256), WW_WARPS,
+//   WT_WARPS, SG, PAD_U (LDS row pad, uint32s), N_FAST (token tiles vary fastest),
+//   EPI 0 = no sub-scale (d*sa per 256 only: the ceiling for a requantised per-256 format)
+//   EPI 1 = per-16 integer sub-scale mad into an int32 per-super-block accumulator
+//   EPI 3 = EPI 1 through s_mad24 (24-bit signed mad; |t| < 2^17, |s| <= 128)
+//   EPI 4 = timing-only emulation of the exact hi/lo two-plane split (2 WMMAs, no per-16 VALU); var "dual"
+//   EPI 2 = per-16 float epilogue (cvt + fma into an f32 per-super-block accumulator)
+//   Q6K   = weights read from real 210-byte block_q6_K (ql[128] qh[64] scales[16] d) and
+//           unpacked 6-bit -> s8 while staging to LDS; otherwise pre-expanded s8 + separate arrays.
+// No per-lane conditional loads: next-tile loads are clamped, never predicated.
+#extension GL_KHR_cooperative_matrix : require
+#extension GL_KHR_memory_scope_semantics : require
+#extension GL_EXT_shader_explicit_arithmetic_types : require
+#extension GL_KHR_shader_subgroup_basic : require
+#if EPI == 3
+// SPIR-V has no 24-bit multiply; OpenCL.std s_mad24 reaches NIR as imul24 -> v_mad_i32_i24 (full rate).
+// Plain int multiply compiles to quarter-rate v_mul_lo_u32 (see the EPI 1 ISA).
+#extension GL_EXT_spirv_intrinsics : require
+spirv_instruction(set = "OpenCL.std", id = 167) int smad24(int a, int b, int c);
+#endif
+#define NT (WT_WARPS * WW_WARPS * SG)
+layout(local_size_x = NT) in;
+layout(binding = 0) readonly buffer ACT { uvec4 act[]; };     // s8 [N][K]
+layout(binding = 1) readonly buffer W4 { uvec4 w4[]; };       // s8 [M][K]           (!Q6K)
+layout(binding = 2) readonly buffer WU { uint wu[]; };        // s8 sc [M][K/16] (!Q6K) | block_q6_K [M][K/256] (Q6K)
+layout(binding = 3) readonly buffer DD { float16_t dd[]; };   // f16 d [M][K/256]    (!Q6K)
+layout(binding = 4) readonly buffer SA { float sa[]; };       // f32 [N][K/256]
+layout(binding = 5) writeonly buffer O { float o[]; };        // f32 [N][M]
+layout(push_constant) uniform P { uint M; uint N; uint K; } pc;
+
+#define ROW_U (BK / 4)
+#define STR_U (ROW_U + PAD_U)
+#define ROW_V (BK / 16)
+#define T_V (BT * ROW_V)
+#define W_V (BW * ROW_V)
+#define T_PER (T_V / NT)
+#define W_PER (W_V / NT)
+#if (T_V % NT) != 0 || (W_V % NT) != 0
+#error tile uvec4 count must divide the workgroup size
+#endif
+shared uint shT[2][BT * STR_U];
+shared uint shW[2][BW * STR_U];
+shared int shS[2][BW * ROW_V];                               // sub-scales [wrow][kk]
+
+#define WTT (BT / WT_WARPS)
+#define WTW (BW / WW_WARPS)
+#define TT (WTT / 16)
+#define TW (WTW / 16)
+#define LEN (256 / SG)
+#define MAT(T, U) coopmat<T, gl_ScopeSubgroup, 16, 16, U>
+
+void main() {
+    const uint tid = gl_LocalInvocationID.x;
+    const uint warp = gl_SubgroupID;
+    const uint wt = warp % WT_WARPS, ww = warp / WT_WARPS;
+#ifdef N_FAST
+    const uint t0 = gl_WorkGroupID.x * BT, w0 = gl_WorkGroupID.y * BW;
+#else
+    const uint w0 = gl_WorkGroupID.x * BW, t0 = gl_WorkGroupID.y * BT;
+#endif
+    const uint kv = pc.K / 16, nsb = pc.K / 256;
+
+    // accumulator element -> (row, col) map, read back from the driver's own layout
+    for (uint x = tid; x < 256; x += NT) shT[0][x] = x;
+    barrier();
+    MAT(int32_t, gl_MatrixUseAccumulator) probe;
+    coopMatLoad(probe, shT[0], 0, 16, gl_CooperativeMatrixLayoutRowMajor);
+    uint rowOf[LEN];
+    [[unroll]] for (uint e = 0; e < LEN; ++e) rowOf[e] = uint(probe[e]) >> 4;
+    const uint mycol = uint(probe[0]) & 15u;
+    barrier();
+
+    MAT(float, gl_MatrixUseAccumulator) facc[TT * TW];
+    [[unroll]] for (uint i = 0; i < TT * TW; ++i) facc[i] = MAT(float, gl_MatrixUseAccumulator)(0.0);
+#if EPI == 2
+    MAT(float, gl_MatrixUseAccumulator) acc[TT * TW];
+    [[unroll]] for (uint i = 0; i < TT * TW; ++i) acc[i] = MAT(float, gl_MatrixUseAccumulator)(0.0);
+#else
+    MAT(int32_t, gl_MatrixUseAccumulator) acc[TT * TW];
+    [[unroll]] for (uint i = 0; i < TT * TW; ++i) acc[i] = MAT(int32_t, gl_MatrixUseAccumulator)(0);
+#endif
+#if EPI == 4
+    MAT(int32_t, gl_MatrixUseAccumulator) acc2[TT * TW];
+    [[unroll]] for (uint i = 0; i < TT * TW; ++i) acc2[i] = MAT(int32_t, gl_MatrixUseAccumulator)(0);
+#endif
+    const MAT(int32_t, gl_MatrixUseAccumulator) zero = MAT(int32_t, gl_MatrixUseAccumulator)(0);
+
+    uvec4 rt[T_PER], rw[W_PER];
+    int rs[W_PER];
+
+#define GLOAD_T(kt) \
+    [[unroll]] for (uint i = 0; i < T_PER; ++i) { uint v = tid + i * NT; uint r = v / ROW_V, c = v % ROW_V; rt[i] = act[(t0 + r) * kv + (kt) * ROW_V + c]; }
+#ifndef Q6K
+#define GLOAD_W(kt) \
+    [[unroll]] for (uint i = 0; i < W_PER; ++i) { uint v = tid + i * NT; uint r = v / ROW_V, c = v % ROW_V; \
+        uint g = (w0 + r) * kv + (kt) * ROW_V + c; rw[i] = w4[g]; rs[i] = bitfieldExtract(int(wu[g >> 2]), int(g & 3u) * 8, 8); }
+#else
+    // 16 consecutive values of one sub-block: ql 16 B + qh 16 B, 2-byte aligned (210-byte blocks),
+    // read as 5 aligned dwords each and funnel-shifted by 0 or 16 bits.
+#define GLOAD_W(kt) \
+    [[unroll]] for (uint i = 0; i < W_PER; ++i) { uint v = tid + i * NT; uint r = v / ROW_V, c = v % ROW_V; \
+        uint k = (kt) * BK + c * 16; uint v0 = k & 255u, hf = v0 >> 7, q = (v0 >> 5) & 3u, l0 = v0 & 31u; \
+        uint base = ((w0 + r) * nsb + (k >> 8)) * 210u; \
+        uint la = base + hf * 64u + (q & 1u) * 32u + l0, ha = base + 128u + hf * 32u + l0; \
+        uint li = la >> 2, hi = ha >> 2; bool sh = (base & 2u) != 0u; \
+        uint L0 = wu[li], L1 = wu[li + 1], L2 = wu[li + 2], L3 = wu[li + 3], L4 = wu[li + 4]; \
+        uint H0 = wu[hi], H1 = wu[hi + 1], H2 = wu[hi + 2], H3 = wu[hi + 3], H4 = wu[hi + 4]; \
+        uvec4 ql = sh ? uvec4((L0 >> 16) | (L1 << 16), (L1 >> 16) | (L2 << 16), (L2 >> 16) | (L3 << 16), (L3 >> 16) | (L4 << 16)) : uvec4(L0, L1, L2, L3); \
+        uvec4 qh = sh ? uvec4((H0 >> 16) | (H1 << 16), (H1 >> 16) | (H2 << 16), (H2 >> 16) | (H3 << 16), (H3 >> 16) | (H4 << 16)) : uvec4(H0, H1, H2, H3); \
+        uvec4 x = ((ql >> (4u * (q >> 1))) & 0x0F0F0F0Fu) | (((qh >> (2u * q)) & 0x03030303u) << 4); \
+        rw[i] = ((x | 0x80808080u) - 0x20202020u) ^ 0x80808080u; \
+        uint sa_ = base + 192u + (v0 >> 4); rs[i] = bitfieldExtract(int(wu[sa_ >> 2]), int(sa_ & 3u) * 8, 8); }
+#endif
+    // LDS staging. Row stride STR_U dwords; a 64-lane b128 store covers 64/ROW_V rows.
+#define SSTORE(buf) \
+    [[unroll]] for (uint i = 0; i < T_PER; ++i) { uint v = tid + i * NT; uint r = v / ROW_V, c = v % ROW_V; uint o_ = r * STR_U + c * 4; \
+        shT[buf][o_] = rt[i].x; shT[buf][o_ + 1] = rt[i].y; shT[buf][o_ + 2] = rt[i].z; shT[buf][o_ + 3] = rt[i].w; } \
+    [[unroll]] for (uint i = 0; i < W_PER; ++i) { uint v = tid + i * NT; uint r = v / ROW_V, c = v % ROW_V; uint o_ = r * STR_U + c * 4; \
+        shW[buf][o_] = rw[i].x; shW[buf][o_ + 1] = rw[i].y; shW[buf][o_ + 2] = rw[i].z; shW[buf][o_ + 3] = rw[i].w; shS[buf][v] = rs[i]; }
+
+    const uint nk = pc.K / BK;
+    GLOAD_T(0) GLOAD_W(0)
+    SSTORE(0)
+    barrier();
+    for (uint kt = 0; kt < nk; ++kt) {
+        const uint cur = kt & 1;
+        const uint kn = min(kt + 1, nk - 1);           // clamped, unconditional prefetch
+        GLOAD_T(kn) GLOAD_W(kn)
+        [[unroll]] for (uint kk = 0; kk < BK / 16; ++kk) {
+            MAT(int8_t, gl_MatrixUseA) ma[TT];
+            [[unroll]] for (uint i = 0; i < TT; ++i)
+                coopMatLoad(ma[i], shT[cur], (wt * WTT + i * 16) * STR_U + kk * 4, STR_U, gl_CooperativeMatrixLayoutRowMajor);
+            [[unroll]] for (uint j = 0; j < TW; ++j) {
+                MAT(int8_t, gl_MatrixUseB) mb;
+                coopMatLoad(mb, shW[cur], (ww * WTW + j * 16) * STR_U + kk * 4, STR_U, gl_CooperativeMatrixLayoutColumnMajor);
+#if EPI == 0
+                [[unroll]] for (uint i = 0; i < TT; ++i) acc[j * TT + i] = coopMatMulAdd(ma[i], mb, acc[j * TT + i]);
+#elif EPI == 4
+                // TIMING-ONLY emulation of the exact hi/lo split (w' = sc*q = 128*hi + lo, two s8 planes):
+                // second B plane loaded from a neighbouring LDS column, two WMMAs, no per-16 VALU. Not verified.
+                MAT(int8_t, gl_MatrixUseB) mb2;
+                coopMatLoad(mb2, shW[cur], (ww * WTW + j * 16) * STR_U + (kk ^ 1u) * 4, STR_U, gl_CooperativeMatrixLayoutColumnMajor);
+                [[unroll]] for (uint i = 0; i < TT; ++i) {
+                    acc[j * TT + i] = coopMatMulAdd(ma[i], mb, acc[j * TT + i]);
+                    acc2[j * TT + i] = coopMatMulAdd(ma[i], mb2, acc2[j * TT + i]);
+                }
+#else
+                const int s = shS[cur][(ww * WTW + j * 16 + mycol) * ROW_V + kk];
+#if EPI == 2
+                const float sf = float(s);
+#endif
+                [[unroll]] for (uint i = 0; i < TT; ++i) {
+                    MAT(int32_t, gl_MatrixUseAccumulator) t = coopMatMulAdd(ma[i], mb, zero);
+                    [[unroll]] for (uint e = 0; e < LEN; ++e)
+#if EPI == 1
+                        acc[j * TT + i][e] += t[e] * s;
+#elif EPI == 3
+                        acc[j * TT + i][e] = smad24(t[e], s, acc[j * TT + i][e]);
+#else
+                        acc[j * TT + i][e] = fma(float(t[e]), sf, acc[j * TT + i][e]);
+#endif
+                }
+#endif
+            }
+        }
+        if (((kt + 1) * BK) % 256 == 0) {               // super-block boundary: to float, once per 256 K
+            const uint blk = (kt * BK) >> 8;
+            float sv[TT * LEN];
+            [[unroll]] for (uint i = 0; i < TT; ++i)
+                [[unroll]] for (uint e = 0; e < LEN; ++e) sv[i * LEN + e] = sa[(t0 + wt * WTT + i * 16 + rowOf[e]) * nsb + blk];
+            [[unroll]] for (uint j = 0; j < TW; ++j) {
+                const uint m = w0 + ww * WTW + j * 16 + mycol;
+#ifndef Q6K
+                const float dj = float(dd[m * nsb + blk]);
+#else
+                const uint da = (m * nsb + blk) * 210u + 208u;
+                const uint dw = wu[da >> 2];
+                const float dj = unpackHalf2x16((da & 2u) != 0u ? (dw >> 16) : dw).x;
+#endif
+                [[unroll]] for (uint i = 0; i < TT; ++i) {
+#if EPI == 4
+                    [[unroll]] for (uint e = 0; e < LEN; ++e) acc[j * TT + i][e] = acc[j * TT + i][e] * 128 + acc2[j * TT + i][e];
+                    acc2[j * TT + i] = MAT(int32_t, gl_MatrixUseAccumulator)(0);
+#endif
+                    [[unroll]] for (uint e = 0; e < LEN; ++e)
+                        facc[j * TT + i][e] = fma(float(acc[j * TT + i][e]), dj * sv[i * LEN + e], facc[j * TT + i][e]);
+#if EPI == 2
+                    acc[j * TT + i] = MAT(float, gl_MatrixUseAccumulator)(0.0);
+#else
+                    acc[j * TT + i] = MAT(int32_t, gl_MatrixUseAccumulator)(0);
+#endif
+                }
+            }
+        }
+        SSTORE(cur ^ 1)
+        barrier();
+    }
+    [[unroll]] for (uint j = 0; j < TW; ++j)
+        [[unroll]] for (uint i = 0; i < TT; ++i)
+            coopMatStore(facc[j * TT + i], o, (t0 + wt * WTT + i * 16) * pc.M + w0 + ww * WTW + j * 16, pc.M, gl_CooperativeMatrixLayoutRowMajor);
+}

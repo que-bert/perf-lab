@@ -179,6 +179,8 @@ static Pipe make_pipe(Ctx & c, const std::string & src, const std::string & defs
     cpi.layout = P.pl;
     VKC(vkCreateComputePipelines(c.dev, VK_NULL_HANDLE, 1, &cpi, nullptr, &P.p));
     vkDestroyShaderModule(c.dev, sm, nullptr);
+    // ISA inspection without the GPU: RADV_FORCE_FAMILY=gfx1201 RADV_DEBUG=shaders WMMA_COMPILE_ONLY=1
+    if (getenv("WMMA_COMPILE_ONLY")) exit(0);
     VkDescriptorPoolSize ps{VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, (uint32_t) nbind};
     VkDescriptorPoolCreateInfo dpi{VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO}; dpi.maxSets = 1; dpi.poolSizeCount = 1; dpi.pPoolSizes = &ps;
     VKC(vkCreateDescriptorPool(c.dev, &dpi, nullptr, &P.dp));
@@ -307,7 +309,7 @@ static void bw(Ctx & c) {
     free_pipe(c, D); free_pipe(c, L); free_buf(c, src); free_buf(c, dst);
 }
 
-struct GemmCfg { bool s8; uint32_t bm, bn, bk, sg, pad; bool nfast; };
+struct GemmCfg { bool s8; uint32_t bm, bn, bk, sg, pad; bool nfast; bool single = false; };
 
 static std::string gemm_defs(const GemmCfg & g, uint32_t & wm, uint32_t & wn) {
     const uint32_t warps = 256 / g.sg;              // 256-thread workgroups
@@ -321,14 +323,14 @@ static std::string gemm_defs(const GemmCfg & g, uint32_t & wm, uint32_t & wn) {
         if (std::fabs(std::log(r)) < std::fabs(std::log(cur)) || g.bn / wn < 16) { wm = a; wn = b; }
     }
     char buf[256];
-    snprintf(buf, sizeof buf, "%s%s -DBM=%u -DBN=%u -DBK=%u -DWM_WARPS=%u -DWN_WARPS=%u -DSG=%u -DPAD_U=%u",
-             g.s8 ? "-DS8" : "", g.nfast ? " -DN_FAST" : "", g.bm, g.bn, g.bk, wm, wn, g.sg, g.pad);
+    snprintf(buf, sizeof buf, "%s%s%s -DBM=%u -DBN=%u -DBK=%u -DWM_WARPS=%u -DWN_WARPS=%u -DSG=%u -DPAD_U=%u",
+             g.s8 ? "-DS8" : "", g.nfast ? " -DN_FAST" : "", g.single ? " -DSINGLE_BUF" : "", g.bm, g.bn, g.bk, wm, wn, g.sg, g.pad);
     return buf;
 }
 
 static bool gemm_valid(const GemmCfg & g) {
     const uint32_t eb = g.s8 ? 1 : 2, row_u = g.bk * eb / 4;
-    return 2u * (g.bm + g.bn) * (row_u + g.pad) * 4 <= 65536 && (g.bk * eb) % 16 == 0;
+    return (g.single ? 1u : 2u) * (g.bm + g.bn) * (row_u + g.pad) * 4 <= 65536 && (g.bk * eb) % 16 == 0;
 }
 
 static uint16_t f2h(float f) { // round-to-nearest f32 -> f16 (normal range only; inputs are in [-1,1])
@@ -388,17 +390,156 @@ static double gemm(Ctx & c, const GemmCfg & g, uint32_t M, uint32_t N, uint32_t 
         run(c, P, pc, 12, gx, gy, 2);
         double best = 1e9; for (int r = 0; r < 5; ++r) best = std::min(best, run(c, P, pc, 12, gx, gy, 5));
         res = 2.0 * M * N * K / best / 1e12;
-        if (!quiet) printf("gemm %-3s %5ux%-4ux%-5u tile=%ux%u bk=%u wave%u warps=%ux%u pad=%u order=%s : %7.1f %s  (%.3f ms)\n", g.s8 ? "s8" : "f16",
-                           M, N, K, g.bm, g.bn, g.bk, g.sg, wm, wn, g.pad, g.nfast ? "n-fast" : "m-fast", res, g.s8 ? "TOPS" : "TFLOPS", best * 1e3);
+        if (!quiet) printf("gemm %-3s %5ux%-4ux%-5u tile=%ux%u bk=%u wave%u warps=%ux%u pad=%u order=%s%s : %7.1f %s  (%.3f ms)\n", g.s8 ? "s8" : "f16",
+                           M, N, K, g.bm, g.bn, g.bk, g.sg, wm, wn, g.pad, g.nfast ? "n-fast" : "m-fast", g.single ? " lds=1buf" : "", res, g.s8 ? "TOPS" : "TFLOPS", best * 1e3);
     }
     free_pipe(c, P); free_buf(c, A); free_buf(c, B); free_buf(c, C); free_buf(c, dA); free_buf(c, dB); free_buf(c, dC);
     return res;
 }
 
+// ---- s8 GEMM with Q6_K-shaped epilogue (gemm_q6.comp) + activation quantisation (quant.comp) ----
+// var: base (s8, d*sa per 256 only) | sub (per-16 int sub-scale) | sub24 (same via s_mad24) | subf (per-16 float) | q6k / q6k24 / q6kf / q6kbase (same, real Q6_K blocks)
+struct Q6Cfg { std::string var; uint32_t bw, bt, bk, sg, pad; bool nfast; };
+
+static int q6_epi(const std::string & v) {
+    return (v == "base" || v == "q6kbase") ? 0 : (v == "subf" || v == "q6kf") ? 2 : (v == "sub24" || v == "q6k24") ? 3 : v == "dual" ? 4 : 1;
+}
+static bool q6_isq6k(const std::string & v) { return v.rfind("q6k", 0) == 0; }
+
+static std::string q6_defs(const Q6Cfg & g, uint32_t & ww, uint32_t & wt) {
+    GemmCfg gg{ true, g.bw, g.bt, g.bk, g.sg, g.pad, g.nfast };
+    gemm_defs(gg, ww, wt);
+    char buf[256];
+    snprintf(buf, sizeof buf, "-DBW=%u -DBT=%u -DBK=%u -DWW_WARPS=%u -DWT_WARPS=%u -DSG=%u -DPAD_U=%u -DEPI=%d%s%s", g.bw, g.bt, g.bk, ww, wt, g.sg,
+             g.pad, q6_epi(g.var), q6_isq6k(g.var) ? " -DQ6K" : "", g.nfast ? " -DN_FAST" : "");
+    return buf;
+}
+static bool q6_valid(const Q6Cfg & g) {
+    const uint32_t lds = 2 * (g.bw + g.bt) * (g.bk / 4 + g.pad) * 4 + 2 * g.bw * (g.bk / 16) * 4;
+    return lds <= 65536 && 256 % g.bk == 0 && g.bk % 16 == 0 && (g.bt * g.bk / 16) % 256 == 0 && (g.bw * g.bk / 16) % 256 == 0;
+}
+
+static uint64_t g_rs = 0x9E3779B97F4A7C15ull;
+static inline uint32_t rnd() { g_rs ^= g_rs << 13; g_rs ^= g_rs >> 7; g_rs ^= g_rs << 17; return (uint32_t) (g_rs >> 11); }
+static inline int rndi(int lo, int hi) { return lo + (int) (rnd() % (uint32_t) (hi - lo + 1)); }
+static inline float rndf(float lo, float hi) { return lo + (hi - lo) * (rnd() & 0xFFFFFF) / 16777216.0f; }
+
+// returns seconds per GEMM (or -1 if verification failed)
+static double gemm_q6(Ctx & c, const Q6Cfg & g, uint32_t M, uint32_t N, uint32_t K, bool verify, bool quiet) {
+    uint32_t ww, wt; std::string defs = q6_defs(g, ww, wt);
+    Pipe P = make_pipe(c, "gemm_q6.comp", defs, 6, 12, g.sg);
+    const bool q6k = q6_isq6k(g.var); const int epi = q6_epi(g.var);
+    const uint32_t nsb = K / 256;
+    std::vector<int8_t> q((size_t) M * K), sc((size_t) M * K / 16); std::vector<uint16_t> d((size_t) M * nsb);
+    for (auto & x : q) x = (int8_t) rndi(-32, 31);
+    for (auto & x : sc) x = (int8_t) rndi(-128, 127);
+    for (auto & x : d) x = f2h(rndf(0.001f, 0.01f));
+    Buf act = make_buf(c, (size_t) N * K, true), sa = make_buf(c, (size_t) N * nsb * 4, true);
+    for (size_t i = 0; i < (size_t) N * K; ++i) ((int8_t *) act.p)[i] = (int8_t) rndi(-127, 127);
+    for (size_t i = 0; i < (size_t) N * nsb; ++i) ((float *) sa.p)[i] = rndf(0.001f, 0.02f);
+    const size_t wsz = q6k ? 16 : (size_t) M * K, usz = q6k ? (size_t) M * nsb * 210 + 16 : (size_t) M * K / 16, dsz = ((size_t) M * nsb * 2 + 3) & ~(size_t) 3;
+    Buf w = make_buf(c, wsz, true), u = make_buf(c, usz, true), dh = make_buf(c, dsz, true);
+    if (!q6k) { memcpy(w.p, q.data(), wsz); memcpy(u.p, sc.data(), usz); memcpy(dh.p, d.data(), (size_t) M * nsb * 2); }
+    else {
+        uint8_t * bp = (uint8_t *) u.p; memset(bp, 0, usz);
+        for (uint32_t m = 0; m < M; ++m) for (uint32_t b = 0; b < nsb; ++b) {
+            uint8_t * blk = bp + ((size_t) m * nsb + b) * 210;
+            for (int v = 0; v < 256; ++v) {
+                const uint32_t x = (uint32_t) (q[(size_t) m * K + b * 256 + v] + 32);
+                const int hf = v >> 7, r = v & 127, qq = r >> 5, l = r & 31;
+                blk[hf * 64 + (qq & 1) * 32 + l] |= (uint8_t) ((x & 15) << ((qq >> 1) * 4));
+                blk[128 + hf * 32 + l] |= (uint8_t) ((x >> 4) << (2 * qq));
+            }
+            for (int j = 0; j < 16; ++j) blk[192 + j] = (uint8_t) sc[(size_t) m * K / 16 + b * 16 + j];
+            memcpy(blk + 208, &d[(size_t) m * nsb + b], 2);
+        }
+    }
+    Buf O = make_buf(c, (size_t) N * M * 4, true);
+    Buf dact = make_buf(c, act.size), dw = make_buf(c, w.size), du = make_buf(c, u.size), dd = make_buf(c, dh.size), dsa = make_buf(c, sa.size), dO = make_buf(c, O.size);
+    copy_buf(c, act, dact, act.size); copy_buf(c, w, dw, w.size); copy_buf(c, u, du, u.size); copy_buf(c, dh, dd, dh.size); copy_buf(c, sa, dsa, sa.size);
+    bind(c, P, { &dact, &dw, &du, &dd, &dsa, &dO });
+    uint32_t pc[3] = { M, N, K };
+    const uint32_t gx = g.nfast ? N / g.bt : M / g.bw, gy = g.nfast ? M / g.bw : N / g.bt;
+    double res = 0;
+    if (verify) {
+        copy_buf(c, dO, dO, 0, true);
+        run(c, P, pc, 12, gx, gy, 1);
+        copy_buf(c, dO, O, O.size);
+        double maxerr = 0, maxref = 0; size_t bad = 0;
+        for (uint32_t n = 0; n < N; ++n) for (uint32_t m = 0; m < M; ++m) {
+            double ref = 0;
+            for (uint32_t b = 0; b < nsb; ++b) {
+                int64_t sbacc = 0;
+                for (int j = 0; j < 16; ++j) {
+                    int64_t s = 0;
+                    for (int k = b * 256 + j * 16; k < (int) (b * 256 + j * 16 + 16); ++k) s += (int) q[(size_t) m * K + k] * ((int8_t *) act.p)[(size_t) n * K + k];
+                    sbacc += epi ? s * sc[(size_t) m * K / 16 + b * 16 + j] : s;
+                }
+                ref += (double) sbacc * h2f(d[(size_t) m * nsb + b]) * ((float *) sa.p)[(size_t) n * nsb + b];
+            }
+            const double got = ((float *) O.p)[(size_t) n * M + m];
+            maxerr = std::max(maxerr, std::fabs(got - ref)); maxref = std::max(maxref, std::fabs(ref));
+            if (std::fabs(got - ref) > 1e-4 * (1 + std::fabs(ref))) bad++;
+        }
+        printf("verify q6 %-7s M=%u N=%u K=%u %s: max_abs_err=%.3g (max |ref| %.3g), mismatches=%zu -> %s\n", g.var.c_str(), M, N, K, defs.c_str(), maxerr, maxref,
+               bad, bad ? "FAIL" : "PASS");
+        res = bad ? -1 : 0;
+    } else {
+        run(c, P, pc, 12, gx, gy, 2);
+        double best = 1e9; for (int r = 0; r < 5; ++r) best = std::min(best, run(c, P, pc, 12, gx, gy, 5));
+        res = best;
+        if (!quiet) printf("q6 %-7s %5ux%-4ux%-5u tile=%ux%u(w x t) bk=%u wave%u warps=%ux%u pad=%u order=%s : %7.1f TOPS  (%.3f ms)\n", g.var.c_str(), M, N, K,
+                           g.bw, g.bt, g.bk, g.sg, ww, wt, g.pad, g.nfast ? "n-fast" : "m-fast", 2.0 * M * N * K / best / 1e12, best * 1e3);
+    }
+    free_pipe(c, P);
+    for (Buf * b : { &act, &sa, &w, &u, &dh, &O, &dact, &dw, &du, &dd, &dsa, &dO }) free_buf(c, *b);
+    return res;
+}
+
+// f32 or f16 [N][K] -> s8 [N][K] + f32 scale per row per 256-K block (amax/127). Seconds per call.
+static double quant(Ctx & c, uint32_t N, uint32_t K, bool f16in, bool verify) {
+    const size_t n = (size_t) N * K, nb = n / 256; const size_t eb = f16in ? 2 : 4;
+    Buf x = make_buf(c, n * eb, true), qo = make_buf(c, n, true), so = make_buf(c, nb * 4, true);
+    std::vector<float> xf(n);
+    for (size_t i = 0; i < n; ++i) { xf[i] = rndf(-3, 3); if (f16in) { ((uint16_t *) x.p)[i] = f2h(xf[i]); xf[i] = h2f(((uint16_t *) x.p)[i]); } else ((float *) x.p)[i] = xf[i]; }
+    Buf dx = make_buf(c, x.size), dq = make_buf(c, qo.size), ds = make_buf(c, so.size);
+    copy_buf(c, x, dx, x.size);
+    Pipe P = make_pipe(c, "quant.comp", f16in ? "-DF16IN" : "", 3, 4, 64);
+    bind(c, P, { &dx, &dq, &ds });
+    uint32_t pc = (uint32_t) nb;
+    const uint32_t groups = (uint32_t) (nb / 4);
+    double best = 1e9;
+    run(c, P, &pc, 4, groups, 1, 2);
+    for (int r = 0; r < 5; ++r) best = std::min(best, run(c, P, &pc, 4, groups, 1, 10));
+    if (verify) {
+        copy_buf(c, dq, qo, qo.size); copy_buf(c, ds, so, so.size);
+        size_t bad = 0;
+        for (size_t b = 0; b < nb; ++b) {
+            float amax = 0; for (int i = 0; i < 256; ++i) amax = std::max(amax, std::fabs(xf[b * 256 + i]));
+            const float s = ((float *) so.p)[b];
+            if (std::fabs(s - amax / 127) > 1e-6f * amax) bad++;
+            for (int i = 0; i < 256; ++i) if (std::abs(((int8_t *) qo.p)[b * 256 + i] - (int) std::lrint(xf[b * 256 + i] / s)) > 1) bad++;
+        }
+        printf("verify quant %s N=%u K=%u: mismatches=%zu -> %s\n", f16in ? "f16" : "f32", N, K, bad, bad ? "FAIL" : "PASS");
+    }
+    free_pipe(c, P);
+    for (Buf * b : { &x, &qo, &so, &dx, &dq, &ds }) free_buf(c, *b);
+    return best;
+}
+
+// Qwen3.8-27B one-ubatch weighted mix (M x N x K per GEMM, instances per ubatch); N is the ubatch.
+struct Shape { uint32_t M, K; int count; const char * name; };
+static const std::vector<Shape> g_mix = {
+    { 17408, 5120, 128, "ffn gate/up" }, { 5120, 17408, 64, "ffn down" }, { 10240, 5120, 48, "gdn qkv" }, { 6144, 5120, 48, "gdn z" },
+    { 5120, 6144, 48, "gdn out" }, { 12288, 5120, 16, "attn q" }, { 1024, 5120, 32, "attn k/v" }, { 5120, 6144, 16, "attn out" },
+};
+
 int main(int argc, char ** argv) {
+    setvbuf(stdout, nullptr, _IOLBF, 0);   // keep partial results when a run is cut short under the GPU lock
     bool nfast = true;
     int dev = 1; std::string type, gemm_t; uint32_t iters = 4096, M = 17408, N = 512, K = 5120, bm = 128, bn = 128, bk = 32, sg = 0, pad = 4;
-    bool do_bw = false, sweep = false, verify = false, do_layout = false;
+    bool do_bw = false, sweep = false, verify = false, do_layout = false, single = false, do_quant = false, do_mix = false;
+    std::string q6var, tiles, bks, pads, sgs, shapes;
     for (int i = 1; i < argc; ++i) {
         std::string a = argv[i]; auto nx = [&]() { return std::string(argv[++i]); };
         if (a == "--device") dev = std::stoi(nx()); else if (a == "--type") type = nx(); else if (a == "--iters") iters = std::stoul(nx());
@@ -408,8 +549,13 @@ int main(int argc, char ** argv) {
         else if (a == "--bk") bk = std::stoul(nx()); else if (a == "--sg") sg = std::stoul(nx()); else if (a == "--pad") pad = std::stoul(nx());
         else if (a == "--sweep") sweep = true; else if (a == "--verify") verify = true;
         else if (a == "--order") nfast = nx() == "n";
+        else if (a == "--single") single = true; else if (a == "--q6") q6var = nx(); else if (a == "--quant") do_quant = true;
+        else if (a == "--mix") do_mix = true; else if (a == "--tiles") tiles = nx(); else if (a == "--bks") bks = nx();
+        else if (a == "--pads") pads = nx(); else if (a == "--sgs") sgs = nx(); else if (a == "--shapes") shapes = nx();
         else { fprintf(stderr, "unknown arg %s\n", a.c_str()); return 1; }
     }
+    auto split = [](const std::string & s) { std::vector<std::string> v; size_t p = 0; while (p <= s.size()) { size_t e = s.find(',', p); if (e == std::string::npos) e = s.size(); if (e > p) v.push_back(s.substr(p, e - p)); p = e + 1; } return v; };
+    auto splitu = [&](const std::string & s) { std::vector<uint32_t> v; for (auto & x : split(s)) v.push_back(std::stoul(x)); return v; };
     const char * sd = getenv("WMMA_SHADER_DIR");
     if (sd) g_shader_dir = sd; else { std::string e = argv[0]; g_shader_dir = e.substr(0, e.find_last_of('/') + 1); if (g_shader_dir.empty()) g_shader_dir = "."; }
     const char * cd = getenv("WMMA_CACHE"); g_cache = cd ? cd : "/tmp/wmma_peak_cache";
@@ -418,10 +564,62 @@ int main(int argc, char ** argv) {
     if (!type.empty()) peak(c, type, iters, sg);
     if (do_bw) bw(c);
     if (do_layout) layout_probe(c);
+    if (do_quant && !do_mix) {
+        for (bool f16in : { false, true }) for (uint32_t k : { 5120u, 6144u, 17408u }) {
+            const double t = quant(c, N, k, f16in, verify);
+            printf("quant %s N=%u K=%-5u : %.4f ms  (%.0f GB/s)\n", f16in ? "f16" : "f32", N, k, t * 1e3, (double) N * k * ((f16in ? 2 : 4) + 1 + 4.0 / 256) / t / 1e9);
+        }
+    }
+    if (do_mix || (!q6var.empty() && !do_mix)) {
+        std::vector<std::pair<uint32_t, uint32_t>> tl;
+        for (auto & t : split(tiles.empty() ? std::to_string(bm) + "x" + std::to_string(bn) : tiles)) { uint32_t a, b; sscanf(t.c_str(), "%ux%u", &a, &b); tl.push_back({ a, b }); }
+        const auto bkl = splitu(bks.empty() ? std::to_string(bk) : bks), padl = splitu(pads.empty() ? std::to_string(pad) : pads),
+                   sgl = splitu(sgs.empty() ? std::to_string(sg ? sg : 64) : sgs);
+        std::vector<Shape> sh;
+        if (!do_mix) sh.push_back({ M, K, 1, "single" });
+        else if (shapes.empty()) sh = g_mix;
+        else for (auto & i : splitu(shapes)) sh.push_back(g_mix[i]);
+        const bool isq6 = !q6var.empty();
+        double ops = 0, tg = 0, tq_gemm = 0; std::map<uint32_t, double> tq;
+        for (auto & s : sh) {
+            double best = 1e9; std::string bcfg;
+            for (auto & t : tl) for (auto b : bkl) for (auto p : padl) for (auto w : sgl) {
+                char cb[128]; snprintf(cb, sizeof cb, "tile=%ux%u bk=%u pad=%u wave%u", t.first, t.second, b, p, w);
+                double sec;
+                if (isq6) {
+                    Q6Cfg g{ q6var, t.first, t.second, b, w, p, nfast };
+                    if (!q6_valid(g) || s.M % t.first || N % t.second || s.K % 256) continue;
+                    if (verify && gemm_q6(c, g, 512, 256, 512, true, false) < 0) continue;
+                    sec = gemm_q6(c, g, s.M, N, s.K, false, false);
+                } else {
+                    GemmCfg g{ gemm_t == "s8", t.first, t.second, b, w, p, nfast, single };
+                    if (!gemm_valid(g) || s.M % t.first || N % t.second || s.K % b) continue;
+                    if (verify && gemm(c, g, 512, 256, 512, true, false) < 0) continue;
+                    sec = 2.0 * s.M * N * s.K / (gemm(c, g, s.M, N, s.K, false, false) * 1e12);
+                }
+                if (sec < best) { best = sec; bcfg = cb; }
+            }
+            double q = 0;
+            if (isq6) { if (!tq.count(s.K)) tq[s.K] = quant(c, N, s.K, true, false); q = tq[s.K]; }
+            const double o = 2.0 * s.M * N * s.K;
+            printf("MIX %-12s %5ux%ux%-5u x%-3d best %s : %.3f ms %6.1f TOPS | +quant(f16) %.4f ms -> %6.1f TOPS\n", s.name, s.M, N, s.K, s.count, bcfg.c_str(),
+                   best * 1e3, o / best / 1e12, q * 1e3, o / (best + q) / 1e12);
+            ops += s.count * o; tg += s.count * best; tq_gemm += s.count * q;
+        }
+        if (do_mix) {
+            double tq_shared = 0;
+            if (isq6 && sh.size() == g_mix.size()) tq_shared = 128 * tq[5120] + 64 * tq[17408] + 64 * tq[6144];
+            printf("WEIGHTED %s N=%u: gemm-only %.1f TOPS (%.2f ms/ubatch)", isq6 ? q6var.c_str() : gemm_t.c_str(), N, ops / tg / 1e12, tg * 1e3);
+            if (isq6) printf(" | +quant per GEMM %.1f TOPS | +quant per distinct input %.1f TOPS", ops / (tg + tq_gemm) / 1e12,
+                             tq_shared > 0 ? ops / (tg + tq_shared) / 1e12 : 0.0);
+            printf("\n");
+        }
+        gemm_t.clear();
+    }
     if (!gemm_t.empty()) {
         const bool s8 = gemm_t == "s8";
         if (!sweep) {
-            GemmCfg g{ s8, bm, bn, bk, sg ? sg : 64, pad, nfast };
+            GemmCfg g{ s8, bm, bn, bk, sg ? sg : 64, pad, nfast, single };
             if (!gemm_valid(g)) { fprintf(stderr, "config exceeds 64 KiB LDS\n"); return 1; }
             if (verify) gemm(c, g, 512, 256, 512, true, false);
             gemm(c, g, M, N, K, false, false);

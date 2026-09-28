@@ -1,0 +1,27 @@
+#version 450
+// Activation quantisation for the s8 GEMM: x[N][K] (f32, or f16 with F16IN) -> s8 q[N][K] plus one
+// f32 scale per row per 256-K block (scale = amax / 127, q = round(x / scale)).
+// One 256-block per wave64 subgroup (4 values per lane), 4 subgroups per workgroup. Needs SG = 64.
+#extension GL_EXT_shader_explicit_arithmetic_types : require
+#extension GL_KHR_shader_subgroup_basic : require
+#extension GL_KHR_shader_subgroup_arithmetic : require
+layout(local_size_x = 256) in;
+#ifdef F16IN
+layout(binding = 0) readonly buffer X { f16vec4 x[]; };
+#else
+layout(binding = 0) readonly buffer X { vec4 x[]; };
+#endif
+layout(binding = 1) writeonly buffer Q { uint q[]; };
+layout(binding = 2) writeonly buffer S { float s[]; };
+layout(push_constant) uniform P { uint nblk; } pc;
+void main() {
+    const uint blk = gl_WorkGroupID.x * 4 + gl_SubgroupID;
+    const uint i = blk * 64 + gl_SubgroupInvocationID;
+    const vec4 v = vec4(x[i]);
+    const vec4 av = abs(v);
+    const float amax = subgroupMax(max(max(av.x, av.y), max(av.z, av.w)));
+    const float inv = amax > 0.0 ? 127.0 / amax : 0.0;
+    const ivec4 qi = ivec4(round(v * inv));
+    q[i] = (uint(qi.x) & 0xFFu) | ((uint(qi.y) & 0xFFu) << 8) | ((uint(qi.z) & 0xFFu) << 16) | (uint(qi.w) << 24);
+    if (gl_SubgroupInvocationID == 0) s[blk] = amax / 127.0;
+}

@@ -1,0 +1,134 @@
+# P0 (plan v2) 8-bit GEMM ceilings: s8 x s8 -> i32 WMMA GEMM with Q6_K-shaped epilogue, R9700 (Vulkan dev 1), RADV 26.0.8
+# harness/wmma_peak: gemm_q6.comp (new), quant.comp (new), gemm.comp (+SINGLE_BUF). All variants verified vs CPU ref except "dual" (timing-only).
+# Design: weights = coopmat B operand (lane owns one weight column -> ONE sub-scale per lane per 16x16 tile),
+#   activations s8 = A operand, f32 scale per row per 256-K block. Accumulate per 16-K WMMA (C=0), then
+#   acc_i32 += t * sc (per 16), facc_f32 += float(acc_i32) * d * sa once per 256. Unconditional clamped prefetch.
+# Variants: base = no sub-scale (d*sa per 256 only; ceiling of a requantised per-256 s8 format)
+#   sub = int mul (ACO emits quarter-rate v_mul_lo_u32 -> 47 TOPS), sub24 = OpenCL.std s_mad24 via
+#   GL_EXT_spirv_intrinsics (-> v_mad_i32_i24, full rate), subf = per-16 float cvt+fma,
+#   q6k* = same but unpacking real 210-B block_q6_K (ql/qh 6-bit -> s8, sc, d) while staging to LDS,
+#   dual = timing emulation of the exact two-plane split w'=sc*q=128*hi+lo (2 WMMA, no per-16 VALU).
+# LDS banks (bk=32 s8, 8 dwords/row, 64 banks, 16 lanes per b128 phase): pad=4 (stride 12) -> coopMatLoad of 16 rows
+#   hits 16 disjoint 4-bank groups (conflict-free), b128 staging stores 2-way; pad=0 is the reverse. XOR swizzle fixes both.
+# Tiles 256x128 / 128x256 collapse (20-40 TOPS: VGPR spill with int32+f32 accumulator sets). 128x128 bk32 wins.
+#
+# ---- 17408x512x5120, 128x128 bk64 wave64 pad4 (first pass, all verified PASS) ----
+# base 128.5 | sub 47.0 | subf 76.0 | sub24 81.7 | q6kbase 116.1 | q6k 44.5 | q6kf 67.8 | q6k24 74.5 TOPS
+# ---- activation quant f32/f16 -> s8 + per-256 scale, N=512 (verified PASS; cache-hot: fits the 64 MB MALL) ----
+quant f32 N=512 K=5120  : 0.0081 ms  (1618 GB/s)
+quant f32 N=512 K=6144  : 0.0095 ms  (1654 GB/s)
+quant f32 N=512 K=17408 : 0.0253 ms  (1764 GB/s)
+quant f16 N=512 K=5120  : 0.0087 ms  (907 GB/s)
+quant f16 N=512 K=6144  : 0.0064 ms  (1491 GB/s)
+quant f16 N=512 K=17408 : 0.0314 ms  (857 GB/s)
+# ---- f16 reference (gemm.comp) ----
+gemm f16 17408x512 x5120  tile=128x128 bk=64 wave64 warps=2x2 pad=2 order=n-fast lds=1buf :   105.6 TFLOPS  (0.864 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=64 wave32 warps=2x4 pad=2 order=n-fast lds=1buf :    89.9 TFLOPS  (1.015 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=64 wave64 warps=2x2 pad=4 order=n-fast lds=1buf :    98.5 TFLOPS  (0.927 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=64 wave32 warps=2x4 pad=4 order=n-fast lds=1buf :    84.0 TFLOPS  (1.087 ms)
+gemm f16 17408x512 x5120  tile=128x128 bk=32 wave64 warps=2x2 pad=2 order=n-fast lds=1buf :   111.5 TFLOPS  (0.819 ms)
+MIX ffn gate/up  17408x512x5120  x128 best tile=256x128 bk=32 pad=2 wave64 : 0.910 ms  100.2 TOPS 
+MIX ffn down      5120x512x17408 x64  best tile=256x128 bk=32 pad=2 wave64 : 1.286 ms   71.0 TOPS 
+MIX gdn qkv      10240x512x5120  x48  best tile=128x128 bk=32 pad=2 wave64 : 0.535 ms  100.3 TOPS 
+MIX gdn z         6144x512x5120  x48  best tile=128x128 bk=32 pad=2 wave64 : 0.322 ms  100.2 TOPS 
+MIX gdn out       5120x512x6144  x48  best tile=128x128 bk=32 pad=2 wave64 : 0.353 ms   91.1 TOPS 
+MIX attn q       12288x512x5120  x16  best tile=256x128 bk=32 pad=2 wave64 : 0.582 ms  110.6 TOPS 
+MIX attn k/v      1024x512x5120  x32  best tile=128x128 bk=32 pad=2 wave64 : 0.095 ms   56.5 TOPS 
+MIX attn out      5120x512x6144  x16  best tile=128x128 bk=32 pad=2 wave64 : 0.357 ms   90.3 TOPS 
+WEIGHTED f16 N=512: gemm-only 90.6 TOPS (274.97 ms/ubatch)
+# ---- tile sweep 17408x512x5120 ----
+q6 sub24   17408x512 x5120  tile=128x128(w x t) bk=32 wave64 warps=2x2 pad=2 order=n-fast :    87.8 TOPS  (1.040 ms)
+q6 sub24   17408x512 x5120  tile=128x128(w x t) bk=32 wave32 warps=2x4 pad=2 order=n-fast :    90.1 TOPS  (1.013 ms)
+q6 sub24   17408x512 x5120  tile=128x128(w x t) bk=32 wave64 warps=2x2 pad=4 order=n-fast :    88.4 TOPS  (1.033 ms)
+q6 sub24   17408x512 x5120  tile=128x128(w x t) bk=32 wave32 warps=2x4 pad=4 order=n-fast :    91.4 TOPS  (0.998 ms)
+q6 sub24   17408x512 x5120  tile=128x128(w x t) bk=64 wave64 warps=2x2 pad=2 order=n-fast :    80.9 TOPS  (1.128 ms)
+q6 sub24   17408x512 x5120  tile=128x128(w x t) bk=64 wave32 warps=2x4 pad=2 order=n-fast :    85.0 TOPS  (1.074 ms)
+q6 sub24   17408x512 x5120  tile=128x128(w x t) bk=64 wave64 warps=2x2 pad=4 order=n-fast :    81.5 TOPS  (1.120 ms)
+q6 sub24   17408x512 x5120  tile=128x128(w x t) bk=64 wave32 warps=2x4 pad=4 order=n-fast :    83.6 TOPS  (1.092 ms)
+q6 sub24   17408x512 x5120  tile=256x128(w x t) bk=32 wave64 warps=2x2 pad=2 order=n-fast :    19.5 TOPS  (4.688 ms)
+q6 sub24   17408x512 x5120  tile=256x128(w x t) bk=32 wave32 warps=4x2 pad=2 order=n-fast :    23.8 TOPS  (3.828 ms)
+q6 sub24   17408x512 x5120  tile=256x128(w x t) bk=32 wave64 warps=2x2 pad=4 order=n-fast :    20.5 TOPS  (4.459 ms)
+q6 sub24   17408x512 x5120  tile=256x128(w x t) bk=32 wave32 warps=4x2 pad=4 order=n-fast :    25.3 TOPS  (3.604 ms)
+q6 sub24   17408x512 x5120  tile=256x128(w x t) bk=64 wave64 warps=2x2 pad=2 order=n-fast :    18.7 TOPS  (4.885 ms)
+q6 sub24   17408x512 x5120  tile=256x128(w x t) bk=64 wave32 warps=4x2 pad=2 order=n-fast :    25.1 TOPS  (3.636 ms)
+q6 sub24   17408x512 x5120  tile=128x256(w x t) bk=32 wave64 warps=1x4 pad=2 order=n-fast :    21.0 TOPS  (4.354 ms)
+q6 sub24   17408x512 x5120  tile=128x256(w x t) bk=32 wave32 warps=2x4 pad=2 order=n-fast :    26.0 TOPS  (3.512 ms)
+q6 sub24   17408x512 x5120  tile=128x256(w x t) bk=32 wave64 warps=1x4 pad=4 order=n-fast :    21.4 TOPS  (4.265 ms)
+q6 sub24   17408x512 x5120  tile=128x256(w x t) bk=32 wave32 warps=2x4 pad=4 order=n-fast :    26.6 TOPS  (3.431 ms)
+q6 sub24   17408x512 x5120  tile=128x256(w x t) bk=64 wave64 warps=1x4 pad=2 order=n-fast :    20.4 TOPS  (4.475 ms)
+q6 sub24   17408x512 x5120  tile=128x256(w x t) bk=64 wave32 warps=2x4 pad=2 order=n-fast :    27.0 TOPS  (3.378 ms)
+q6 sub24   17408x512 x5120  tile=128x256(w x t) bk=64 wave64 warps=1x4 pad=4 order=n-fast :    20.7 TOPS  (4.408 ms)
+q6 sub24   17408x512 x5120  tile=128x256(w x t) bk=64 wave32 warps=2x4 pad=4 order=n-fast :    27.1 TOPS  (3.368 ms)
+q6 base    17408x512 x5120  tile=128x128(w x t) bk=32 wave64 warps=2x2 pad=2 order=n-fast :   137.8 TOPS  (0.662 ms)
+q6 base    17408x512 x5120  tile=128x128(w x t) bk=32 wave64 warps=2x2 pad=4 order=n-fast :   137.0 TOPS  (0.666 ms)
+q6 base    17408x512 x5120  tile=128x128(w x t) bk=64 wave64 warps=2x2 pad=2 order=n-fast :   128.2 TOPS  (0.712 ms)
+q6 base    17408x512 x5120  tile=128x128(w x t) bk=64 wave64 warps=2x2 pad=4 order=n-fast :   128.2 TOPS  (0.712 ms)
+q6 base    17408x512 x5120  tile=256x128(w x t) bk=32 wave64 warps=2x2 pad=2 order=n-fast :    37.5 TOPS  (2.436 ms)
+q6 base    17408x512 x5120  tile=256x128(w x t) bk=32 wave64 warps=2x2 pad=4 order=n-fast :    40.1 TOPS  (2.275 ms)
+q6 base    17408x512 x5120  tile=256x128(w x t) bk=64 wave64 warps=2x2 pad=2 order=n-fast :    34.2 TOPS  (2.668 ms)
+q6 base    17408x512 x5120  tile=128x256(w x t) bk=32 wave64 warps=1x4 pad=2 order=n-fast :    38.9 TOPS  (2.346 ms)
+q6 base    17408x512 x5120  tile=128x256(w x t) bk=32 wave64 warps=1x4 pad=4 order=n-fast :    40.6 TOPS  (2.245 ms)
+q6 base    17408x512 x5120  tile=128x256(w x t) bk=64 wave64 warps=1x4 pad=2 order=n-fast :    34.9 TOPS  (2.611 ms)
+q6 base    17408x512 x5120  tile=128x256(w x t) bk=64 wave64 warps=1x4 pad=4 order=n-fast :    36.2 TOPS  (2.521 ms)
+q6 dual    17408x512 x5120  tile=128x128(w x t) bk=32 wave64 warps=2x2 pad=2 order=n-fast :    83.0 TOPS  (1.100 ms)
+q6 dual    17408x512 x5120  tile=128x128(w x t) bk=32 wave64 warps=2x2 pad=4 order=n-fast :    81.6 TOPS  (1.119 ms)
+q6 dual    17408x512 x5120  tile=128x128(w x t) bk=64 wave64 warps=2x2 pad=2 order=n-fast :    88.3 TOPS  (1.034 ms)
+q6 dual    17408x512 x5120  tile=128x128(w x t) bk=64 wave64 warps=2x2 pad=4 order=n-fast :    88.7 TOPS  (1.029 ms)
+q6 dual    17408x512 x5120  tile=256x128(w x t) bk=32 wave64 warps=2x2 pad=2 order=n-fast :     4.2 TOPS  (21.588 ms)
+q6 dual    17408x512 x5120  tile=256x128(w x t) bk=32 wave64 warps=2x2 pad=4 order=n-fast :     4.2 TOPS  (21.485 ms)
+q6 dual    17408x512 x5120  tile=256x128(w x t) bk=64 wave64 warps=2x2 pad=2 order=n-fast :     4.3 TOPS  (21.119 ms)
+q6 dual    17408x512 x5120  tile=128x256(w x t) bk=32 wave64 warps=1x4 pad=2 order=n-fast :     4.3 TOPS  (21.310 ms)
+q6 dual    17408x512 x5120  tile=128x256(w x t) bk=32 wave64 warps=1x4 pad=4 order=n-fast :     4.3 TOPS  (21.302 ms)
+q6 dual    17408x512 x5120  tile=128x256(w x t) bk=64 wave64 warps=1x4 pad=2 order=n-fast :     4.3 TOPS  (21.024 ms)
+q6 dual    17408x512 x5120  tile=128x256(w x t) bk=64 wave64 warps=1x4 pad=4 order=n-fast :     4.3 TOPS  (21.012 ms)
+# ---- full mix N=512 ----
+MIX ffn gate/up  17408x512x5120  x128 best tile=128x128 bk=32 pad=4 wave32 : 0.984 ms   92.7 TOPS | +quant(f16) 0.0049 ms ->   92.3 TOPS
+MIX ffn down      5120x512x17408 x64  best tile=128x128 bk=32 pad=4 wave32 : 1.158 ms   78.8 TOPS | +quant(f16) 0.0161 ms ->   77.7 TOPS
+MIX gdn qkv      10240x512x5120  x48  best tile=128x128 bk=32 pad=4 wave32 : 0.600 ms   89.5 TOPS | +quant(f16) 0.0049 ms ->   88.7 TOPS
+MIX gdn z         6144x512x5120  x48  best tile=128x128 bk=32 pad=4 wave32 : 0.373 ms   86.3 TOPS | +quant(f16) 0.0049 ms ->   85.2 TOPS
+MIX gdn out       5120x512x6144  x48  best tile=128x128 bk=32 pad=4 wave32 : 0.426 ms   75.6 TOPS | +quant(f16) 0.0063 ms ->   74.5 TOPS
+MIX attn q       12288x512x5120  x16  best tile=128x128 bk=32 pad=4 wave32 : 0.706 ms   91.2 TOPS | +quant(f16) 0.0049 ms ->   90.6 TOPS
+MIX attn k/v      1024x512x5120  x32  best tile=128x128 bk=32 pad=4 wave32 : 0.131 ms   41.1 TOPS | +quant(f16) 0.0049 ms ->   39.6 TOPS
+MIX attn out      5120x512x6144  x16  best tile=128x128 bk=32 pad=4 wave32 : 0.425 ms   75.8 TOPS | +quant(f16) 0.0063 ms ->   74.7 TOPS
+WEIGHTED sub24 N=512: gemm-only 86.0 TOPS (289.52 ms/ubatch) | +quant per GEMM 85.2 TOPS | +quant per distinct input 85.4 TOPS
+MIX ffn gate/up  17408x512x5120  x128 best tile=128x128 bk=32 pad=2 wave32 : 0.646 ms  141.2 TOPS | +quant(f16) 0.0048 ms ->  140.2 TOPS
+MIX ffn down      5120x512x17408 x64  best tile=128x128 bk=32 pad=2 wave32 : 0.766 ms  119.1 TOPS | +quant(f16) 0.0163 ms ->  116.6 TOPS
+MIX gdn qkv      10240x512x5120  x48  best tile=128x128 bk=32 pad=2 wave32 : 0.416 ms  129.1 TOPS | +quant(f16) 0.0048 ms ->  127.6 TOPS
+MIX gdn z         6144x512x5120  x48  best tile=128x128 bk=32 pad=2 wave32 : 0.262 ms  123.1 TOPS | +quant(f16) 0.0048 ms ->  120.9 TOPS
+MIX gdn out       5120x512x6144  x48  best tile=128x128 bk=32 pad=2 wave32 : 0.299 ms  107.6 TOPS | +quant(f16) 0.0060 ms ->  105.5 TOPS
+MIX attn q       12288x512x5120  x16  best tile=128x128 bk=32 pad=2 wave32 : 0.473 ms  136.3 TOPS | +quant(f16) 0.0048 ms ->  135.0 TOPS
+MIX attn k/v      1024x512x5120  x32  best tile=128x128 bk=32 pad=2 wave32 : 0.079 ms   67.6 TOPS | +quant(f16) 0.0048 ms ->   63.7 TOPS
+MIX attn out      5120x512x6144  x16  best tile=128x128 bk=32 pad=2 wave32 : 0.297 ms  108.5 TOPS | +quant(f16) 0.0060 ms ->  106.4 TOPS
+WEIGHTED base N=512: gemm-only 128.7 TOPS (193.51 ms/ubatch) | +quant per GEMM 126.9 TOPS | +quant per distinct input 127.4 TOPS
+MIX ffn gate/up  17408x512x5120  x128 best tile=128x128 bk=32 pad=4 wave32 : 1.107 ms   82.5 TOPS | +quant(f16) 0.0048 ms ->   82.1 TOPS
+MIX ffn down      5120x512x17408 x64  best tile=128x128 bk=32 pad=4 wave32 : 1.279 ms   71.3 TOPS | +quant(f16) 0.0161 ms ->   70.5 TOPS
+MIX gdn qkv      10240x512x5120  x48  best tile=128x128 bk=32 pad=4 wave32 : 0.632 ms   84.9 TOPS | +quant(f16) 0.0048 ms ->   84.3 TOPS
+MIX gdn z         6144x512x5120  x48  best tile=128x128 bk=32 pad=4 wave32 : 0.396 ms   81.3 TOPS | +quant(f16) 0.0048 ms ->   80.3 TOPS
+MIX gdn out       5120x512x6144  x48  best tile=128x128 bk=32 pad=4 wave32 : 0.454 ms   71.0 TOPS | +quant(f16) 0.0062 ms ->   70.1 TOPS
+MIX attn q       12288x512x5120  x16  best tile=128x128 bk=32 pad=4 wave32 : 0.755 ms   85.4 TOPS | +quant(f16) 0.0048 ms ->   84.8 TOPS
+MIX attn k/v      1024x512x5120  x32  best tile=128x128 bk=32 pad=4 wave32 : 0.147 ms   36.5 TOPS | +quant(f16) 0.0048 ms ->   35.4 TOPS
+MIX attn out      5120x512x6144  x16  best tile=128x128 bk=32 pad=4 wave32 : 0.454 ms   70.9 TOPS | +quant(f16) 0.0062 ms ->   70.0 TOPS
+WEIGHTED q6k24 N=512: gemm-only 78.2 TOPS (318.71 ms/ubatch) | +quant per GEMM 77.5 TOPS | +quant per distinct input 77.7 TOPS
+# ---- larger ubatch (base, f16 from v5b; q6k24/sub24 from v7) ----
+MIX ffn gate/up  17408x1024x5120  x128 best tile=128x128 bk=32 pad=4 wave32 : 1.222 ms  149.4 TOPS | +quant(f16) 0.0095 ms ->  148.2 TOPS
+MIX ffn down      5120x1024x17408 x64  best tile=128x128 bk=32 pad=4 wave32 : 1.305 ms  139.9 TOPS | +quant(f16) 0.0322 ms ->  136.5 TOPS
+MIX ffn gate/up  17408x1024x5120  x128 best tile=256x128 bk=32 pad=2 wave64 : 1.616 ms  112.9 TOPS | +quant(f16) 0.0000 ms ->  112.9 TOPS
+MIX ffn down      5120x1024x17408 x64  best tile=256x128 bk=32 pad=2 wave64 : 1.798 ms  101.5 TOPS | +quant(f16) 0.0000 ms ->  101.5 TOPS
+MIX ffn gate/up  17408x2048x5120  x128 best tile=128x128 bk=32 pad=4 wave32 : 2.337 ms  156.2 TOPS | +quant(f16) 0.0190 ms ->  154.9 TOPS
+MIX ffn down      5120x2048x17408 x64  best tile=128x128 bk=32 pad=4 wave32 : 2.459 ms  148.5 TOPS | +quant(f16) 0.1757 ms ->  138.6 TOPS
+MIX ffn gate/up  17408x2048x5120  x128 best tile=256x128 bk=32 pad=2 wave64 : 3.062 ms  119.2 TOPS | +quant(f16) 0.0000 ms ->  119.2 TOPS
+MIX ffn down      5120x2048x17408 x64  best tile=256x128 bk=32 pad=2 wave64 : 3.092 ms  118.1 TOPS | +quant(f16) 0.0000 ms ->  118.1 TOPS
+q6k24 MIX ffn gate/up  17408x1024x5120  x128 best tile=128x128 bk=32 pad=4 wave32 : 2.139 ms   85.3 TOPS | +quant(f16) 0.0106 ms ->   84.9 TOPS
+q6k24 MIX ffn down      5120x1024x17408 x64  best tile=128x128 bk=32 pad=4 wave32 : 2.151 ms   84.8 TOPS | +quant(f16) 0.0387 ms ->   83.3 TOPS
+sub24 MIX ffn gate/up  17408x1024x5120  x128 best tile=128x128 bk=32 pad=4 wave32 : 1.880 ms   97.1 TOPS | +quant(f16) 0.0095 ms ->   96.6 TOPS
+sub24 MIX ffn down      5120x1024x17408 x64  best tile=128x128 bk=32 pad=4 wave32 : 1.931 ms   94.5 TOPS | +quant(f16) 0.0321 ms ->   93.0 TOPS
+q6k24 MIX ffn gate/up  17408x2048x5120  x128 best tile=128x128 bk=32 pad=4 wave32 : 4.214 ms   86.6 TOPS | +quant(f16) 0.0191 ms ->   86.2 TOPS
+q6k24 MIX ffn down      5120x2048x17408 x64  best tile=128x128 bk=32 pad=4 wave32 : 4.233 ms   86.2 TOPS | +quant(f16) 0.1756 ms ->   82.8 TOPS
+sub24 MIX ffn gate/up  17408x2048x5120  x128 best tile=128x128 bk=32 pad=4 wave32 : 3.685 ms   99.1 TOPS | +quant(f16) 0.0190 ms ->   98.6 TOPS
+sub24 MIX ffn down      5120x2048x17408 x64  best tile=128x128 bk=32 pad=4 wave32 : 3.705 ms   98.5 TOPS | +quant(f16) 0.1757 ms ->   94.1 TOPS
+# ---- SUMMARY (weighted = total mix ops / total time; quant counted once per GEMM) ----
+# f16 (128x128|256x128 bk32 wave64 pad2 n-fast):           90.6 TFLOPS
+# s8 exact Q6_K, real block_q6_K unpack (q6k24, 128x128 bk32 wave32 pad4): 78.2 gemm-only, 77.5 with quant
+# s8 exact, pre-expanded s8 + sc/d arrays (sub24):          86.0 gemm-only, 85.2 with quant
+# s8 no sub-scale ceiling (base, 128x128 bk32 wave32 pad2): 128.7 gemm-only, 126.9 with quant (127.4 quant per distinct input)
+# GATE >= 135 TOPS: NO-GO (all designs, N=512). base passes only at N>=1024 on the FFN shapes (148/137 @1024, 155/139 @2048).
