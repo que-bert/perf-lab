@@ -1,0 +1,50 @@
+[
+  {
+    "label": "~70k",
+    "reps_requested": 1600,
+    "prompt_n": 72489,
+    "decode_mean": 53.239,
+    "decode_steady_mean": 53.239,
+    "decode_steady_min": 53.239,
+    "decode_steady_max": 53.239,
+    "decode_spread_pct": null,
+    "prefill": 846.4793324881814,
+    "accept_frac": 1.0,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 53.238596799599776,
+        "prefill": 846.4793324881814,
+        "prompt_n": 72489,
+        "accepted": 47,
+        "drafted": 47,
+        "wall": 87.02019190788269,
+        "content": "\nRequest 1600. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1601. Write a short technical description of how a write-ahead"
+      }
+    ]
+  },
+  {
+    "label": "~176k",
+    "reps_requested": 4000,
+    "prompt_n": 182889,
+    "decode_mean": 48.02,
+    "decode_steady_mean": 48.02,
+    "decode_steady_min": 48.02,
+    "decode_steady_max": 48.02,
+    "decode_spread_pct": null,
+    "prefill": 513.1404270733809,
+    "accept_frac": 1.0,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 48.02037893414577,
+        "prefill": 513.1404270733809,
+        "prompt_n": 182889,
+        "accepted": 47,
+        "drafted": 47,
+        "wall": 358.0366401672363,
+        "content": "\nRequest 4000. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4001. Write a short technical description of how a write-ahead"
+      }
+    ]
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "label": "~176k",
+    "reps_requested": 4000,
+    "prompt_n": 182889,
+    "decode_mean": 46.891,
+    "decode_steady_mean": 46.891,
+    "decode_steady_min": 46.891,
+    "decode_steady_max": 46.891,
+    "decode_spread_pct": null,
+    "prefill": 511.6654041237234,
+    "accept_frac": 1.0,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 46.891328230365936,
+        "prefill": 511.6654041237234,
+        "prompt_n": 182889,
+        "accepted": 47,
+        "drafted": 47,
+        "wall": 359.1563320159912,
+        "content": "\nRequest 4000. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4001. Write a short technical description of how a write-ahead"
+      }
+    ]
+  }
+]

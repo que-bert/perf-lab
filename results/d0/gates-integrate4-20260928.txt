@@ -1,0 +1,32 @@
+== git 093e47d59 Merge branch 'r9700-d3-verifyhost' into r9700-integrate4
+== test MUL_MAT:   1147/1147 tests passed 
+== test MUL_MAT_VEC_FUSION:   1271/1271 tests passed 
+== test RMS_NORM:   51/51 tests passed 
+== test RMS_NORM_MUL_ADD:   36/36 tests passed 
+== test SCALE:   4/4 tests passed 
+== test RMS_NORM_SCALE:   16/16 tests passed 
+== test CPY:   252/252 tests passed 
+== test CONCAT:   201/201 tests passed 
+== test GET_ROWS:   240/240 tests passed 
+== test ADD:   101/101 tests passed 
+== test MUL:   91/91 tests passed 
+== test GATED_DELTA_NET:   37/37 tests passed 
+== test GATED_DELTA_NET_CACHE_FUSION:   5/5 tests passed 
+== test GDN_RECURRENT_CACHE:   10/10 tests passed 
+== test RMS_NORM_MUL_SILU_MUL:   5/5 tests passed 
+== test SSM_CONV:   45/45 tests passed 
+== test SIGMOID:   8/8 tests passed 
+== test SOFTPLUS:   8/8 tests passed 
+== test SILU:   8/8 tests passed 
+== test L2_NORM:   30/30 tests passed 
+== test FA:   183/183 tests passed 
+== PPL: PPL = 2.2879 +/- 0.03233
+== KLD d70000 b4: mean_kld 0.000890 top1_flip 0.3906% (2 / 512) 
+== KLD d70000 b1: mean_kld 0.000928 top1_flip 0.1953% (1 / 512) 
+== KLD d176000 b4: mean_kld 0.000308 top1_flip 0.0000% (0 / 512) 
+== KLD d176000 b1: mean_kld 0.000173 top1_flip 0.1953% (1 / 512) 
+Running as unit: perflab-srv-8097.service; invocation ID: edfaa24def55480f8134dec6e33ba7b1
+== ACC i4-corpus load=0.98 1.74 3.81 POOLED 2589 3677 0.7041
+Running as unit: perflab-srv-8097.service; invocation ID: 25bcaf7ad3f04fa09ce4cd47ad168a28
+== ACC i4-chat load=1.17 1.32 3.19 POOLED 2020 3763 0.5368
+== GATES DONE Mon Sep 28 04:14:21 PM PDT 2026
