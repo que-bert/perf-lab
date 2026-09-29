@@ -1,0 +1,86 @@
+# verify n=2 kv~70k: 1 graphs, mean 52.63 ms
+# draft n=2 kv~70k: 1 graphs, mean 4.13 ms
+# verify n=6 kv~70k: 1 graphs, mean 56.42 ms
+# draft n=6 kv~70k: 1 graphs, mean 1.33 ms
+
+## verify n=4 kv~70k: 70 graphs, mean GPU 43.922 ms/graph
+    17.418 ms  x128.0  MUL_MAT_VEC q6_K m=17408 n=4 k=5120
+     8.368 ms  x 64.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=4 k=17408
+     3.744 ms  x 48.0  MUL_MAT_VEC q6_K m=10240 n=4 k=5120
+     2.992 ms  x 48.0  MUL_MAT_VEC q8_0 m=5120 n=4 k=6144
+     2.529 ms  x 48.0  MUL_MAT_VEC q6_K m=6144 n=4 k=5120
+     1.654 ms  x  1.0  MUL_MAT_VEC q6_K m=248320 n=4 k=5120
+     1.527 ms  x 16.0  MUL_MAT_VEC q6_K m=12288 n=4 k=5120
+     0.909 ms  x  2.0  GET_ROWS
+     0.876 ms  x 16.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=4 k=6144
+     0.586 ms  x 48.0  GDN_CACHE GATED_DELTA_NET
+     0.444 ms  x 96.0  MUL_MAT_VEC f32 m=48 n=4 k=5120
+     0.356 ms  x129.0  RMS_NORM_MUL RMS_NORM(5120,4,1,1)
+     0.330 ms  x 16.0  FLASH_ATTN_EXT dst(256,24,4,1),  q(256,4,24,1),  k(*,KV,4,1),  v(*,KV,4,1),  m(KV,4,1,1)
+     0.303 ms  x 32.0  MUL_MAT_VEC q6_K m=1024 n=4 k=5120
+     0.285 ms  x 48.0  RMS_NORM_MUL_SILU_MUL RMS_NORM(128,48,4,1)
+     0.248 ms  x 48.0  SSM_CONV_SILU SSM_CONV
+     0.242 ms  x 96.0  RMS_NORM_SCALE RMS_NORM(128,16,4,1)
+     0.185 ms  x 48.0  ADD
+     0.136 ms  x 32.0  ROPE
+     0.123 ms  x 48.0  GDN_CONV_STATE CONCAT
+     0.116 ms  x 64.0  GLU
+     0.092 ms  x 32.0  SET_ROWS
+     0.067 ms  x 16.0  RMS_NORM_MUL RMS_NORM(256,4,4,1)
+     0.064 ms  x 16.0  MUL_MAT f32 m=64 n=384 k=64
+     0.064 ms  x 16.0  CONT
+     0.060 ms  x 16.0  RMS_NORM_MUL RMS_NORM(256,24,4,1)
+     0.060 ms  x 16.0  MUL_MAT f32 m=256 n=16 k=256
+     0.058 ms  x 16.0  MUL_MAT f32 m=64 n=64 k=64
+     0.033 ms  x 16.0  SIGMOID_MUL SIGMOID
+     0.032 ms  x 16.0  MUL_MAT f32 m=256 n=96 k=256
+     0.024 ms  x  0.0  MUL_MAT_VEC q6_K m=248320 n=1 k=5120
+
+## draft n=4 kv~70k: 70 graphs, mean GPU 0.831 ms/graph
+     0.258 ms  x  2.0  MUL_MAT_VEC q6_K m=17408 n=4 k=5120
+     0.155 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=4 k=17408
+     0.129 ms  x  1.0  MUL_MAT_VEC q6_K m=12288 n=4 k=5120
+     0.106 ms  x  1.0  MUL_MAT_VEC q8_0 m=5120 n=4 k=10240
+     0.061 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=4 k=6144
+     0.041 ms  x  5.0  RMS_NORM_MUL RMS_NORM(5120,4,1,1)
+     0.020 ms  x  1.0  FLASH_ATTN_EXT dst(256,24,4,1),  q(256,4,24,1),  k(*,KV,4,1),  v(*,KV,4,1),  m(KV,4,1,1)
+     0.018 ms  x  2.0  MUL_MAT_VEC q6_K m=1024 n=4 k=5120
+     0.007 ms  x  2.0  ROPE
+     0.005 ms  x  2.0  SET_ROWS
+     0.004 ms  x  1.0  RMS_NORM_MUL RMS_NORM(256,24,4,1)
+     0.004 ms  x  1.0  RMS_NORM_MUL RMS_NORM(256,4,4,1)
+     0.004 ms  x  1.0  CONT
+     0.004 ms  x  1.0  MUL_MAT f32 m=64 n=384 k=64
+     0.004 ms  x  1.0  MUL_MAT f32 m=64 n=64 k=64
+     0.003 ms  x  1.0  CONCAT
+     0.003 ms  x  1.0  MUL_MAT f32 m=256 n=16 k=256
+     0.002 ms  x  1.0  MUL_MAT f32 m=256 n=96 k=256
+     0.002 ms  x  1.0  SIGMOID_MUL SIGMOID
+     0.002 ms  x  1.0  GLU
+
+## draft n=1 kv~70k: 208 graphs, mean GPU 1.414 ms/graph
+     0.674 ms  x  1.0  MUL_MAT_VEC q6_K m=98304 n=1 k=5120
+     0.256 ms  x  2.0  MUL_MAT_VEC q6_K m=17408 n=1 k=5120
+     0.123 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=1 k=17408
+     0.104 ms  x  1.0  MUL_MAT_VEC q8_0 m=5120 n=1 k=10240
+     0.090 ms  x  1.0  MUL_MAT_VEC q6_K m=12288 n=1 k=5120
+     0.049 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=1 k=6144
+     0.022 ms  x  5.0  RMS_NORM_MUL RMS_NORM(5120,1,1,1)
+     0.018 ms  x  2.0  MUL_MAT_VEC q6_K m=1024 n=1 k=5120
+     0.013 ms  x  1.0  FLASH_ATTN_EXT dst(256,24,1,1),  q(256,1,24,1),  k(*,KV,4,1),  v(*,KV,4,1),  m(KV,1,1,1)
+     0.009 ms  x  1.0  TOP_K K=10 (98304,1,1,1)
+     0.009 ms  x  2.0  GET_ROWS
+     0.007 ms  x  2.0  ROPE
+     0.006 ms  x  1.0  PAD
+     0.005 ms  x  2.0  SET_ROWS
+     0.004 ms  x  1.0  RMS_NORM_MUL RMS_NORM(256,4,1,1)
+     0.004 ms  x  1.0  CONCAT
+     0.004 ms  x  1.0  CONT
+     0.004 ms  x  1.0  RMS_NORM_MUL RMS_NORM(256,24,1,1)
+     0.003 ms  x  1.0  MUL_MAT f32 m=64 n=96 k=64
+     0.003 ms  x  1.0  MUL_MAT f32 m=64 n=16 k=64
+     0.003 ms  x  1.0  MUL_MAT_VEC f32 m=256 n=4 k=256
+     0.002 ms  x  1.0  GLU
+     0.002 ms  x  1.0  SIGMOID_MUL SIGMOID
+     0.002 ms  x  1.0  MUL_MAT f32 m=256 n=24 k=256
+# verify n=1 kv~70k: 1 graphs, mean 40.01 ms

@@ -1,0 +1,32 @@
+== git df1e6be71 vulkan: RDNA4 n>=5 q6_K MMVQ tuning (dword-exact dmmv-style weight loads, 2 rows/WG); GGML_VK_NO_MQ5_TUNE=1 disables
+== test MUL_MAT:   1157/1157 tests passed 
+== test MUL_MAT_VEC_FUSION:   1271/1271 tests passed 
+== test RMS_NORM:   51/51 tests passed 
+== test RMS_NORM_MUL_ADD:   36/36 tests passed 
+== test SCALE:   4/4 tests passed 
+== test RMS_NORM_SCALE:   16/16 tests passed 
+== test CPY:   252/252 tests passed 
+== test CONCAT:   201/201 tests passed 
+== test GET_ROWS:   240/240 tests passed 
+== test ADD:   101/101 tests passed 
+== test MUL:   91/91 tests passed 
+== test GATED_DELTA_NET:   37/37 tests passed 
+== test GATED_DELTA_NET_CACHE_FUSION:   5/5 tests passed 
+== test GDN_RECURRENT_CACHE:   10/10 tests passed 
+== test RMS_NORM_MUL_SILU_MUL:   5/5 tests passed 
+== test SSM_CONV:   45/45 tests passed 
+== test SIGMOID:   8/8 tests passed 
+== test SOFTPLUS:   8/8 tests passed 
+== test SILU:   8/8 tests passed 
+== test L2_NORM:   30/30 tests passed 
+== test FA:   183/183 tests passed 
+== PPL: PPL = 2.2878 +/- 0.03233
+== KLD d70000 b4: mean_kld 0.000753 top1_flip 0.7812% (4 / 512) 
+== KLD d70000 b1: mean_kld 0.000682 top1_flip 0.3906% (2 / 512) 
+== KLD d176000 b4: mean_kld 0.000235 top1_flip 0.0000% (0 / 512) 
+== KLD d176000 b1: mean_kld 0.000185 top1_flip 0.1953% (1 / 512) 
+Running as unit: perflab-srv-8097.service; invocation ID: 2fdf8ac20a7049b3b9cb7884656aa1dd
+== ACC integrate7-corpus load=0.66 0.97 1.51 POOLED 2584 3688 0.7007
+Running as unit: perflab-srv-8097.service; invocation ID: 7ab9316891dd40b8ab257bd6f1db5607
+== ACC integrate7-chat load=0.95 0.91 1.35 POOLED 2016 3776 0.5339
+== GATES DONE Tue Sep 29 02:45:39 AM PDT 2026

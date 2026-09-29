@@ -3499,3 +3499,50 @@ What each task delivered (fork branches, each with env kill switches):
 Rules learned: check ISA for `s_wait_loadcnt 0` directly after a prefetch in
 any RDNA4 shader; compute LDS bank mapping for staging stores before tuning
 anything else; judge MTP acceptance pooled over ≥ 10 prompts.
+
+## Autoresearch round 1: `r9700-integrate7` @ df1e6be71 + `--spec-draft-n-max 4` is the serving candidate (2026-09-29)
+
+integrate6 = integrate4 + P3 prefill host fixes + W2 MMVQ at n≥5 + Q8G q8_0 GEMM. It passes
+`gates4.sh` (`results/d0/gates-integrate6-20260929.txt`). The numbers come from quiet
+windows (loadavg < 2.6, back to back). Rows are in `autoresearch/results.tsv`.
+
+| metric | integrate4 n3 | integrate5 n3 | **integrate5/6 n4** | target |
+|---|---:|---:|---:|---:|
+| decode ~70k (depth.sh, 3 reps) | 52.05 | 52.07 | **55.98 / 55.97** | ≥ 60 (missed) |
+| decode ~176k | 47.58 | 47.54 | **55.72 / 55.71** | ≥ 55 (**met**) |
+| pooled t/s, 37 prompts | — | 48.51 (tok/step 2.75) | **49.69** (2.97) | ≥ kept −1% |
+| pp2048 d0 / d16384 | — | 1,577 / 1,377 | **1,607 / 1,403** (i6) | 1,700 / 1,480 |
+| pp512 d131072 | — | 766 | 772 (i6) | 850 |
+
+- **integrate7 = integrate6 + MQ5** (q6_K MMVQ fast path at n≥5, 2 rows/WG, `GGML_VK_NO_MQ5_TUNE=1`):
+  verify n=5 46.0 → 44.6 ms; depth.sh n4 70k 58.40 → **59.41 / 59.33** (target 60, missed by 1%), 176k
+  55.74 → **57.27 / 57.26**; pooled 50.25 → **50.74**. Gates pass (`results/d0/gates-integrate7-20260929.txt`),
+  but they run at n ≤ 4, so the n=5 path is covered only by test-backend-ops and pooled tok/step.
+  i6's 70k number rose vs i5 (56.0 → 58.4) because acceptance on the one depth.sh prompt moved
+  0.657 → 0.698 (Q8G changes prefill numerics); compare depth.sh only within one acceptance.
+- **n_max 4** is +2.4% pooled: corpus +8.0%, chat +0.8%, held-out −2.6%. On depth.sh it is
+  +7.5% at 70k and +17% at 176k. P3 is decode-neutral (i5 n3 = i4 n3).
+- **VRAM peak at n4** during a 176k prefill plus an image request is **32,609 of 32,624 MiB**.
+  That is 15 MiB free, with no allocation errors. Anything that adds VRAM is closed at
+  this ctx.
+- **Q8G**: q8_0 had only the generic int8 MMQ path. A P1-style f16-WMMA shader takes the
+  q8_0 GEMM from 59.7 to 83.9 TF in-model (+1.9% pp2048). The switch is
+  `GGML_VK_NO_Q8_GEMM_TUNE=1`. The shader reads ≤4 bytes past the last block, which is
+  never used and sits in a page-granular allocation.
+- **Killed with measurements:**
+  - q6_K rows per WG: 4 stays (1/2/8 cost +20.7/+3.9/+6.5 ms per verify).
+  - MMVQ at n=4: +0.7 ms.
+  - Fused gate+up+GLU GEMV: −0.4 ms ABAB, under the 0.8 kill line.
+  - ubatch 1024/2048: d0 is −1.2%/−3.5%.
+  - P2c FA mask double buffer: 0%.
+  - f32 m=48 split-K: ceiling below 1 ms.
+  - Prefill residual ADD in GEMM epilogue: net −1.3 ms (GEMMs +2 ms).
+  - GEMV fixed cost: quantize reuse and barrier grouping already exist; skipping every q8_1
+    quantize saves only 1.0 ms. The ~8 µs/call is in-kernel ramp/tail and RAW barriers.
+  - Prefill GATED_DELTA_NET: fp32 VALU-bound at ~65% of floor. Only a chunked WY/WMMA
+    kernel could reach 2×, which is a multi-day project.
+
+Rules learned:
+- Perf-logger in-model A/Bs repeat to 0.02 ms at load < 4, but spread ~1 ms at load 10–15.
+  Run them ABAB and record the load.
+- `inmodel.sh`'s "GEMV sum" line misses fused-op rows. Compare the per-op rows instead.

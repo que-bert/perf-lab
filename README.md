@@ -39,8 +39,12 @@ card and stamping the row with a fingerprint that lies.
 
 ### Current known-good config
 
-Qwen3.8-27B Q6_K, 262,144 context, `q4_0` K and V, `--spec-type draft-mtp
---spec-draft-n-max 4`. 46.15 tok/s decode, 711 t/s prefill, 29.3 of 32 GB VRAM.
+Fork branch `r9700-qwen` @ df1e6be71 (= `r9700-integrate7`; previous serving build tagged
+`r9700-qwen-integrate2`). Qwen3.8-27B Q6_K, 262,144 context, `-fa on`, `--parallel 1`,
+`-ctk q8_0 -ctv q8_0`, `--spec-type draft-mtp --spec-draft-n-max 4 -ctkd q8_0 -ctvd q8_0
+--spec-draft-vocab 98304 --spec-draft-vocab-adaptive`, `--mmproj mmproj-F16.gguf`.
+Decode 59.4 t/s at ~70k and 57.3 at ~176k; prefill pp2048 1,607 t/s. VRAM peak is
+32,609 of 32,624 MiB (176k prefill plus an image). See FINDINGS 2026-09-29.
 
 ## Layout
 
