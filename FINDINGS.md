@@ -3547,7 +3547,7 @@ Rules learned:
   Run them ABAB and record the load.
 - `inmodel.sh`'s "GEMV sum" line misses fused-op rows. Compare the per-op rows instead.
 
-## Workstation RAM has a stuck bit: compiler crashes on 2026-09-29 were hardware (2026-09-29)
+## Workstation RAM has a weak cell on bit 58: the compiler and app crashes were hardware (2026-09-29)
 
 Symptoms. Rebuilding `r9700-qwen` hit a gcc internal compiler error (segfault) in 4 of 5
 attempts, in a different file each time. The kernel log shows general protection faults in
@@ -3561,8 +3561,29 @@ and run `./memtest 16 3 24`. It ran over 16 GiB, 3 passes, 24 threads, in 60 s a
 **4 errors, all at one address with the same bit**: bit 58 reads 1 where 0 was written
 (xor `0400000000000000`). The fault showed on every pass and in both the address and random
 patterns. The inverse and walking patterns passed at that address because they expect a 1
-there. That signature is a stuck-at-1 cell, not marginal timing noise. The RAM is non-ECC,
-so EDAC reports nothing.
+there. The RAM is non-ECC, so EDAC reports nothing. (This first read it as a stuck-at-1
+cell. memtest86+ below showed the cell also fails 1→0, and is pattern-dependent.)
+
+memtest86+ v8.00 (GRUB entry "Memory test (mt86+x64)"; the menu is hidden, so use
+`sudo grub-reboot 'Memory test (mt86+x64)' && sudo reboot`):
+- DDR4-3600 CL26: 5 errors in ~1 pass, tests 6 and 7, at `0x3dde30360`, `0x3dde306a0` and
+  `0x3df385ba0`. All on bit 58, in both directions.
+- DDR4-3200 CL22: 4 errors in ~1 pass, all at `0x3dde30360`, bit 58.
+The same cell fails at both speeds, so this is a defective cell, not timing. `0x3df385ba0`
+has only failed at 3600. A root run of `harness/memtest.c` (now reports physical addresses)
+covered both pages for 3 passes and found nothing: its patterns do not trigger the cell.
+
+Crash attribution, from the kernel log (09-09 to 09-29) and Firefox minidumps:
+- Firefox main-process crashes on 09-26 and 09-29 faulted on pointers that are valid
+  except for bit 58 (`04007aeff9a00000`, `04000f2187d04a30`). Setting bit 58 makes a user
+  pointer non-canonical, which gives exactly the "general protection fault" seen in
+  `glslc` (09-20, 09-29 ×3) and `localsearch` (09-28).
+- Not RAM: ~40 `test-backend-ops` traps in `libvulkan_radeon.so` (the same two code
+  offsets every time, a RADV bug), Chrome "invalid opcode" (its own CHECK traps, same
+  offset), `wmma_isa` in lavapipe (same offset twice), and one OOM kill on 09-22
+  (systemd-oomd under memory pressure; swap was present).
+- No machine-check events in 20 days, so no sign of a CPU fault.
+- 84 parallel compiles of `ggml-vulkan.cpp` (~21 GB RAM) all gave byte-identical objects.
 
 Impact. `git fsck` on perf-lab and `llama.cpp-r9700` is clean. The serving build that
 completed gives byte-identical greedy output to `r9700-integrate7`'s build (200 tokens, same
@@ -3570,11 +3591,16 @@ MD5). All gate and benchmark results above passed their own checks. A flipped bi
 running process would more likely crash than silently shift a number, but that is not
 proven.
 
-Open, operator hardware steps:
-1. Boot memtest86+ (installed; GRUB entry "Memory test (memtest86+x64.efi)") for the
-   physical address and full coverage of all 32 GB.
-2. Retest with XMP/EXPO disabled.
-3. Test one DIMM at a time to find the bad stick.
+Mitigation (in place 2026-09-29, no replacement RAM available):
+- `harness/badram.cfg` is installed as `/etc/default/grub.d/badram.cfg`. It passes
+  `memmap=4K$0x3dde30000 memmap=4K$0x3df385000`, and the boot log shows both pages as
+  "device reserved". If DIMMs change, delete it and run `update-grub`.
+- The memory runs at DDR4-3200 (it was 3600), so CPU-side overheads in benchmarks from
+  before 2026-09-29 16:38 are not directly comparable. Re-baseline before A/Bs.
+- Swap is one 32 GB `/swapfile` (it was 8 + 16 GB).
+- Still open: an overnight memtest86+ run (10+ passes, F1 → error reporting "Linux
+  memmap") to find any other weak cells, then a repeat every month or so. A growing list
+  means the DIMM is failing.
 
-Until the fault is fixed, retry compiler crashes on this machine, and verify any important
-binary against a known-good build before trusting it.
+Until then, a random GPF or compiler ICE on this machine is suspect hardware first. Verify
+any important binary against a known-good build before trusting it.
