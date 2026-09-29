@@ -3546,3 +3546,35 @@ Rules learned:
 - Perf-logger in-model A/Bs repeat to 0.02 ms at load < 4, but spread ~1 ms at load 10–15.
   Run them ABAB and record the load.
 - `inmodel.sh`'s "GEMV sum" line misses fused-op rows. Compare the per-op rows instead.
+
+## Workstation RAM has a stuck bit: compiler crashes on 2026-09-29 were hardware (2026-09-29)
+
+Symptoms. Rebuilding `r9700-qwen` hit a gcc internal compiler error (segfault) in 4 of 5
+attempts, in a different file each time. The kernel log shows general protection faults in
+`glslc` (three times, 09:15, while building) and in the desktop indexer `localsearch`
+(2026-09-28), all in stock system libraries at unrelated addresses. RAM was not short
+(23 GB available), and temperatures were normal (Tctl 49 °C idle, GPUs 24–52 °C).
+
+Test. `harness/memtest.c` is a user-space pattern tester: address, inverse address, walking
+ones, and xorshift random. Build it with `gcc -O2 -pthread -o memtest harness/memtest.c`
+and run `./memtest 16 3 24`. It ran over 16 GiB, 3 passes, 24 threads, in 60 s and found
+**4 errors, all at one address with the same bit**: bit 58 reads 1 where 0 was written
+(xor `0400000000000000`). The fault showed on every pass and in both the address and random
+patterns. The inverse and walking patterns passed at that address because they expect a 1
+there. That signature is a stuck-at-1 cell, not marginal timing noise. The RAM is non-ECC,
+so EDAC reports nothing.
+
+Impact. `git fsck` on perf-lab and `llama.cpp-r9700` is clean. The serving build that
+completed gives byte-identical greedy output to `r9700-integrate7`'s build (200 tokens, same
+MD5). All gate and benchmark results above passed their own checks. A flipped bit in a
+running process would more likely crash than silently shift a number, but that is not
+proven.
+
+Open, operator hardware steps:
+1. Boot memtest86+ (installed; GRUB entry "Memory test (memtest86+x64.efi)") for the
+   physical address and full coverage of all 32 GB.
+2. Retest with XMP/EXPO disabled.
+3. Test one DIMM at a time to find the bad stick.
+
+Until the fault is fixed, retry compiler crashes on this machine, and verify any important
+binary against a known-good build before trusting it.
