@@ -1,0 +1,367 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 63.075,
+   "tok_step": 3.511,
+   "accept": 0.6429,
+   "n": 3841,
+   "ms_step": 55.663
+  },
+  "chat": {
+   "tps": 48.226,
+   "tok_step": 2.7533,
+   "accept": 0.4465,
+   "n": 3293,
+   "ms_step": 57.092
+  },
+  "heldout": {
+   "tps": 45.172,
+   "tok_step": 2.6736,
+   "accept": 0.4266,
+   "n": 2048,
+   "ms_step": 59.187
+  },
+  "pooled": {
+   "tps": 52.614,
+   "tok_step": 3.0046,
+   "accept": 0.5116,
+   "n": 9182,
+   "ms_step": 57.106
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 3903.123,
+   "dn": 274,
+   "da": 186,
+   "text": " older low-end devices.\n\n## Build CLI using Termux\n\n1. Install [Termux](https://termux.dev)\n2. Install dependencies:\n   ```sh\n   pkg install cmake clang make\n   ```\n3. Clone the repository:\n   ```sh\n   git clone https://github.com/ggml-org/llama.cpp\n   ```\n4. Build:\n   ```sh\n   cd llama.cpp\n   cmake -B build -DGGML_NATIVE=OFF\n   cmake --build build --config Release -j\n   ```\n5. Run:\n   ```sh\n   ./build/bin/llama-cli -m <model>\n   ```\n\n## Build CLI using Nix\n\n1. Install [Nix](https://nixos.org/download)\n2. Clone the repository:\n   ```sh\n   git clone https://github.com/ggml-org/llama.cpp\n   ```\n3. Build:\n   ```sh\n   cd llama.cpp\n   nix build .#llama-cpp\n   ```\n4. Run:\n   ```sh\n   nix run .#llama-cpp -- -m <model>\n   ```\n\n## Build CLI"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 4393.774,
+   "dn": 305,
+   "da": 177,
+   "text": "\n...\n[truncated]\n...\n==== license/MIT ====\nMIT License\n\nCopyright (c) 2025 gg\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\n==== license/README.md ====\n# Licenses\n\nThe llama.cpp code base"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 4489.293,
+   "dn": 314,
+   "da": 175,
+   "text": " GNU GENERAL PUBLIC LICENSE\n               Version 1, February 1989\n\n Copyright (C) 1989 Free Software Foundation, Inc.\n 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA\n Everyone is permitted to copy and distribute verbatim copies\n of this license document, but changing it is not allowed.\n\n                            Preamble\n\n  The licenses for most software are designed to take away your\nfreedom to share and change it.  By contrast, the GNU General Public\nLicense is intended to guarantee your freedom to share and change free\nsoftware--to make sure the software is free for all its users.  This\nGeneral Public License applies to most of the Free Software\nFoundation's software and to any other program whose authors commit to\nusing it.  (Some other Free Software Foundation software is covered by\nthe GNU Library General Public License instead.)  You can apply it to\nyour programs, too.\n\n  When we speak of free software, we are referring to freedom, not\nprice.  Our General Public Licenses are designed to make sure that you\nhave the freedom to distribute copies of free software (and charge for\nthis service"
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 256,
+   "ms": 3296.428,
+   "dn": 230,
+   "da": 197,
+   "text": "2.5-coder-7b-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/Phi-3-mini-4k-instruct-Q4_K_M](https://huggingface.co/bartowski/Phi-3-mini-4k-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/Phi-4-mini-instruct-Q4_K_M](https://huggingface.co/bartowski/Phi-4-mini-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/gemma-2-2b-it-Q4_K_M](https://huggingface.co/bartowski/gemma-2-2b-it-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/gemma-3-4b-it-Q4_K_M](https://huggingface.co/bartowski/gemma-3-4b-it-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  | "
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 3688.426,
+   "dn": 258,
+   "da": 190,
+   "text": "ollow the [installation guide](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2025-1/2025-1.html) to install the packages.\n\n*Note*:\n  - The **Intel® oneAPI Base toolkit** and **Intel® Deep Learning Essentials** are available for Linux and Windows.\n  - The **Intel® Deep Learning Essentials** is only available for Linux.\n  - The **Intel® oneAPI Base toolkit** and **Intel® Deep Learning Essentials** are available for both FP32 and FP16.\n  - The **Intel® oneAPI Base toolkit** and **Intel® Deep Learning Essentials** are available for both Intel GPU and other vendor GPU.\n\n- **For other vendor GPU**\n\nAll above are included in **Intel® oneAPI Base toolkit** package.\n\nPlease foollow the [installation guide](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2025-1/2025-1.html) to install the packages.\n\n*Note*:\n  - The **Intel® oneAPI Base toolkit** is available for Linux and Windows.\n  - The **"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 4561.49,
+   "dn": 322,
+   "da": 174,
+   "text": " system and a licensee cannot\nimpose that choice.\n\nThis section is intended to make thoroughly clear what is believed to\nbe a consequence of the rest of this License.\n\n  12. If the distribution and/or use of the Library is restricted in\ncertain countries either by patents or by copyrighted interfaces, the\noriginal copyright holder who places the Library under this License may add\nan explicit geographical distribution limitation excluding those countries,\nso that distribution is permitted only in or among countries not thus\nexcluded.  In such case, this License incorporates the limitation as if\nwritten in the body of this License.\n\n  13. The Free Software Foundation may publish revised and/or new\nversions of the Lesser General Public License from time to time.\nSuch new versions will be similar in spirit to the present version,\nbut may differ in detail to address new problems or concerns.\n\nEach version is given a distinguishing version number.  If the Library\nspecifies a version number of this License which applies to it and\n\"any later version\", you have the option of following the terms and\nconditions either of that version or of any later version published by\nthe Free Software Foundation.  If the Library does not specify a license\nversion"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 256,
+   "ms": 4820.519,
+   "dn": 336,
+   "da": 170,
+   "text": ".g. an Open Source license that may be attached to the\n    Specific License, such as the BSD License, the Apache License,\n    the GNU Lesser General Public License, or the Mozilla Public\n    License version 1.1.\n\n1.13. \"Source Code Form\"\n    means the form of the work preferred for making modifications.\n\n1.14. \"Use\"\n    means use by the method of making, using, selling, offering for\n    sale, having made, import, and transfer or otherwise making\n    available.\n\n1.15. \"You\" (or \"Your\")\n    means an individual or a legal entity exercising rights under this\n    License. For legal entities, \"You\" includes any entity that\n    controls, is controlled by, or is under common control with You. For\n    purposes of this definition, \"control\" means (a) the power, direct\n    or indirect, to cause the direction or management of such entity,\n    whether by contract or otherwise, or (b) ownership of more than\n    fifty percent (50%) of the outstanding shares or beneficial\n    ownership of such entity.\n\n2. License Grants and Conditions\n--------------------------------\n\n2"
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 3618.874,
+   "dn": 256,
+   "da": 191,
+   "text": " 100 | \n   101 |     def test_get_all(self):\n   102 |         \"\"\"Test getting all items.\"\"\"\n   103 |         items = self.store.get_all()\n   104 |         self.assertEqual(len(items), 3)\n   105 | \n   106 |     def test_get_all_with_filter(self):\n   107 |         \"\"\"Test getting all items with filter.\"\"\"\n   108 |         items = self.store.get_all(category=\"electronics\")\n   109 |         self.assertEqual(len(items), 2)\n   110 | \n   111 |     def test_get_all_with_limit(self):\n   112 |         \"\"\"Test getting all items with limit.\"\"\"\n   113 |         items = self.store.get_all(limit=2)\n   114 |         self.assertEqual(len(items), 2)\n   115 | \n   116 |     def test_get_all_with_offset(self):\n   117 |         \"\"\"Test getting all items with offset.\"\"\"\n   118 |"
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 3627.481,
+   "dn": 255,
+   "da": 191,
+   "text": ":\n                mytz = self.replace(tzinfo=None)._local_timezone()\n                myoffset = mytz.utcoffset(self)\n                if myoffset is None:\n                    mytz = timezone.utc\n                    myoffset = timedelta(0)\n                    self = self.replace(tzinfo=mytz)\n\n        if tz is mytz:\n            return self\n\n        # Convert self to UTC, and attach the new time zone object.\n        utc = (self - myoffset).replace(tzinfo=tz)\n\n        # Convert from UTC to tz's local time.\n        return tz.fromutc(utc)\n\n    # Pickle support.\n\n    def _getstate(self, protocol=3):\n        us2, us3 = divmod(self._microsecond, 256)\n        us1, us2 = divmod(us2, 256)\n        h = self._hour\n        basestate = bytes([self._year, self._month, self._day,\n                           h, self._minute, self._second,\n                           us1, us2, us3])\n        if self._fold and protocol > 3:\n            h += 128"
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 1,
+   "ms": 0.001,
+   "dn": 0,
+   "da": 0,
+   "text": ""
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 3412.633,
+   "dn": 239,
+   "da": 195,
+   "text": " \"\"\"\n        a = _convert_other(a, raiseit=True)\n        return a.compare_total(b, context=self)\n\n    def compare_total_mag(self, a, b):\n        \"\"\"Compares two operands using their abstract representation\n        (unsigned).\n\n        Like compare_total, but as if the operands both were positive.  This\n        allows the values to be compared without regard to sign.\n\n        >>> ExtendedContext.compare_total_mag(Decimal('12.7'),  Decimal('127'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('-127'), Decimal('12'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.3'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.30'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('12.300'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('NaN'))\n        Decimal('-"
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 4658.895,
+   "dn": 331,
+   "da": 172,
+   "text": " Note: using the module __builtin__.io is deprecated.\n    \"\"\"\n\n    _closed = False\n\n    def close(self):\n        \"\"\"Close the file.\n\n        After the file is closed, any other operation on it will\n        raise a ValueError.\n        \"\"\"\n        if self._closed:\n            return\n        self._closed = True\n\n    @property\n    def closed(self):\n        \"\"\"A boolean saying whether the file is closed.\"\"\"\n        return self._closed\n\n    __del__ = close\n\n    def __enter__(self):\n        \"\"\"Context management protocol.  Returns self.\"\"\"\n        if self._closed:\n            raise ValueError(\"I/O operation on closed file\")\n        return self\n\n    def __exit__(self, type, value, traceback):\n        \"\"\"Context management protocol.  Closes the file.\"\"\"\n        self.close()\n\n    def __iter__(self):\n        \"\"\"Iterate over the lines of the file.\"\"\"\n        return iter(self.readline, b\"\")\n\n    def __reversed__(self):\n        \"\"\"Iterate over the lines of the file in reverse order.\"\"\"\n        self._checkSeekable()\n        if not self._checkReadable():\n           "
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 4065.004,
+   "dn": 287,
+   "da": 183,
+   "text": "ally-represented\n    # value in a decimal context with precision set to MAX_PREC.\n    #\n    # The algorithm is:\n    #\n    # 1. Split the number into two halves, high and low.\n    # 2. Recursively convert the high half to decimal.\n    # 3. Multiply the high half by 10**len(low).\n    # 4. Recursively convert the low half to decimal.\n    # 5. Add the results of steps 3 and 4.\n    #\n    # The key insight is that the multiplication in step 3 is a\n    # power-of-2 to power-of-2 multiplication, which is fast.\n    #\n    # The algorithm is O(n log n) where n is the number of digits.\n    #\n    # The algorithm is not used for small numbers, as the overhead of\n    # the recursive calls is not worth it.  The threshold is 1000\n    # digits.\n\n    # The algorithm is not used for small numbers, as the overhead of\n    # the recursive calls is not worth it.  The threshold is 1000\n   "
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 4219.531,
+   "dn": 296,
+   "da": 180,
+   "text": "-guide/index.html#environmental-variables) to control the runtime behavior.\n\nFor example, you can set `CUDA_VISIBLE_DEVICES` to select which GPU(s) to use.\n\n```bash\nCUDA_VISIBLE_DEVICES=0,1 ./build/bin/llama-cli -m model.gguf\n```\n\n### CUDA 12.8+\n\nCUDA 12.8+ requires CMake 3.25+ to build.\n\n## MUSA\n\nThis provides GPU acceleration using a Moore Threads GPU. Make sure to have the [MUSA toolkit](https://developer.mthreads.com/) installed.\n\n```bash\ncmake -B build -DGGML_MUSA=ON\ncmake --build build --config Release\n```\n\n## HIP\n\nThis provides GPU acceleration using an AMD GPU. Make sure to have the [ROCm](https://www.rocm.com/) toolkit installed.\n\n```bash\ncmake -B build -DGGML_HIP=ON\ncmake --build build --config Release\n```\n\n### Non-Native Builds\n\nBy default llama.cpp will be built for the hardware that is connected to the system at that time.\nFor a build covering all AMD GPUs, disable `GGML_NATIVE`:\n\n```"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 4306.017,
+   "dn": 302,
+   "da": 179,
+   "text": "DCACHE': 0,\n    'HAVE_COPYFILE': 0,\n    'HAVE_COPYFILE_AT': 0,\n    'HAVE_COPYSIGN': 1,\n    'HAVE_COPYSIGNL': 1,\n    'HAVE_CRYPT': 1,\n    'HAVE_CRYPT_H': 1,\n    'HAVE_CURSES_H': 1,\n    'HAVE_CURSES_SET_WINDOW': 1,\n    'HAVE_CURS_SET_WINDOW': 1,\n    'HAVE_DECL_H_ERRNO': 1,\n    'HAVE_DECL_PTHREAD_YIELD': 1,\n    'HAVE_DECL_ST_RDEV': 1,\n    'HAVE_DECL_TZNAME': 1,\n    'HAVE_DIRENT_H': 1,\n    'HAVE_DIRFD': 1,\n    'HAVE_DLFCN_H': 1,\n    'HAVE_DLOPEN': 1,\n    'HAVE_DLSYM_UNCONST': 0,\n    'HAVE_DN_EXPAND': 1,\n    'HAVE_DN_MAKE_NAME': 1,\n    'HAVE_DTRACE': 1,\n    'HAVE_DUP2"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 3834.018,
+   "dn": 268,
+   "da": 187,
+   "text": " N`) flag that configures the number of CPU threads to use. If you set this to a value that is too high, then the CPU will be oversaturated, and performance will suffer. For example, if you have a 16-core CPU, and you set `-t 16`, then the CPU will be oversaturated, and performance will suffer. In this case, you should set `-t 14` or `-t 12` to avoid oversaturation.\n\n## Verifying that the CPU is not throttling\nIf the CPU is throttling, then performance will suffer. This can happen if the CPU is overheating, or if the power supply is not providing enough power. You can check the CPU temperature with a tool like `htop` or `coretemp`. If the CPU is overheating, then you should improve the cooling of the CPU, or reduce the workload.\n\n## Verifying that the GPU is not throttling\nIf the GPU is throttling, then performance will suffer. This can happen if the GPU is overheating, or if the power supply is not providing enough power. You can check the GPU temperature with a tool like `nvidia-smi`. If the GPU is overheating, then you"
+  },
+  {
+   "set": "chat",
+   "i": 0,
+   "n": 256,
+   "ms": 6230.454,
+   "dn": 442,
+   "da": 143,
+   "text": "The wind off the North Sea didn’t just blow; it screamed. For Elias, the sound was a constant companion, a rhythmic thrum that had replaced the silence of his youth. He wiped the salt crust from the lens of the lighthouse, his hands rough and mapped with scars from decades of maintenance. It was a lonely life, chosen for the solitude, but lately, the quiet felt less like peace and more like a void.\n\nOn a Tuesday, when the fog was so thick it seemed to have weight, Elias found the bottle. It was wedged in the rocks below the cliff, half-buried in wet kelp. It wasn’t the usual debris of plastic wrappers or broken glass. This was a heavy, green glass cylinder, sealed with wax that had turned brittle with age.\n\nHe brought it inside, placing it on the small wooden table beside his cold cup of tea. With trembling fingers, he pried the cork loose. The smell that escaped was not of rot, but of lavender and old paper. He pulled out a rolled slip of parchment, yellowed and fragile.\n\nThe handwriting was elegant, looping, and unmistakably feminine.\n\n*“If you are reading this, I am gone. I left this for the keeper"
+  },
+  {
+   "set": "chat",
+   "i": 1,
+   "n": 256,
+   "ms": 5162.018,
+   "dn": 368,
+   "da": 162,
+   "text": "The fall of the Western Roman Empire was not the result of a single catastrophic event, but rather a complex interplay of internal decay and external pressures that unfolded over several centuries. Internally, the empire suffered from severe political instability, characterized by frequent civil wars, short-lived emperors, and a lack of centralized authority. This political fragmentation weakened the state’s ability to maintain infrastructure, enforce laws, and coordinate military defense. Concurrently, the economy experienced significant strain due to heavy taxation, inflation, and the debasement of currency, which eroded public confidence and reduced the state’s revenue. Social cohesion also deteriorated as the gap between the wealthy elite and the impoverished populace widened, leading to a decline in civic duty and military recruitment.\n\nExternally, the empire faced relentless pressure from migrating Germanic tribes, such as the Visigoths, Vandals, and Ostrogoths, who were themselves being pushed westward by the Huns. These groups initially sought settlement within Roman borders but increasingly launched devastating raids and invasions. The most symbolic blow came in 410 AD when the Visigoths sacked Rome, shattering the myth of the city’s invincibility. Over time, these tribes established their own kingdoms within former Roman territories, effectively replacing"
+  },
+  {
+   "set": "chat",
+   "i": 2,
+   "n": 256,
+   "ms": 4846.476,
+   "dn": 340,
+   "da": 169,
+   "text": "Think of it this way: the main difference comes down to **when you pay the taxes**.\n\nWith a **Traditional IRA**, you get the tax break *now*. You contribute pre-tax dollars, which lowers your taxable income for the year you make the contribution. But when you withdraw that money in retirement, you pay income tax on it. It’s like getting a discount today, but paying the bill later.\n\nWith a **Roth IRA**, you pay the taxes *now*. You contribute after-tax dollars, so you don’t get a tax deduction today. But the magic happens later: when you withdraw the money in retirement (as long as you meet the rules), it’s completely tax-free. It’s like paying the bill upfront so you can enjoy the ride without worrying about extra charges later.\n\nHere are a few other key differences to keep in mind:\n\n*   **Income Limits:** Roth IRAs have income caps. If you earn too much, you can’t contribute directly to one. Traditional IRAs don’t have income limits for contributions, though your ability to deduct them depends on your income and whether you have a workplace retirement plan.\n*   **Required Minimum Distributions (RMDs):** Traditional IRAs require you to start taking withdrawals by"
+  },
+  {
+   "set": "chat",
+   "i": 3,
+   "n": 256,
+   "ms": 4832.078,
+   "dn": 344,
+   "da": 168,
+   "text": "Congratulations on landing the interview! That is a huge step. Since it is tomorrow, you don’t have time for a deep dive into new material, but you can definitely sharpen your focus and reduce anxiety with targeted preparation.\n\nHere is a strategic, last-minute prep plan for your nursing interview:\n\n### 1. Research the Facility & Unit (15–20 mins)\n*   **Know the Unit:** Is it ICU, ER, Med-Surg, Peds, or Home Health? Each has different priorities.\n    *   *ICU/ER:* Focus on rapid assessment, critical thinking, and stability.\n    *   *Med-Surg:* Focus on patient education, discharge planning, and managing multiple patients.\n    *   *Peds:* Focus on family-centered care and communication with parents.\n*   **Check the Website:** Look at their \"Mission/Vision\" statement. If they mention \"compassionate care\" or \"innovation,\" weave those words into your answers.\n*   **Recent News:** Did they recently open a new wing? Win an award? Mentioning this shows genuine interest.\n\n### 2. Prepare for the \"Big Three\" Nursing Questions\nMost nursing interviews revolve around these core competencies"
+  },
+  {
+   "set": "chat",
+   "i": 4,
+   "n": 256,
+   "ms": 5640.771,
+   "dn": 408,
+   "da": 153,
+   "text": "**Pride and Prejudice**, published in 1813 by Jane Austen, is a classic novel of manners that explores the social dynamics, marriage, and class structures of early 19th-century England.\n\n### Plot Summary\n\nThe story centers on **Elizabeth Bennet**, the second of five daughters in a family whose estate is entailed away from the women, meaning the sisters must secure financial security through marriage. When the wealthy and charming **Mr. Bingley** moves into the neighborhood, he immediately takes a liking to Elizabeth’s eldest sister, **Jane**. However, Bingley’s friend, the wealthy and proud **Mr. Fitzwilliam Darcy**, initially dislikes Elizabeth, dismissing her as merely \"tolerable\" and not handsome enough to tempt him.\n\nElizabeth’s prejudice against Darcy deepens after he insults her at a ball and later reveals his role in separating Jane and Bingley, claiming Jane’s feelings were indifferent. Meanwhile, Elizabeth’s younger sister, **Lydia**, elopes with **Mr. Wickham**, a charming officer who has previously deceived Elizabeth by claiming Darcy wronged him. This scandal threatens the reputation and future prospects of all the Bennet sisters.\n\nIn a dramatic turn, Darcy,"
+  },
+  {
+   "set": "chat",
+   "i": 5,
+   "n": 256,
+   "ms": 5397.823,
+   "dn": 356,
+   "da": 165,
+   "text": "长城（The Great Wall）不仅是世界上规模最大的军事防御工程，更是中华民族精神的象征。以下从**历史沿革**和**文化意义**两个维度为您详细介绍：\n\n### 一、 长城的历史沿革\n\n长城并非一次性建成，而是历经两千多年，由多个朝代不断修筑、连接和加固而成的庞大体系。\n\n1. **起源：春秋战国时期（公元前7世纪 - 前3世纪）**\n   - 长城的雏形最早可追溯至春秋战国时期。当时诸侯国林立，为了防御彼此侵扰，各国（如楚、齐、燕、赵、魏、秦等）在边境修筑了各自的城墙。\n   - 这些早期长城多为土筑或石砌，规模较小，且互不相连。\n\n2. **统一与初建：秦朝（公元前221年 - 前207年）**\n   - 秦始皇统一六国后，为防御北方匈奴的南下，命大将蒙恬将原秦、赵、燕三国的北边长城连接起来，并向西延伸。\n   - 这是历史上第一次将分散的长城连成一体，形成了“万里长城”的雏形，主要功能是军事防御。\n\n3. **"
+  },
+  {
+   "set": "chat",
+   "i": 6,
+   "n": 256,
+   "ms": 5698.124,
+   "dn": 375,
+   "da": 160,
+   "text": "**El Pulmona Verde del Mundo: La Urgencia de Preservar la Biodiversidad en América Latina**\n\nAmérica Latina no es simplemente una región geográfica; es un bastión biológico sin precedentes en el planeta. Con una riqueza de especies que supera a la de cualquier otra región, este continente alberga aproximadamente el 50% de la biodiversidad mundial, a pesar de ocupar solo el 8% de la superficie terrestre. Desde la selva amazónica hasta los bosques andinos, pasando por los manglares del Caribe y las praderas del Pampas, esta diversidad no es solo un lujo estético, sino un pilar fundamental para la estabilidad ecológica, económica y social del mundo.\n\nLa importancia de la biodiversidad en la región trasciende lo biológico. En primer lugar, actúa como un regulador climático global. Los ecosistemas latinoamericanos, particularmente la Amazonía y los bosques tropicales de Centroamérica, son sumideros de carbono cruciales que mitigan el cambio climático. Además, estos ecosistemas regulan los ciclos del agua, garantizando el suministro de agua dulce para millones de personas y sosteniendo la agricultura, que es la base de la seguridad alimentaria regional."
+  },
+  {
+   "set": "chat",
+   "i": 7,
+   "n": 256,
+   "ms": 5288.398,
+   "dn": 349,
+   "da": 167,
+   "text": "Stell dir vor, eine Pflanze ist wie eine kleine **Fabrik**, die ihre eigene Nahrung herstellt. Hier ist der Prozess in einfachen Schritten erklärt:\n\n### 1. Die Zutaten\nDie Pflanze braucht drei Dinge, um zu „kochen“:\n*   **Licht** (von der Sonne) – das ist die Energiequelle.\n*   **Wasser** (aus dem Boden, aufgenommen über die Wurzeln).\n*   **Kohlendioxid** (aus der Luft, aufgenommen über die Blätter).\n\n### 2. Der Ort: Das Blatt\nDie meisten dieser „Fabriken“ sitzen in den **Blättern**. In den Blättern gibt es winzige grüne Körnchen, die **Chloroplasten** heißen. Darin steckt ein grünes Pigment namens **Chlorophyll**. Dieses Chlorophyll ist wie ein Solarpanel: Es fängt das Sonnenlicht ein.\n\n### 3. Der Prozess (Die „Magie“)\nWenn das Sonnenlicht auf das Chlorophyll trifft, passiert Folgendes:\n*   Das Licht gibt seine Energie ab.\n*   Diese Energie wird genutzt, um das **Wasser**"
+  },
+  {
+   "set": "chat",
+   "i": 8,
+   "n": 256,
+   "ms": 6351.719,
+   "dn": 423,
+   "da": 149,
+   "text": "日本の四季は、気候の変化だけでなく、その季節に根付いた独自の文化や行事を通じて深く体験されます。以下に、春・夏・秋・冬それぞれの季節の特徴と代表的な伝統行事について解説します。\n\n### 1. 春（3月～5月）\n**【季節の特徴】**\n冬から抜け出し、気温が上昇し始める季節です。特に3月下旬から4月上旬にかけては、桜が満開となり、日本全国で「花見」の季節を迎えます。新緑が芽吹き、自然が生き生きと目覚める時期でもあります。\n\n**【伝統行事・文化】**\n*   **花見（はなみ）**：桜の下で弁当を食べたり、お酒を飲んだりしながら花を愛でる風習です。\n*   **入学式・入社式**：4月1日は日本の新しい年度の始まりであり、多くの学校や企業で新しいスタートを切る行事が行われます。\n*   **ひな祭り（3月3日）**：女の子の健やかな成長を祈る行事で、雛人形を飾り、ひなあられや桃の餅を食べます。\n*   **こどもの日（5月5日）**：男"
+  },
+  {
+   "set": "chat",
+   "i": 9,
+   "n": 221,
+   "ms": 4434.985,
+   "dn": 296,
+   "da": 147,
+   "text": "Objet : Demande de congé annuel\n\nMadame, Monsieur [Nom du supérieur hiérarchique],\n\nPar la présente, je me permets de vous soumettre ma demande de congé annuel pour une durée de trois semaines, du [Date de début] au [Date de fin], inclus.\n\nJ’ai pris soin de planifier mes tâches en amont afin de garantir la continuité du service durant mon absence. J’ai également identifié [Nom du collègue] comme personne de contact pour assurer la gestion des dossiers urgents ou spécifiques pendant cette période. Je reste bien entendu disponible avant mon départ pour finaliser les transitions nécessaires et répondre à toute question.\n\nJe vous serais reconnaissant(e) de bien vouloir m’accuser réception de cette demande et de me confirmer votre accord dans les meilleurs délais.\n\nDans l’attente de votre retour, je vous prie d’agréer, Madame, Monsieur, l’expression de mes salutations distinguées.\n\n[Votre Prénom et Nom]\n[Votre Fonction]\n[Votre Numéro de téléphone]"
+  },
+  {
+   "set": "chat",
+   "i": 10,
+   "n": 256,
+   "ms": 3429.83,
+   "dn": 241,
+   "da": 194,
+   "text": "Here is the step-by-step reasoning to determine the arrival time.\n\n### Step 1: Calculate the travel time\nTo find out how long the train travels, we use the formula:\n$$ \\text{Time} = \\frac{\\text{Distance}}{\\text{Speed}} $$\n\nGiven:\n*   Distance = $210 \\text{ km}$\n*   Speed = $84 \\text{ km/h}$\n\n$$ \\text{Time} = \\frac{210}{84} \\text{ hours} $$\n\nTo simplify the fraction $\\frac{210}{84}$:\n1.  Divide numerator and denominator by 2: $\\frac{105}{42}$\n2.  Divide numerator and denominator by 7: $\\frac{15}{6}$\n3.  Divide numerator and denominator by 3: $\\frac{5}{2}$\n\nSo, the travel time is $\\frac{5}{2}$ hours, which equals **2.5 hours**.\n\n### Step 2: Convert decimal hours to hours and minutes\nWe have 2.5 hours.\n*   The whole number part is **2 hours**.\n*   The decimal part is"
+  },
+  {
+   "set": "chat",
+   "i": 11,
+   "n": 256,
+   "ms": 5548.112,
+   "dn": 371,
+   "da": 162,
+   "text": "Here is a heartfelt wedding toast for Sam and Priya. I’ve included placeholders in brackets **[like this]** where you can insert specific details to make it truly personal.\n\n***\n\n**The Toast**\n\nGood evening, everyone.\n\nFor those of you who don’t know me, I’m **[Your Name]**, and I have had the incredible privilege of being Sam’s best friend for **[Number]** years.\n\nSam, I’ve known you through **[mention 1-2 shared experiences, e.g., college parties, moving apartments, career struggles, or a specific funny memory]**. I’ve seen you at your best, and I’ve definitely seen you at your... *most human*. I’ve watched you grow from **[describe who he was then, e.g., a nervous student]** into the man standing here today.\n\nBut what I’ve always admired most about Sam is his heart. He is loyal, he is funny, and he is deeply caring. But I’ll be honest with you: before I met Priya, I thought I knew everything about Sam. I was wrong.\n\nPriya, when you walked into Sam’s life, something shifted. I watched him light up in a way I had never seen before. You didn’t just become"
+  },
+  {
+   "set": "chat",
+   "i": 12,
+   "n": 256,
+   "ms": 5421.542,
+   "dn": 384,
+   "da": 158,
+   "text": "This is a dark, atmospheric, and abstract digital illustration with a muted, moody color palette dominated by deep maroons, burgundies, and shades of gray. The overall tone is somber, mysterious, or perhaps nostalgic.\n\nHere’s a detailed breakdown of the elements:\n\n**1. Background & Composition:**\n- The background consists of large, overlapping, semi-transparent geometric shapes — primarily circles and curved arcs — that create a sense of depth and layering.\n- These shapes are rendered in varying opacities and tones of red and gray, giving the impression of soft, blurred forms floating in space.\n- A subtle grainy texture overlays the entire image, adding to its vintage or analog feel.\n- Faint horizontal streaks or light rays cut across the middle of the frame, suggesting motion, wind, or ambient light filtering through darkness.\n\n**2. Central Element:**\n- Near the center, slightly below the horizontal midline, there is a prominent, solid dark red circle. It appears almost like a moon, a lens flare, or an abstract focal point. Its edges are soft but distinct against the darker surroundings.\n\n**3. Foreground Subject (Bottom Right):**\n- In the lower right quadrant, partially obscured by"
+  },
+  {
+   "set": "heldout",
+   "i": 0,
+   "n": 256,
+   "ms": 6854.705,
+   "dn": 453,
+   "da": 140,
+   "text": "한국을 대표하는 발효식품이자 세계적으로 사랑받는 **김치**에 대해 그 역사, 다양한 종류, 그리고 기본 제조 방법을 자세히 설명해 드리겠습니다.\n\n---\n\n### 1. 김치의 역사\n\n김치는 단순히 '배추에 양념을 한 것'이 아니라, 한국인의 식생활과 밀접하게 연결된 **발효 문화의 결정체**입니다.\n\n*   **고대~삼국시대 (기원전~6세기):**\n    *   초기에는 배추나 무를 소금에 절여 저장하는 **'절임 채소'** 형태가 주를 이뤘습니다.\n    *   고구려 벽화나 문헌에서 '김치'라는 명칭보다는 '김장'이나 '절임'으로 기록된 사례가 있습니다.\n    *   이 시기의 김치는 주로 겨울철 채소 부족을 대비하기 위한 **보존 식품**으로서의 기능이 강했습니다.\n\n*   **고려시대 (11~14세기):**\n    *   고추의 도입 이전이었기 때문에, **고춧가루 없이** 마늘, 생강, 파, 새우젓, 멸치액젓 등을 이용해 간을"
+  },
+  {
+   "set": "heldout",
+   "i": 1,
+   "n": 256,
+   "ms": 5028.755,
+   "dn": 330,
+   "da": 171,
+   "text": "Солнечная система — это гравитационно связанная система, в центре которой находится звезда **Солнце**, а вокруг неё вращаются планеты, карликовые планеты, астероиды, кометы, метеориты и другие небесные тела.\n\nНиже приведено подробное описание устройства Солнечной системы и её планет.\n\n---\n\n### 1. Центр системы: Солнце\nСолнце — это звезда среднего размера (желтый карлик), которая содержит **99,86%** всей массы Солнечной системы.\n- **Источник энергии:** В ядре Солнца происходят термоядерные реакции (синтез водорода в гелий), выделяющие огромное количество энергии в виде света и тепла.\n- **Влияние:** Гравитация Солнца удерживает все объекты системы на их орбитах.\n\n---\n\n### 2. Планеты Солнечной системы\nСогласно определению Международного астрономического союза (2006 г.), в Солнечной системе **8 планет**. Они делятся на две группы:\n\n#### А. Планеты земной группы (внут"
+  },
+  {
+   "set": "heldout",
+   "i": 2,
+   "n": 256,
+   "ms": 6098.998,
+   "dn": 404,
+   "da": 153,
+   "text": "Ecco una guida essenziale per vivere Roma al meglio in soli tre giorni, bilanciando i grandi monumenti, l'atmosfera locale e la gastronomia.\n\n### **Giorno 1: Il Cuore Antico e il Vaticano**\n*Obiettivo: I simboli assoluti della città.*\n\n*   **Mattina:** Inizia presto (apre alle 8:00) al **Colosseo**. Prenota i biglietti online con largo anticipo per evitare code. Da lì, cammina verso il **Foro Romano** e il **Palatino** (spesso inclusi nello stesso biglietto).\n*   **Pranzo:** Siediti in una trattoria classica nel rione Monti o vicino al Colosseo. Prova la **Carbonara** o la **Cacio e Pepe**. *Consiglio:* \"Da Enzo al 29\" (famosa per la carbonara, ma aspettativa alta) o \"Trattoria Luzzi\" per un'atmosfera più autentica.\n*   **Pomeriggio:** Spostati verso il Vaticano. Visita la **Basilica di San Pietro** (gratis, ma coda per la cupola) e i **Musei Vaticani** (prenota in anticipo,"
+  },
+  {
+   "set": "heldout",
+   "i": 3,
+   "n": 256,
+   "ms": 5508.478,
+   "dn": 364,
+   "da": 163,
+   "text": "O sistema de saúde pública no Brasil é conhecido como **Sistema Único de Saúde (SUS)**. Ele é um dos maiores sistemas de saúde do mundo e é frequentemente citado como um modelo de referência global por garantir o acesso universal e gratuito à população.\n\nAbaixo, explico em detalhes como ele funciona, sua estrutura, princípios e os principais desafios que enfrenta.\n\n---\n\n### 1. Fundamentos e Princípios do SUS\n\nO SUS foi criado pela **Constituição Federal de 1988** (Artigos 196 a 200). Seus pilares são:\n\n*   **Universalidade:** O direito à saúde é de todos os cidadãos, independentemente de renda, classe social ou condição de trabalho. Não há cobrança de coparticipação ou ticket.\n*   **Integralidade:** O sistema não trata apenas doenças, mas oferece ações de promoção, prevenção, tratamento e reabilitação. Isso inclui desde a vacinação até cirurgias complexas e saúde mental.\n*   **Equidade:** Todos têm direito à saúde, mas as necessidades são atendidas de forma proporcional. Populações mais vulneráveis recebem atenção prioritária.\n*   **Regionalização e Hierarquização:** Os"
+  },
+  {
+   "set": "heldout",
+   "i": 4,
+   "n": 256,
+   "ms": 5215.621,
+   "dn": 346,
+   "da": 168,
+   "text": "Tết Nguyên Đán (hay còn gọi là Tết Ta, Tết Âm lịch) là lễ hội lớn nhất, quan trọng nhất và mang đậm bản sắc văn hóa nhất trong năm của người Việt Nam. Không chỉ là dịp để đón năm mới, Tết còn là dịp để gia đình sum họp, tưởng nhớ tổ tiên và cầu mong một năm mới an khang, thịnh vượng.\n\nDưới đây là giải thích chi tiết về lịch sử và ý nghĩa sâu sắc của Tết Nguyên Đán ở Việt Nam:\n\n### 1. Nguồn gốc và Lịch sử\n\n#### a. Nguồn gốc từ Trung Hoa và sự bản địa hóa\nTết Nguyên Đán có nguồn gốc từ Trung Quốc, gắn liền với lịch sử nông nghiệp và tín ngưỡng cổ đại. Tuy nhiên, khi du nhập vào Việt Nam, nó đã được **bản địa hóa** mạnh mẽ, hòa quyện với tín ngưỡng thờ cúng tổ tiên, phong tục tập quán và khí hậu nhiệt đới của người Việt, tạo nên một nét riêng biệt không thể nhầm lẫn.\n\n*   **\"Nguyên Đán\" nghĩa là gì?**\n    *   *Nguyên*: Đầu tiên, ban đầu.\n    *   *Đán*: Giao thừa, khoảnh khắc chuyển giao giữa năm cũ và năm mới"
+  },
+  {
+   "set": "heldout",
+   "i": 5,
+   "n": 256,
+   "ms": 6222.889,
+   "dn": 414,
+   "da": 151,
+   "text": "عملية تحميل صفحة ويب من لحظة كتابة الرابط في المتصفح حتى ظهور المحتوى على الشاشة هي رحلة معقدة وسريعة تمر عبر عدة طبقات تقنية. يمكن تقسيم هذه العملية إلى مراحل رئيسية، تبدأ من جهاز المستخدم وتنتهي بالعودة إليه، مع المرور عبر شبكة عالمية من الخوادم.\n\nإليك الشرح التفصيلي خطوة بخطوة:\n\n### 1. إدخال العنوان (URL) في المتصفح\nعندما تكتب عنواناً مثل `https://www.example.com` في شريط العنوان وتضغط على \"Enter\"، يبدأ المتصفح (مثل Chrome أو Firefox) في معالجة هذا الطلب.\n\n### 2. التحقق من الكاش (Cache)\nقبل إرسال أي طلب إلى الشبكة، يتحقق المتصفح من ذاكرته المؤقتة (Cache):\n- **كاش المتصفح:** هل سبق لك زيارة هذه الصفحة؟ إذا كانت البيانات محفوظة محلياً ولم تنتهِ صلاحيتها، يعرضها المتصفح فوراً دون الاتصال بالإنترنت.\n- **كاش نظام التشغيل:** إذا لم تكن في كاش المتصفح، يتحقق نظام التشغيل من ذاكرته المؤقتة.\n- إذا لم يجد البيانات في أي مكان، يتابع العملية التالية.\n\n### 3. حل اسم النطاق (DNS"
+  },
+  {
+   "set": "heldout",
+   "i": 6,
+   "n": 256,
+   "ms": 4492.24,
+   "dn": 300,
+   "da": 180,
+   "text": "```python\nclass LRUCache:\n    \"\"\"\n    LRU（Least Recently Used，最近最少使用）缓存类。\n    \n    支持 get 和 put 操作，时间复杂度均为 O(1)。\n    \n    实现思路：\n    1. 使用双向链表来维护访问顺序：最近访问的节点放在链表头部，最久未访问的节点放在链表尾部。\n       当缓存满时需要淘汰最久未使用的元素，即删除链表尾部的节点。\n    2. 使用哈希表（字典）来快速定位 key 对应的节点，实现 O(1) 的查找。\n    \n    双向链表节点结构：\n    - key: 缓存键\n    - value: 缓存值\n    - prev: 指向前一个节点的指针\n    - next: 指向后一个节点的指针\n    \n    为了简化边界处理，使用虚拟头节点（dummy head）和虚拟尾节点（dummy tail）。\n    实际数据节点位于 dummy head 和 dummy tail 之间。\n    \"\"\"\n    \n    class Node:\n        \"\"\"\n        双向链表节点类。\n        \n        每个节点存储一个 key-value 对，以及"
+  },
+  {
+   "set": "heldout",
+   "i": 7,
+   "n": 256,
+   "ms": 5915.783,
+   "dn": 394,
+   "da": 156,
+   "text": "委员会将决定推迟，直至田间试验提供更多数据，理由是担忧长期安全性和成本问题。\n\n**用词说明：**\n\n1. **“将决定推迟”**：对应 “postponed its decision”。中文习惯用“将……推迟”或“推迟……决定”，这里采用“将决定推迟”更符合正式公文语序，强调动作对象。\n2. **“直至”**：对应 “until”。比“直到”更书面、正式，适合委员会决策这类语境。\n3. **“田间试验”**：对应 “field trials”。在农业或生物医学领域，“field trials” 标准译法为“田间试验”（若为药物临床前研究，也可称“现场试验”，但“田间”更贴合常见语境，如农药、作物等）。\n4. **“提供更多数据”**：对应 “more data … became available”。中文不直译“变得可用”，而用“提供”更自然，体现数据由试验产生并可供参考。\n5. **“理由是”**：对应 “citing”。比“引用”更准确，因为“citing concerns” 是说明推迟的原因，而非引用文献或条文。\n6. **“担忧”**：对应 “concerns”。比“担心”更正式"
+  }
+ ]
+}

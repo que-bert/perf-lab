@@ -39,12 +39,15 @@ card and stamping the row with a fingerprint that lies.
 
 ### Current known-good config
 
-Fork branch `r9700-qwen` @ df1e6be71 (= `r9700-integrate7`; previous serving build tagged
-`r9700-qwen-integrate2`). Qwen3.8-27B Q6_K, 262,144 context, `-fa on`, `--parallel 1`,
+Fork branch `r9700-qwen` @ 0b5e351c8 (= `r9700-integrate8`: integrate7 + GDN conv-state
+fusion for K ≤ 8 + ne00 = 1 GET_ROWS fast path; previous serving builds tagged
+`r9700-qwen-integrate7` and `r9700-qwen-integrate2`). Qwen3.8-27B Q6_K, 262,144 context, `-fa on`, `--parallel 1`,
 `-ctk q8_0 -ctv q8_0`, `--spec-type draft-mtp --spec-draft-n-max 4 -ctkd q8_0 -ctvd q8_0
 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive`, `--mmproj mmproj-F16.gguf`.
-Decode 59.4 t/s at ~70k and 57.3 at ~176k; prefill pp2048 1,607 t/s. VRAM peak is
-32,609 of 32,624 MiB (176k prefill plus an image). See FINDINGS 2026-09-29.
+Decode 60.4 / 59.4 t/s at ~70k and 57.6 / 57.1 at ~176k; pooled 51.8–52.6 t/s (37 prompts);
+prefill pp2048 ~1,600 t/s. VRAM peak is 32,600–32,609 of 32,624 MiB. At that fill, server
+prefill at 70k runs ~7% below what the same work reaches with more headroom (autoresearch
+row VCTX). See FINDINGS 2026-09-29 and `autoresearch/results.tsv` (E2E8, GATES8, PF8).
 
 ## Layout
 

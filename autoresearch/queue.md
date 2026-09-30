@@ -1,6 +1,6 @@
 # Hypothesis queue (root rewrites; ranked by expected gain)
 
-Integration head: r9700-integrate8 = integrate7 + RSI + GR2 @ 0b5e351c8 — gates pass (GATES8). n4: 70k 60.42/59.37, 176k 57.59/57.06, pooled 51.756 (i7 same window 50.547). Serving r9700-qwen: integrate7 (promote i8 = operator).
+Integration head: r9700-integrate8 = integrate7 + RSI + GR2 @ 0b5e351c8 — gates pass (GATES8). n4: 70k 60.42/59.37, 176k 57.59/57.06, pooled 51.756 (i7 same window 50.547). Serving r9700-qwen = integrate8 (SERVE8).
 Serving candidate flags: `-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive --spec-draft-n-max 4`.
 
 | id | hypothesis | est. gain | owner | state |

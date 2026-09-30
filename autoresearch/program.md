@@ -90,3 +90,7 @@ request (43 MiB was free before D0b freed 234 MiB).
 - `results.tsv`: one row per experiment, append-only.
 - `queue.md`: the ranked hypothesis queue, which the root rewrites.
 - `pool.py`: the pooled t/s arbiter.
+- The perf-lab nightly/drain/heartbeat timers are disabled and masked (2026-09-30 OOM:
+  nightly canaries raced a GPU-locked experiment). Before any GPU run, `pgrep -a
+  'llama-(server|bench)'` must show nothing outside the lock holder. Only one model may be
+  loaded on the R9700 at a time; a second spills to system RAM and OOMs the machine.
