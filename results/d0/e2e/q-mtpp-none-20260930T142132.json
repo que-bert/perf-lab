@@ -1,0 +1,26 @@
+[
+  {
+    "label": "~70k",
+    "reps_requested": 1600,
+    "prompt_n": 72489,
+    "decode_mean": 22.124,
+    "decode_steady_mean": 22.124,
+    "decode_steady_min": 22.124,
+    "decode_steady_max": 22.124,
+    "decode_spread_pct": null,
+    "prefill": 1247.4869648806837,
+    "accept_frac": null,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 22.124283073059434,
+        "prefill": 1247.4869648806837,
+        "prompt_n": 72489,
+        "accepted": null,
+        "drafted": null,
+        "wall": 63.97426080703735,
+        "content": "\nRequest 1600. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1601. Write a short technical description of how a write-ahead log keeps a database\n\n<think>\nThe user has sent 1602 identical requests (Request 0 through Request 1601), all asking for the same thing: a short technical description of how a write-ahead log keeps a database consistent across a crash, covering the log record, the checkpoint, and"
+      }
+    ]
+  }
+]

@@ -9,7 +9,8 @@ B=${B:-/home/bbuckham/git/llama.cpp-r9700-ar-hgr/build/bin}; T=${T:-hgr}
 L=$P/harness/gpu_lock.sh
 F="-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive -lm none"
 quiet() { until awk -v m="${MAXLOAD:-2}" '{exit !($1 < m)}' /proc/loadavg; do sleep 30; done; }
-env_of() { [ "$1" = on ] && echo "GGML_VK_HOST_GET_ROWS=1" || echo ""; }
+# BASE_ENV (KEY=VAL;...) goes to both arms, e.g. BASE_ENV=MTMD_LAZY_GPU=1 after VB.
+env_of() { local e="${BASE_ENV:-}"; [ "$1" = on ] && e="${e:+$e;}GGML_VK_HOST_GET_ROWS=1"; echo "$e"; }
 for arm in off on off on; do
   quiet; echo "== depth $T-$arm start load=$(cut -d' ' -f1-3 /proc/loadavg)"
   $L env PERFLAB_ENV="$(env_of $arm)" DEPTHS=1600,4000 REPS=3 PERFLAB_CTK=q8_0 PERFLAB_CTV=q8_0 SPEC_NMAX=4 DEPTH_LOG_DIR=results/d0/e2e \

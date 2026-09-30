@@ -17,9 +17,9 @@ Serving candidate flags: `-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-
 | GR2 | verify: reduced-vocab logits unpermute is GET_ROWS with ne00=1 over 248320x5 "rows" (qwen35.cpp:226-237), 2 calls 1.09 ms -> flat per-element kernel | -0.5..1.0 ms/step | root | in integrate8 (-1.08 ms GPU) |
 | R7P | chain screen: chain adds nothing; Vulkan GET_ROWS from pinned host token_embd cuts draft host 3.2 -> 1.0 ms (16k) | - | - | candidate -> HGR |
 | HGR | host GET_ROWS + sync (integrate9): decode +3.5..5.7%, prefill -14% (MTP pass only); HGR2 size-gating discard (broke accept) | +5.7% pooled | - | see HGR3 |
-| HGR3 | HGR prefill loss is the MTP prompt pass (-11%); likely large host inputs (hidden states ~10 MB/ubatch) read in place over PCIe -> in-place only for small inputs | keep +5.7% decode at 0% prefill | worker HGR3 | running |
-| MTPP | MTP draft pass over the prompt costs 19% of server prefill at 70k (1249 -> 1008 t/s, spec none vs mtp) | up to +20% prefill | - | queued (after HGR3) |
-| VB | VRAM budget: free >= 800 MB at ctx 262144 (fixed formats) -> recover ~7% prefill and unblock HGR (+5.7% decode) | +7% prefill, +5.7% decode | worker VB | running |
+| HGR3 | HGR prefill loss is the MTP prompt pass (-11%); likely large host inputs (hidden states ~10 MB/ubatch) read in place over PCIe -> in-place only for small inputs | keep +5.7% decode at 0% prefill | - | discard (cause was VRAM, see VB) |
+| MTPP | MTP prompt pass: gap is -9.7% after VB (was 19% under VRAM pressure); cost is 1-layer GPU compute, host-copy lever +0.4% | - | - | discard (overlap on 2nd queue capped ~3%) |
+| VB | lazy mmproj (MTMD_LAZY_GPU=1) frees ~1130 MiB: 70k prefill 1008 -> 1117, 176k 545 -> 662, ~+2 s per image request | +10.8% / +21% prefill | root | in integrate10; HGR A/B on it running (hgr10) |
 | TREE | tree drafting: MTP top-2 at draft pos 1 as two branches in one verify batch | tok/step | root | needs brainstorm/plan (multi-day) |
 
 Closed: P3-dec (i5 n3 = i4 n3 decode), MV4 MMVQ at n=4 (+0.7 ms), G2 gate+up GEMV fusion (-0.4 ms), RM rows/WG sweep (4 stays), UB ubatch (512 stays), P2c mask DB (0%), P1c (under 2% kill line), prefill 10 unfused gate+up layers (~0.75%, under kill line), W1 draft window (acceptance), POL p_min (all lose), POL5 n_max 5 (pooled loses), W2 n=4 dequant reuse (no change).
