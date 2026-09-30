@@ -1,0 +1,26 @@
+[
+  {
+    "label": "~70k",
+    "reps_requested": 1600,
+    "prompt_n": 72489,
+    "decode_mean": 71.838,
+    "decode_steady_mean": 71.838,
+    "decode_steady_min": 71.838,
+    "decode_steady_max": 71.838,
+    "decode_spread_pct": null,
+    "prefill": 1008.3874117349757,
+    "accept_frac": 1.0,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 71.8377042585391,
+        "prefill": 1008.3874117349757,
+        "prompt_n": 72489,
+        "accepted": 12,
+        "drafted": 12,
+        "wall": 72.22106075286865,
+        "content": "\nRequest 1600. Write a short technical description of how a"
+      }
+    ]
+  }
+]

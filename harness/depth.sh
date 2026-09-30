@@ -38,7 +38,7 @@ export PERFLAB_BIN="$BIN"
   echo "### ctk=${PERFLAB_CTK:-q8_0} ctv=${PERFLAB_CTV:-q4_0} gpu=${PERFLAB_GPU:-1} depths=$DEPTHS reps=$REPS npred=$NPRED"
   echo "### spec=${SPEC_TYPE} nmax=${SPEC_NMAX} env=${PERFLAB_ENV:-}"
   harness/gpu_guard.sh "${GUARD_TIMEOUT:-900}" || exit 1
-  harness/serve_unit.sh "$MODEL" "$PORT" 262144 \
+  harness/serve_unit.sh "$MODEL" "$PORT" "${CTX:-262144}" \
     --parallel 1 --spec-type "$SPEC_TYPE" --spec-draft-n-max "$SPEC_NMAX" --mmproj "$MMPROJ" "$@"
   python3 harness/depth.py "$PORT" --depths "$DEPTHS" --reps "$REPS" --npred "$NPRED" \
     ${CORPUS:+--corpus "$CORPUS"} ${REPREFLILL:+--reprefill} \

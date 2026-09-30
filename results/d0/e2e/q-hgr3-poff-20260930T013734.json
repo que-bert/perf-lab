@@ -1,0 +1,26 @@
+[
+  {
+    "label": "~17k",
+    "reps_requested": 400,
+    "prompt_n": 17889,
+    "decode_mean": 72.031,
+    "decode_steady_mean": 72.031,
+    "decode_steady_min": 72.031,
+    "decode_steady_max": 72.031,
+    "decode_spread_pct": null,
+    "prefill": 1269.3591641430623,
+    "accept_frac": 1.0,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 72.03123274251715,
+        "prefill": 1269.3591641430623,
+        "prompt_n": 17889,
+        "accepted": 12,
+        "drafted": 12,
+        "wall": 14.339759588241577,
+        "content": "\nRequest 400. Write a short technical description of how a write"
+      }
+    ]
+  }
+]

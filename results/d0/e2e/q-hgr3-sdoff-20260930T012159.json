@@ -1,0 +1,26 @@
+[
+  {
+    "label": "short",
+    "reps_requested": 1,
+    "prompt_n": 42,
+    "decode_mean": 59.775,
+    "decode_steady_mean": 59.775,
+    "decode_steady_min": 59.775,
+    "decode_steady_max": 59.775,
+    "decode_spread_pct": null,
+    "prefill": 138.89715657678036,
+    "accept_frac": 0.7857,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 59.77548328478236,
+        "prefill": 138.89715657678036,
+        "prompt_n": 42,
+        "accepted": 11,
+        "drafted": 14,
+        "wall": 0.5614945888519287,
+        "content": "\n\nRequest 1. Write a short technical description of how a write-ahead log"
+      }
+    ]
+  }
+]
