@@ -1,0 +1,367 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 61.506,
+   "tok_step": 3.3546,
+   "accept": 0.6014,
+   "n": 3841,
+   "ms_step": 54.541
+  },
+  "chat": {
+   "tps": 49.496,
+   "tok_step": 2.7533,
+   "accept": 0.4465,
+   "n": 3293,
+   "ms_step": 55.627
+  },
+  "heldout": {
+   "tps": 46.565,
+   "tok_step": 2.6736,
+   "accept": 0.4266,
+   "n": 2048,
+   "ms_step": 57.417
+  },
+  "pooled": {
+   "tps": 53.087,
+   "tok_step": 2.9553,
+   "accept": 0.4986,
+   "n": 9182,
+   "ms_step": 55.668
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 4442.984,
+   "dn": 319,
+   "da": 175,
+   "text": " older ones.\n\n## Build CLI using NDK\n\n### Prerequisites\n\n- [Android NDK](https://developer.android.com/ndk/downloads)\n- [CMake](https://cmake.org/download/)\n- [Python](https://www.python.org/downloads/)\n\n### Build\n\n```bash\n# Set NDK path\nexport NDK=/path/to/android-ndk\n\n# Build for arm64\ncmake -B build-android \\\n    -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake \\\n    -DANDROID_ABI=arm64-v8a \\\n    -DANDROID_PLATFORM=android-21 \\\n    -DCMAKE_BUILD_TYPE=Release\n\ncmake --build build-android --config Release -j$(nproc)\n```\n\n### Run\n\n```bash\n# Push binary to device\nadb push build-android/bin/llama-cli /data/local/tmp/\n\n# Run on device\nadb shell /data/local/tmp/llama-cli -m /data/local/tmp/model.gguf -p \"Hello\"\n```\n\n## Build with Termux\n\n### Prerequisites\n\n- [Termux](https://termux.com/) installed on Android device\n\n### Build\n\n"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 4080.137,
+   "dn": 296,
+   "da": 181,
+   "text": "\n   of the Document, and any Invariant Sections of the Document that\n   are not Invariant Sections of your Modified Version must be listed\n   as invariant.  You may not add any other Invariant Sections to your\n   Modified Version.\nL. If a section in the Document is Entitled \"Acknowledgements\" or\n   \"Dedications\", you must preserve its title, and this section must\n   contain, in addition, for each acknowledgment or dedication you\n   want to include, the text of the acknowledgment or dedication you\n   want to add or keep.\nM. Preserve the section Entitled \"License\", and its title, and add to\n   it an item stating at least the title, year, new authors, and\n   publisher of the Modified Version as given on the Title Page.  If\n   there is no section Entitled \"License\" in the Document, create one\n   stating the title, year, authors, and publisher of the Document as\n   given on its Title Page, then add an item describing the Modified\n   Version as stated in the previous sentence.\nN. Preserve the network location, if any, given in the Document for\n   public access to a Transparent copy of the Document"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 5057.044,
+   "dn": 363,
+   "da": 163,
+   "text": " GNU GENERAL PUBLIC LICENSE\n               Version 1, 21 June 1989\n\n Copyright (C) 1989 Free Software Foundation, Inc.\n 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA\n Everyone is permitted to copy and distribute verbatim copies\n of this license document, but changing it is not allowed.\n\n                            Preamble\n\n  The license agreements of most software companies try to keep users\nat the mercy of those companies.  By contrast, our General Public\nLicense is intended to guarantee your freedom to share and change free\nsoftware--to make sure the software is free for all its users.  The\nGeneral Public License applies to the Free Software Foundation's\nsoftware, and to any other program whose authors commit to using\nit.  You can use it for your programs, too.\n\n  When we speak of free software, we are referring to freedom, not\nprice.  Specifically, the General Public License is designed to make\nsure that you have the freedom to distribute copies of free software\n(that you charge a price for or that you redistribute free of charge),\nthat you receive source code or else can get source code"
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 1,
+   "ms": 0.001,
+   "dn": 0,
+   "da": 0,
+   "text": ""
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 3821.289,
+   "dn": 276,
+   "da": 186,
+   "text": "\n\n```sh\nsudo apt install -y build-essential cmake git\n```\n\n3. **Build llama.cpp**\n\n```sh\ngit clone https://github.com/ggml-org/llama.cpp\ncd llama.cpp\ncmake -B build -DGGML_SYCL=ON\ncmake --build build --config Release -j\n```\n\n4. **Run llama.cpp**\n\n```sh\n./build/bin/llama-cli -m <model.gguf>\n```\n\n### II. Troubleshooting\n\n1. **`clinfo` not found**\n\n   - Please make sure the `clinfo` is installed.\n   - Please make sure the `clinfo` is in the `PATH`.\n\n2. **`clinfo` not found the device**\n\n   - Please make sure the GPU driver is installed.\n   - Please make sure the GPU driver is up to date.\n   - Please make sure the GPU is not in use by other processes.\n   - Please make sure the GPU is not in the `blacklist`.\n   - Please make sure the GPU is not in the `whitelist`.\n   - Please make sure the GPU is not in the `denylist`.\n   -"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 4458.514,
+   "dn": 319,
+   "da": 174,
+   "text": "12. The Free Software Foundation may publish revised and/or new\nversions of the Lesser General Public License from time to time.\nSuch new versions will be similar in spirit to the present version,\nbut may differ in detail to address new problems or concerns.\n\nEach version is given a distinguishing version number.  If the Library\nspecifies a version number of this License which applies to it and\n\"any later version\", you have the option of following the terms and\nconditions either of that version or of any later version published by\nthe Free Software Foundation.  If the Library does not specify a\nlicense version number, you may choose any version ever published by\nthe Free Software Foundation.\n\f\n  13. If you wish to incorporate parts of the Library into other free\nprograms whose distribution conditions are incompatible with these,\nwrite to the author to ask for permission.  For software which is\ncopyrighted by the Free Software Foundation, write to the Free\nSoftware Foundation; we sometimes make exceptions for this.  Our\ndecision will be guided by the two goals of preserving the free status\nof all derivatives of our free software and of promoting the sharing\nand reuse of software generally.\n\n================================================================\n```\n\n## File: license/"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 256,
+   "ms": 5316.381,
+   "dn": 382,
+   "da": 159,
+   "text": ".g. an Open Source license that may be attached to the\n    Initial Developer Version. The listing of such Secondary Licenses\n    may be found at www.mozilla.org/MPL/.\n\n1.13. \"Source Code Form\"\n    means the form of the work preferred for making modifications.\n\n1.14. \"Use\"\n    means any use of the Covered Software, new or derivative, for or\n    toward any purpose.\n\n1.15. \"Exhibit A\" is the following text:\n\n    \"This Source Code Form is subject to the terms of the Mozilla Public\n    License, v. 2.0. If a copy of the MPL was not distributed with this\n    file, You can obtain one at http://mozilla.org/MPL/2.0/.\"\n\n    (For reference, See Appendix A: The Mozilla Public License, Version 2.0.)\n\n1.16. \"Exhibit B\" is the following text:\n\n    \"This Source Code Form is \"Incompatible With Secondary Licenses\",\n    to which the following exceptions apply:\"\n    (a) [List of exceptions, if any.]\n    \"For full details of any exceptions, See the appendix of the\n"
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 2851.835,
+   "dn": 204,
+   "da": 204,
+   "text": " 100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 4381.11,
+   "dn": 312,
+   "da": 176,
+   "text": ":\n                mytz = self.replace(tzinfo=None)._local_timezone()\n                myoffset = mytz.utcoffset(self)\n\n        if tz is mytz:\n            return self\n\n        # Convert self to UTC, and attach the new time zone object.\n        utc = (self - myoffset).replace(tzinfo=tz)\n\n        # Convert from UTC to tz's local time.\n        return tz.fromutc(utc)\n\n    # Pickle support.\n\n    def _getstate(self, protocol=3):\n        us = self.microsecond\n        if protocol == 2:\n            return (2, _ymd2ord(self.year, self.month, self.day),\n                    self.hour, self.minute, self.second, us, self._tzinfo)\n        return (3, _ymd2ord(self.year, self.month, self.day),\n                self.hour, self.minute, self.second, us, self._tzinfo, self._fold)\n\n    def __reduce__(self):\n        return (self.__class__, (), self._getstate())\n\n    def __setstate(self, gen):\n        kind = gen[0]\n        if kind == 2:"
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 256,
+   "ms": 3387.611,
+   "dn": 243,
+   "da": 194,
+   "text": " #   0 if all zeros\n        if self._int[prec] == '5' and _all_zeros(self._int, prec+1):\n            return 1\n        else:\n            return self._round_down(prec)\n\n    def _round_half_down(self, prec):\n        \"\"\"Rounds 5 down (towards 0)\"\"\"\n        if self._int[prec+1:] and self._int[prec] == '5' and _all_zeros(self._int, prec+1):\n            return 0\n        else:\n            return self._round_down(prec)\n\n    def _round_half_even(self, prec):\n        \"\"\"Rounds 5 to even, and anything else away from 0.\"\"\"\n        if self._int[prec] == '5' and _all_zeros(self._int, prec+1):\n            return int(self._int[prec-1]) % 2\n        else:\n            return self._round_down(prec)\n\n    def _round_half_odd(self, prec):\n        \"\"\"Rounds 5 to odd, and anything else away from 0.\"\"\"\n        if self._int[prec] == '5' and"
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 2999.831,
+   "dn": 212,
+   "da": 201,
+   "text": " >>> ExtendedContext.compare_total(Decimal(1), 2)\n        Decimal('-1')\n        >>> ExtendedContext.compare_total(1, Decimal(2))\n        Decimal('-1')\n        \"\"\"\n        a = _convert_other(a, raiseit=True)\n        return a.compare_total(b, context=self)\n\n    def compare_total_mag(self, a, b):\n        \"\"\"Compares two operands using their abstract representation\n        (ignoring sign).\n\n        This is not like the standard compare, which use their numerical\n        value. Note that a total ordering is defined for all possible abstract\n        representations.\n\n        >>> ExtendedContext.compare_total_mag(Decimal('12.73'), Decimal('127.9'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('-127'),  Decimal('12'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.3'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.30'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total_mag"
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 5716.99,
+   "dn": 415,
+   "da": 151,
+   "text": " -  The \"close\" method can be called multiple times without\n     calling any other method. This is referred to as having an\n     \"idempotent close\" (see also Closeable).\n\n  -  Once a file has been closed (via the close method),\n     subsequent calls to the file's I/O operations will raise a\n     ValueError. The file object is not usable for I/O anymore.\n\n  -  An object need not be of this type to support all of the\n     operations of the file interface object.\n\n  -  This class does not implement the iterator protocol. That's\n     intentional since its methods can raise a \"ValueError\" if the\n     file has been closed.\n\n  -  This class supports the context manager protocol. The \"with\"\n     statement can be used with subclasses of this class.\n\n  -  There is no method to explicitly flush the buffer. The buffer\n     is flushed automatically when the file is closed or when the\n     buffer is full.\n\n  -  The \"closed\" attribute is True when the file is closed.\n\n  -  The \"name\" attribute is the name of the file, if any.\n\n  -  The \"mode\""
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 3756.646,
+   "dn": 268,
+   "da": 187,
+   "text": "ally-represented\n    # number in a tree-like fashion.  The tree is built in a bottom-up\n    # fashion.  The leaves are the digits of the number in base 2**30.\n    # The internal nodes are the concatenation of the decimal\n    # representations of the children.  The root is the decimal\n    # representation of the number.\n    #\n    # The algorithm is O(n^2) in the number of digits, but the constant\n    # factor is much smaller than the quadratic algorithm in\n    # longobject.c.\n    #\n    # The algorithm is O(n^2) in the number of digits, but the constant\n    # factor is much smaller than the quadratic algorithm in\n    # longobject.c.\n    #\n    # The algorithm is O(n^2) in the number of digits, but the constant\n    # factor is much smaller than the quadratic algorithm in\n    # longobject.c.\n    #\n    # The algorithm is O(n^2) in the number of digits, but the constant\n    # factor is much smaller than the quadratic algorithm in\n    # longobject.c.\n    #\n    # The algorithm"
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 3695.97,
+   "dn": 264,
+   "da": 188,
+   "text": "\n```\ncmake -B build -DGGML_METAL=OFF\n```\n\n### Metal Performance Shaders (MPS)\n\nMetal Performance Shaders (MPS) is a collection of optimized functions for Apple silicon.\nTo enable MPS, build with:\n\n```bash\ncmake -B build -DGGML_METAL_USE_MPS=ON\n```\n\n### Metal Performance Shaders (MPS) with Metal Performance Shaders (MPS)\n\nMetal Performance Shaders (MPS) is a collection of optimized functions for Apple silicon.\nTo enable MPS, build with:\n\n```bash\ncmake -B build -DGGML_METAL_USE_MPS=ON\n```\n\n### Metal Performance Shaders (MPS) with Metal Performance Shaders (MPS)\n\nMetal Performance Shaders (MPS) is a collection of optimized functions for Apple silicon.\nTo enable MPS, build with:\n\n```bash\ncmake -B build -DGGML_METAL_USE_MPS=ON\n```\n\n### Metal Performance Shaders (MPS) with Metal Performance Shaders (MPS)\n\nMetal Performance Shaders (MPS) is a collection of optimized functions for Apple silicon.\nTo enable MPS,"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 4393.722,
+   "dn": 315,
+   "da": 176,
+   "text": "STATAT': 0,\n    'HAVE_COPY_LSTATAT': 0,\n    'HAVE_COPY_STAT': 1,\n    'HAVE_COPYSIGN': 1,\n    'HAVE_COPYSIGNF': 1,\n    'HAVE_COPYSIGNL': 1,\n    'HAVE_CRYPT': 1,\n    'HAVE_CRYPT_H': 1,\n    'HAVE_CTERMID': 1,\n    'HAVE_CURSES_H': 1,\n    'HAVE_CURSES_SET_WINDOW': 1,\n    'HAVE_DECL_H_ERRNO': 1,\n    'HAVE_DECL_PTHREAD_YIELD': 1,\n    'HAVE_DECL_TZNAME': 1,\n    'HAVE_DIRENT_H': 1,\n    'HAVE_DIRFD': 1,\n    'HAVE_DLFCN_H': 1,\n    'HAVE_DLOPEN': 1,\n    'HAVE_DLSYM_UNCONST': 0,\n    'HAVE_DN_EXPAND': 1,\n    'HAVE_DN_MAKE_NAME': 1,\n    'HAVE_DNS_QUERY': 1,\n    'HAVE_D"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 4089.548,
+   "dn": 295,
+   "da": 181,
+   "text": " N`) flag that configures the number of CPU threads to use. If you set this to a value that is too high, then the CPU will be oversaturated, and the performance will be degraded. For example, if you have a 4-core CPU, and you set `-t 8`, then the CPU will be oversaturated, and the performance will be degraded.\n\n## Verifying that the CPU is using the correct instruction set\nllama accepts a `-v` (or `--verbose`) flag that will output diagnostic information about the CPU instruction set that is being used. For example:\n```shell\nllama_print_system_info: AVX = 1 | AVX2 = 1 | AVX512 = 0 | AVX512_FMA = 0 | AVX512_DQ = 0 | AVX_VNNI = 0 | AVX512_VNNI = 0 | AVX512_BF16 = 0 | F16C = 1 | ARM_FMA = 0 | NEON = 0 | ARM_I8MM = 0 | FMA = 1 |\n```\n\nIf you see `AVX = "
+  },
+  {
+   "set": "chat",
+   "i": 0,
+   "n": 256,
+   "ms": 6074.287,
+   "dn": 442,
+   "da": 143,
+   "text": "The wind off the North Sea didn’t just blow; it screamed. For Elias, the sound was a constant companion, a rhythmic thrum that had replaced the silence of his youth. He wiped the salt crust from the lens of the lighthouse, his hands rough and mapped with scars from decades of maintenance. It was a lonely life, chosen for the solitude, but lately, the quiet felt less like peace and more like a void.\n\nOn a Tuesday, when the fog was so thick it seemed to have weight, Elias found the bottle. It was wedged in the rocks below the cliff, half-buried in wet kelp. It wasn’t the usual debris of plastic wrappers or broken glass. This was a heavy, green glass cylinder, sealed with wax that had turned brittle with age.\n\nHe brought it inside, placing it on the small wooden table beside his cold cup of tea. With trembling fingers, he pried the cork loose. The smell that escaped was not of rot, but of lavender and old paper. He pulled out a rolled slip of parchment, yellowed and fragile.\n\nThe handwriting was elegant, looping, and unmistakably feminine.\n\n*“If you are reading this, I am gone. I left this for the keeper"
+  },
+  {
+   "set": "chat",
+   "i": 1,
+   "n": 256,
+   "ms": 5040.787,
+   "dn": 368,
+   "da": 162,
+   "text": "The fall of the Western Roman Empire was not the result of a single catastrophic event, but rather a complex interplay of internal decay and external pressures that unfolded over several centuries. Internally, the empire suffered from severe political instability, characterized by frequent civil wars, short-lived emperors, and a lack of centralized authority. This political fragmentation weakened the state’s ability to maintain infrastructure, enforce laws, and coordinate military defense. Concurrently, the economy experienced significant strain due to heavy taxation, inflation, and the debasement of currency, which eroded public confidence and reduced the state’s revenue. Social cohesion also deteriorated as the gap between the wealthy elite and the impoverished populace widened, leading to a decline in civic duty and military recruitment.\n\nExternally, the empire faced relentless pressure from migrating Germanic tribes, such as the Visigoths, Vandals, and Ostrogoths, who were themselves being pushed westward by the Huns. These groups initially sought settlement within Roman borders but increasingly launched devastating raids and invasions. The most symbolic blow came in 410 AD when the Visigoths sacked Rome, shattering the myth of the city’s invincibility. Over time, these tribes established their own kingdoms within former Roman territories, effectively replacing"
+  },
+  {
+   "set": "chat",
+   "i": 2,
+   "n": 256,
+   "ms": 4714.411,
+   "dn": 340,
+   "da": 169,
+   "text": "Think of it this way: the main difference comes down to **when you pay the taxes**.\n\nWith a **Traditional IRA**, you get the tax break *now*. You contribute pre-tax dollars, which lowers your taxable income for the year you make the contribution. But when you withdraw that money in retirement, you pay income tax on it. It’s like getting a discount today, but paying the bill later.\n\nWith a **Roth IRA**, you pay the taxes *now*. You contribute after-tax dollars, so you don’t get a tax deduction today. But the magic happens later: when you withdraw the money in retirement (as long as you meet the rules), it’s completely tax-free. It’s like paying the bill upfront so you can enjoy the ride without worrying about extra charges later.\n\nHere are a few other key differences to keep in mind:\n\n*   **Income Limits:** Roth IRAs have income caps. If you earn too much, you can’t contribute directly to one. Traditional IRAs don’t have income limits for contributions, though your ability to deduct them depends on your income and whether you have a workplace retirement plan.\n*   **Required Minimum Distributions (RMDs):** Traditional IRAs require you to start taking withdrawals by"
+  },
+  {
+   "set": "chat",
+   "i": 3,
+   "n": 256,
+   "ms": 4724.446,
+   "dn": 344,
+   "da": 168,
+   "text": "Congratulations on landing the interview! That is a huge step. Since it is tomorrow, you don’t have time for a deep dive into new material, but you can definitely sharpen your focus and reduce anxiety with targeted preparation.\n\nHere is a strategic, last-minute prep plan for your nursing interview:\n\n### 1. Research the Facility & Unit (15–20 mins)\n*   **Know the Unit:** Is it ICU, ER, Med-Surg, Peds, or Home Health? Each has different priorities.\n    *   *ICU/ER:* Focus on rapid assessment, critical thinking, and stability.\n    *   *Med-Surg:* Focus on patient education, discharge planning, and managing multiple patients.\n    *   *Peds:* Focus on family-centered care and communication with parents.\n*   **Check the Website:** Look at their \"Mission/Vision\" statement. If they mention \"compassionate care\" or \"innovation,\" weave those words into your answers.\n*   **Recent News:** Did they recently open a new wing? Win an award? Mentioning this shows genuine interest.\n\n### 2. Prepare for the \"Big Three\" Nursing Questions\nMost nursing interviews revolve around these core competencies"
+  },
+  {
+   "set": "chat",
+   "i": 4,
+   "n": 256,
+   "ms": 5526.375,
+   "dn": 408,
+   "da": 153,
+   "text": "**Pride and Prejudice**, published in 1813 by Jane Austen, is a classic novel of manners that explores the social dynamics, marriage, and class structures of early 19th-century England.\n\n### Plot Summary\n\nThe story centers on **Elizabeth Bennet**, the second of five daughters in a family whose estate is entailed away from the women, meaning the sisters must secure financial security through marriage. When the wealthy and charming **Mr. Bingley** moves into the neighborhood, he immediately takes a liking to Elizabeth’s eldest sister, **Jane**. However, Bingley’s friend, the wealthy and proud **Mr. Fitzwilliam Darcy**, initially dislikes Elizabeth, dismissing her as merely \"tolerable\" and not handsome enough to tempt him.\n\nElizabeth’s prejudice against Darcy deepens after he insults her at a ball and later reveals his role in separating Jane and Bingley, claiming Jane’s feelings were indifferent. Meanwhile, Elizabeth’s younger sister, **Lydia**, elopes with **Mr. Wickham**, a charming officer who has previously deceived Elizabeth by claiming Darcy wronged him. This scandal threatens the reputation and future prospects of all the Bennet sisters.\n\nIn a dramatic turn, Darcy,"
+  },
+  {
+   "set": "chat",
+   "i": 5,
+   "n": 256,
+   "ms": 5234.059,
+   "dn": 356,
+   "da": 165,
+   "text": "长城（The Great Wall）不仅是世界上规模最大的军事防御工程，更是中华民族精神的象征。以下从**历史沿革**和**文化意义**两个维度为您详细介绍：\n\n### 一、 长城的历史沿革\n\n长城并非一次性建成，而是历经两千多年，由多个朝代不断修筑、连接和加固而成的庞大体系。\n\n1. **起源：春秋战国时期（公元前7世纪 - 前3世纪）**\n   - 长城的雏形最早可追溯至春秋战国时期。当时诸侯国林立，为了防御彼此侵扰，各国（如楚、齐、燕、赵、魏、秦等）在边境修筑了各自的城墙。\n   - 这些早期长城多为土筑或石砌，规模较小，且互不相连。\n\n2. **统一与初建：秦朝（公元前221年 - 前207年）**\n   - 秦始皇统一六国后，为防御北方匈奴的南下，命大将蒙恬将原秦、赵、燕三国的北边长城连接起来，并向西延伸。\n   - 这是历史上第一次将分散的长城连成一体，形成了“万里长城”的雏形，主要功能是军事防御。\n\n3. **"
+  },
+  {
+   "set": "chat",
+   "i": 6,
+   "n": 256,
+   "ms": 5529.141,
+   "dn": 375,
+   "da": 160,
+   "text": "**El Pulmona Verde del Mundo: La Urgencia de Preservar la Biodiversidad en América Latina**\n\nAmérica Latina no es simplemente una región geográfica; es un bastión biológico sin precedentes en el planeta. Con una riqueza de especies que supera a la de cualquier otra región, este continente alberga aproximadamente el 50% de la biodiversidad mundial, a pesar de ocupar solo el 8% de la superficie terrestre. Desde la selva amazónica hasta los bosques andinos, pasando por los manglares del Caribe y las praderas del Pampas, esta diversidad no es solo un lujo estético, sino un pilar fundamental para la estabilidad ecológica, económica y social del mundo.\n\nLa importancia de la biodiversidad en la región trasciende lo biológico. En primer lugar, actúa como un regulador climático global. Los ecosistemas latinoamericanos, particularmente la Amazonía y los bosques tropicales de Centroamérica, son sumideros de carbono cruciales que mitigan el cambio climático. Además, estos ecosistemas regulan los ciclos del agua, garantizando el suministro de agua dulce para millones de personas y sosteniendo la agricultura, que es la base de la seguridad alimentaria regional."
+  },
+  {
+   "set": "chat",
+   "i": 7,
+   "n": 256,
+   "ms": 5138.224,
+   "dn": 349,
+   "da": 167,
+   "text": "Stell dir vor, eine Pflanze ist wie eine kleine **Fabrik**, die ihre eigene Nahrung herstellt. Hier ist der Prozess in einfachen Schritten erklärt:\n\n### 1. Die Zutaten\nDie Pflanze braucht drei Dinge, um zu „kochen“:\n*   **Licht** (von der Sonne) – das ist die Energiequelle.\n*   **Wasser** (aus dem Boden, aufgenommen über die Wurzeln).\n*   **Kohlendioxid** (aus der Luft, aufgenommen über die Blätter).\n\n### 2. Der Ort: Das Blatt\nDie meisten dieser „Fabriken“ sitzen in den **Blättern**. In den Blättern gibt es winzige grüne Körnchen, die **Chloroplasten** heißen. Darin steckt ein grünes Pigment namens **Chlorophyll**. Dieses Chlorophyll ist wie ein Solarpanel: Es fängt das Sonnenlicht ein.\n\n### 3. Der Prozess (Die „Magie“)\nWenn das Sonnenlicht auf das Chlorophyll trifft, passiert Folgendes:\n*   Das Licht gibt seine Energie ab.\n*   Diese Energie wird genutzt, um das **Wasser**"
+  },
+  {
+   "set": "chat",
+   "i": 8,
+   "n": 256,
+   "ms": 6194.729,
+   "dn": 423,
+   "da": 149,
+   "text": "日本の四季は、気候の変化だけでなく、その季節に根付いた独自の文化や行事を通じて深く体験されます。以下に、春・夏・秋・冬それぞれの季節の特徴と代表的な伝統行事について解説します。\n\n### 1. 春（3月～5月）\n**【季節の特徴】**\n冬から抜け出し、気温が上昇し始める季節です。特に3月下旬から4月上旬にかけては、桜が満開となり、日本全国で「花見」の季節を迎えます。新緑が芽吹き、自然が生き生きと目覚める時期でもあります。\n\n**【伝統行事・文化】**\n*   **花見（はなみ）**：桜の下で弁当を食べたり、お酒を飲んだりしながら花を愛でる風習です。\n*   **入学式・入社式**：4月1日は日本の新しい年度の始まりであり、多くの学校や企業で新しいスタートを切る行事が行われます。\n*   **ひな祭り（3月3日）**：女の子の健やかな成長を祈る行事で、雛人形を飾り、ひなあられや桃の餅を食べます。\n*   **こどもの日（5月5日）**：男"
+  },
+  {
+   "set": "chat",
+   "i": 9,
+   "n": 221,
+   "ms": 4319.109,
+   "dn": 296,
+   "da": 147,
+   "text": "Objet : Demande de congé annuel\n\nMadame, Monsieur [Nom du supérieur hiérarchique],\n\nPar la présente, je me permets de vous soumettre ma demande de congé annuel pour une durée de trois semaines, du [Date de début] au [Date de fin], inclus.\n\nJ’ai pris soin de planifier mes tâches en amont afin de garantir la continuité du service durant mon absence. J’ai également identifié [Nom du collègue] comme personne de contact pour assurer la gestion des dossiers urgents ou spécifiques pendant cette période. Je reste bien entendu disponible avant mon départ pour finaliser les transitions nécessaires et répondre à toute question.\n\nJe vous serais reconnaissant(e) de bien vouloir m’accuser réception de cette demande et de me confirmer votre accord dans les meilleurs délais.\n\nDans l’attente de votre retour, je vous prie d’agréer, Madame, Monsieur, l’expression de mes salutations distinguées.\n\n[Votre Prénom et Nom]\n[Votre Fonction]\n[Votre Numéro de téléphone]"
+  },
+  {
+   "set": "chat",
+   "i": 10,
+   "n": 256,
+   "ms": 3350.546,
+   "dn": 241,
+   "da": 194,
+   "text": "Here is the step-by-step reasoning to determine the arrival time.\n\n### Step 1: Calculate the travel time\nTo find out how long the train travels, we use the formula:\n$$ \\text{Time} = \\frac{\\text{Distance}}{\\text{Speed}} $$\n\nGiven:\n*   Distance = $210 \\text{ km}$\n*   Speed = $84 \\text{ km/h}$\n\n$$ \\text{Time} = \\frac{210}{84} \\text{ hours} $$\n\nTo simplify the fraction $\\frac{210}{84}$:\n1.  Divide numerator and denominator by 2: $\\frac{105}{42}$\n2.  Divide numerator and denominator by 7: $\\frac{15}{6}$\n3.  Divide numerator and denominator by 3: $\\frac{5}{2}$\n\nSo, the travel time is $\\frac{5}{2}$ hours, which equals **2.5 hours**.\n\n### Step 2: Convert decimal hours to hours and minutes\nWe have 2.5 hours.\n*   The whole number part is **2 hours**.\n*   The decimal part is"
+  },
+  {
+   "set": "chat",
+   "i": 11,
+   "n": 256,
+   "ms": 5403.871,
+   "dn": 371,
+   "da": 162,
+   "text": "Here is a heartfelt wedding toast for Sam and Priya. I’ve included placeholders in brackets **[like this]** where you can insert specific details to make it truly personal.\n\n***\n\n**The Toast**\n\nGood evening, everyone.\n\nFor those of you who don’t know me, I’m **[Your Name]**, and I have had the incredible privilege of being Sam’s best friend for **[Number]** years.\n\nSam, I’ve known you through **[mention 1-2 shared experiences, e.g., college parties, moving apartments, career struggles, or a specific funny memory]**. I’ve seen you at your best, and I’ve definitely seen you at your... *most human*. I’ve watched you grow from **[describe who he was then, e.g., a nervous student]** into the man standing here today.\n\nBut what I’ve always admired most about Sam is his heart. He is loyal, he is funny, and he is deeply caring. But I’ll be honest with you: before I met Priya, I thought I knew everything about Sam. I was wrong.\n\nPriya, when you walked into Sam’s life, something shifted. I watched him light up in a way I had never seen before. You didn’t just become"
+  },
+  {
+   "set": "chat",
+   "i": 12,
+   "n": 256,
+   "ms": 5280.069,
+   "dn": 384,
+   "da": 158,
+   "text": "This is a dark, atmospheric, and abstract digital illustration with a muted, moody color palette dominated by deep maroons, burgundies, and shades of gray. The overall tone is somber, mysterious, or perhaps nostalgic.\n\nHere’s a detailed breakdown of the elements:\n\n**1. Background & Composition:**\n- The background consists of large, overlapping, semi-transparent geometric shapes — primarily circles and curved arcs — that create a sense of depth and layering.\n- These shapes are rendered in varying opacities and tones of red and gray, giving the impression of soft, blurred forms floating in space.\n- A subtle grainy texture overlays the entire image, adding to its vintage or analog feel.\n- Faint horizontal streaks or light rays cut across the middle of the frame, suggesting motion, wind, or ambient light filtering through darkness.\n\n**2. Central Element:**\n- Near the center, slightly below the horizontal midline, there is a prominent, solid dark red circle. It appears almost like a moon, a lens flare, or an abstract focal point. Its edges are soft but distinct against the darker surroundings.\n\n**3. Foreground Subject (Bottom Right):**\n- In the lower right quadrant, partially obscured by"
+  },
+  {
+   "set": "heldout",
+   "i": 0,
+   "n": 256,
+   "ms": 6641.749,
+   "dn": 453,
+   "da": 140,
+   "text": "한국을 대표하는 발효식품이자 세계적으로 사랑받는 **김치**에 대해 그 역사, 다양한 종류, 그리고 기본 제조 방법을 자세히 설명해 드리겠습니다.\n\n---\n\n### 1. 김치의 역사\n\n김치는 단순히 '배추에 양념을 한 것'이 아니라, 한국인의 식생활과 밀접하게 연결된 **발효 문화의 결정체**입니다.\n\n*   **고대~삼국시대 (기원전~6세기):**\n    *   초기에는 배추나 무를 소금에 절여 저장하는 **'절임 채소'** 형태가 주를 이뤘습니다.\n    *   고구려 벽화나 문헌에서 '김치'라는 명칭보다는 '김장'이나 '절임'으로 기록된 사례가 있습니다.\n    *   이 시기의 김치는 주로 겨울철 채소 부족을 대비하기 위한 **보존 식품**으로서의 기능이 강했습니다.\n\n*   **고려시대 (11~14세기):**\n    *   고추의 도입 이전이었기 때문에, **고춧가루 없이** 마늘, 생강, 파, 새우젓, 멸치액젓 등을 이용해 간을"
+  },
+  {
+   "set": "heldout",
+   "i": 1,
+   "n": 256,
+   "ms": 4866.347,
+   "dn": 330,
+   "da": 171,
+   "text": "Солнечная система — это гравитационно связанная система, в центре которой находится звезда **Солнце**, а вокруг неё вращаются планеты, карликовые планеты, астероиды, кометы, метеориты и другие небесные тела.\n\nНиже приведено подробное описание устройства Солнечной системы и её планет.\n\n---\n\n### 1. Центр системы: Солнце\nСолнце — это звезда среднего размера (желтый карлик), которая содержит **99,86%** всей массы Солнечной системы.\n- **Источник энергии:** В ядре Солнца происходят термоядерные реакции (синтез водорода в гелий), выделяющие огромное количество энергии в виде света и тепла.\n- **Влияние:** Гравитация Солнца удерживает все объекты системы на их орбитах.\n\n---\n\n### 2. Планеты Солнечной системы\nСогласно определению Международного астрономического союза (2006 г.), в Солнечной системе **8 планет**. Они делятся на две группы:\n\n#### А. Планеты земной группы (внут"
+  },
+  {
+   "set": "heldout",
+   "i": 2,
+   "n": 256,
+   "ms": 5921.149,
+   "dn": 404,
+   "da": 153,
+   "text": "Ecco una guida essenziale per vivere Roma al meglio in soli tre giorni, bilanciando i grandi monumenti, l'atmosfera locale e la gastronomia.\n\n### **Giorno 1: Il Cuore Antico e il Vaticano**\n*Obiettivo: I simboli assoluti della città.*\n\n*   **Mattina:** Inizia presto (apre alle 8:00) al **Colosseo**. Prenota i biglietti online con largo anticipo per evitare code. Da lì, cammina verso il **Foro Romano** e il **Palatino** (spesso inclusi nello stesso biglietto).\n*   **Pranzo:** Siediti in una trattoria classica nel rione Monti o vicino al Colosseo. Prova la **Carbonara** o la **Cacio e Pepe**. *Consiglio:* \"Da Enzo al 29\" (famosa per la carbonara, ma aspettativa alta) o \"Trattoria Luzzi\" per un'atmosfera più autentica.\n*   **Pomeriggio:** Spostati verso il Vaticano. Visita la **Basilica di San Pietro** (gratis, ma coda per la cupola) e i **Musei Vaticani** (prenota in anticipo,"
+  },
+  {
+   "set": "heldout",
+   "i": 3,
+   "n": 256,
+   "ms": 5340.848,
+   "dn": 364,
+   "da": 163,
+   "text": "O sistema de saúde pública no Brasil é conhecido como **Sistema Único de Saúde (SUS)**. Ele é um dos maiores sistemas de saúde do mundo e é frequentemente citado como um modelo de referência global por garantir o acesso universal e gratuito à população.\n\nAbaixo, explico em detalhes como ele funciona, sua estrutura, princípios e os principais desafios que enfrenta.\n\n---\n\n### 1. Fundamentos e Princípios do SUS\n\nO SUS foi criado pela **Constituição Federal de 1988** (Artigos 196 a 200). Seus pilares são:\n\n*   **Universalidade:** O direito à saúde é de todos os cidadãos, independentemente de renda, classe social ou condição de trabalho. Não há cobrança de coparticipação ou ticket.\n*   **Integralidade:** O sistema não trata apenas doenças, mas oferece ações de promoção, prevenção, tratamento e reabilitação. Isso inclui desde a vacinação até cirurgias complexas e saúde mental.\n*   **Equidade:** Todos têm direito à saúde, mas as necessidades são atendidas de forma proporcional. Populações mais vulneráveis recebem atenção prioritária.\n*   **Regionalização e Hierarquização:** Os"
+  },
+  {
+   "set": "heldout",
+   "i": 4,
+   "n": 256,
+   "ms": 5060.509,
+   "dn": 346,
+   "da": 168,
+   "text": "Tết Nguyên Đán (hay còn gọi là Tết Ta, Tết Âm lịch) là lễ hội lớn nhất, quan trọng nhất và mang đậm bản sắc văn hóa nhất trong năm của người Việt Nam. Không chỉ là dịp để đón năm mới, Tết còn là dịp để gia đình sum họp, tưởng nhớ tổ tiên và cầu mong một năm mới an khang, thịnh vượng.\n\nDưới đây là giải thích chi tiết về lịch sử và ý nghĩa sâu sắc của Tết Nguyên Đán ở Việt Nam:\n\n### 1. Nguồn gốc và Lịch sử\n\n#### a. Nguồn gốc từ Trung Hoa và sự bản địa hóa\nTết Nguyên Đán có nguồn gốc từ Trung Quốc, gắn liền với lịch sử nông nghiệp và tín ngưỡng cổ đại. Tuy nhiên, khi du nhập vào Việt Nam, nó đã được **bản địa hóa** mạnh mẽ, hòa quyện với tín ngưỡng thờ cúng tổ tiên, phong tục tập quán và khí hậu nhiệt đới của người Việt, tạo nên một nét riêng biệt không thể nhầm lẫn.\n\n*   **\"Nguyên Đán\" nghĩa là gì?**\n    *   *Nguyên*: Đầu tiên, ban đầu.\n    *   *Đán*: Giao thừa, khoảnh khắc chuyển giao giữa năm cũ và năm mới"
+  },
+  {
+   "set": "heldout",
+   "i": 5,
+   "n": 256,
+   "ms": 6040.206,
+   "dn": 414,
+   "da": 151,
+   "text": "عملية تحميل صفحة ويب من لحظة كتابة الرابط في المتصفح حتى ظهور المحتوى على الشاشة هي رحلة معقدة وسريعة تمر عبر عدة طبقات تقنية. يمكن تقسيم هذه العملية إلى مراحل رئيسية، تبدأ من جهاز المستخدم وتنتهي بالعودة إليه، مع المرور عبر شبكة عالمية من الخوادم.\n\nإليك الشرح التفصيلي خطوة بخطوة:\n\n### 1. إدخال العنوان (URL) في المتصفح\nعندما تكتب عنواناً مثل `https://www.example.com` في شريط العنوان وتضغط على \"Enter\"، يبدأ المتصفح (مثل Chrome أو Firefox) في معالجة هذا الطلب.\n\n### 2. التحقق من الكاش (Cache)\nقبل إرسال أي طلب إلى الشبكة، يتحقق المتصفح من ذاكرته المؤقتة (Cache):\n- **كاش المتصفح:** هل سبق لك زيارة هذه الصفحة؟ إذا كانت البيانات محفوظة محلياً ولم تنتهِ صلاحيتها، يعرضها المتصفح فوراً دون الاتصال بالإنترنت.\n- **كاش نظام التشغيل:** إذا لم تكن في كاش المتصفح، يتحقق نظام التشغيل من ذاكرته المؤقتة.\n- إذا لم يجد البيانات في أي مكان، يتابع العملية التالية.\n\n### 3. حل اسم النطاق (DNS"
+  },
+  {
+   "set": "heldout",
+   "i": 6,
+   "n": 256,
+   "ms": 4367.902,
+   "dn": 300,
+   "da": 180,
+   "text": "```python\nclass LRUCache:\n    \"\"\"\n    LRU（Least Recently Used，最近最少使用）缓存类。\n    \n    支持 get 和 put 操作，时间复杂度均为 O(1)。\n    \n    实现思路：\n    1. 使用双向链表来维护访问顺序：最近访问的节点放在链表头部，最久未访问的节点放在链表尾部。\n       当缓存满时需要淘汰最久未使用的元素，即删除链表尾部的节点。\n    2. 使用哈希表（字典）来快速定位 key 对应的节点，实现 O(1) 的查找。\n    \n    双向链表节点结构：\n    - key: 缓存键\n    - value: 缓存值\n    - prev: 指向前一个节点的指针\n    - next: 指向后一个节点的指针\n    \n    为了简化边界处理，使用虚拟头节点（dummy head）和虚拟尾节点（dummy tail）。\n    实际数据节点位于 dummy head 和 dummy tail 之间。\n    \"\"\"\n    \n    class Node:\n        \"\"\"\n        双向链表节点类。\n        \n        每个节点存储一个 key-value 对，以及"
+  },
+  {
+   "set": "heldout",
+   "i": 7,
+   "n": 256,
+   "ms": 5742.696,
+   "dn": 394,
+   "da": 156,
+   "text": "委员会将决定推迟，直至田间试验提供更多数据，理由是担忧长期安全性和成本问题。\n\n**用词说明：**\n\n1. **“将决定推迟”**：对应 “postponed its decision”。中文习惯用“将……推迟”或“推迟……决定”，这里采用“将决定推迟”更符合正式公文语序，强调动作对象。\n2. **“直至”**：对应 “until”。比“直到”更书面、正式，适合委员会决策这类语境。\n3. **“田间试验”**：对应 “field trials”。在农业或生物医学领域，“field trials” 标准译法为“田间试验”（若为药物临床前研究，也可称“现场试验”，但“田间”更贴合常见语境，如农药、作物等）。\n4. **“提供更多数据”**：对应 “more data … became available”。中文不直译“变得可用”，而用“提供”更自然，体现数据由试验产生并可供参考。\n5. **“理由是”**：对应 “citing”。比“引用”更准确，因为“citing concerns” 是说明推迟的原因，而非引用文献或条文。\n6. **“担忧”**：对应 “concerns”。比“担心”更正式"
+  }
+ ]
+}

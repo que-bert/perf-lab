@@ -1,0 +1,98 @@
+[
+  {
+    "label": "~70k",
+    "reps_requested": 1600,
+    "prompt_n": 4,
+    "decode_mean": 80.381,
+    "decode_steady_mean": 80.507,
+    "decode_steady_min": 80.443,
+    "decode_steady_max": 80.571,
+    "decode_spread_pct": 0.16,
+    "prefill": 847.8713579524933,
+    "accept_frac": 1.0,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 80.12946407529027,
+        "prefill": 847.8713579524933,
+        "prompt_n": 72489,
+        "accepted": 204,
+        "drafted": 204,
+        "wall": 88.80670213699341,
+        "content": "\nRequest 1600. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1601. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1602. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1603. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1604. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1605. Write a short technical description of how a write-ahead log keeps a database consistent across a crash"
+      },
+      {
+        "rep": 1,
+        "decode": 80.57139336376088,
+        "prefill": 11.442727717433282,
+        "prompt_n": 4,
+        "accepted": 204,
+        "drafted": 204,
+        "wall": 3.6348838806152344,
+        "content": "\nRequest 1600. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1601. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1602. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1603. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1604. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1605. Write a short technical description of how a write-ahead log keeps a database consistent across a crash"
+      },
+      {
+        "rep": 2,
+        "decode": 80.44285844075873,
+        "prefill": 11.384140753516277,
+        "prompt_n": 4,
+        "accepted": 204,
+        "drafted": 204,
+        "wall": 3.641611099243164,
+        "content": "\nRequest 1600. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1601. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1602. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1603. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1604. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1605. Write a short technical description of how a write-ahead log keeps a database consistent across a crash"
+      }
+    ],
+    "prefill_mean": 290.2,
+    "prefill_min": 11.4,
+    "prefill_max": 847.9,
+    "prefill_spread_pct": 288.21
+  },
+  {
+    "label": "~176k",
+    "reps_requested": 4000,
+    "prompt_n": 4,
+    "decode_mean": 70.908,
+    "decode_steady_mean": 70.921,
+    "decode_steady_min": 70.887,
+    "decode_steady_max": 70.955,
+    "decode_spread_pct": 0.1,
+    "prefill": 478.14924562975307,
+    "accept_frac": 1.0,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 70.88342428649578,
+        "prefill": 478.14924562975307,
+        "prompt_n": 182889,
+        "accepted": 204,
+        "drafted": 204,
+        "wall": 386.3875353336334,
+        "content": "\nRequest 4000. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4001. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4002. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4003. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4004. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4005. Write a short technical description of how a write-ahead log keeps a database consistent across a crash"
+      },
+      {
+        "rep": 1,
+        "decode": 70.95472504209285,
+        "prefill": 6.851884525190098,
+        "prompt_n": 4,
+        "accepted": 204,
+        "drafted": 204,
+        "wall": 4.478835344314575,
+        "content": "\nRequest 4000. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4001. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4002. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4003. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4004. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4005. Write a short technical description of how a write-ahead log keeps a database consistent across a crash"
+      },
+      {
+        "rep": 2,
+        "decode": 70.88677408468496,
+        "prefill": 6.8920125021106795,
+        "prompt_n": 4,
+        "accepted": 204,
+        "drafted": 204,
+        "wall": 4.4722325801849365,
+        "content": "\nRequest 4000. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4001. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4002. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4003. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4004. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4005. Write a short technical description of how a write-ahead log keeps a database consistent across a crash"
+      }
+    ],
+    "prefill_mean": 164.0,
+    "prefill_min": 6.9,
+    "prefill_max": 478.1,
+    "prefill_spread_pct": 287.44
+  }
+]

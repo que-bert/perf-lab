@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # gates.sh <worktree> <label> : tests, PPL, decode KLD, acceptance (corpus + chat). Each GPU step takes the lock.
 set -u
-S=/tmp/claude-1000/-home-bbuckham-git-perf-lab/1b4570a8-7144-4fd6-9ca9-d9b9b418654f/scratchpad
+S=/home/bbuckham/git/perf-lab/results/d0/scripts
 P=/home/bbuckham/git/perf-lab; W=$1; LB=$2; B=$W/build/bin
 M=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf
 L=$P/harness/gpu_lock.sh

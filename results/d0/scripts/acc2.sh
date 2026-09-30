@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # acc.sh <bin> <label> [extra server args]  -- pooled acceptance, 16 corpus slices, n_max 3
 set -u
-S=/tmp/claude-1000/-home-bbuckham-git-perf-lab/1b4570a8-7144-4fd6-9ca9-d9b9b418654f/scratchpad
+S=/home/bbuckham/git/perf-lab/results/d0/scripts
 cd /home/bbuckham/git/perf-lab
 B=$1; L=$2; shift 2
 MNT=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth
