@@ -39,15 +39,16 @@ card and stamping the row with a fingerprint that lies.
 
 ### Current known-good config
 
-Fork branch `r9700-qwen` @ 0b5e351c8 (= `r9700-integrate8`: integrate7 + GDN conv-state
-fusion for K ≤ 8 + ne00 = 1 GET_ROWS fast path; previous serving builds tagged
-`r9700-qwen-integrate7` and `r9700-qwen-integrate2`). Qwen3.8-27B Q6_K, 262,144 context, `-fa on`, `--parallel 1`,
-`-ctk q8_0 -ctv q8_0`, `--spec-type draft-mtp --spec-draft-n-max 4 -ctkd q8_0 -ctvd q8_0
---spec-draft-vocab 98304 --spec-draft-vocab-adaptive`, `--mmproj mmproj-F16.gguf`.
-Decode 60.4 / 59.4 t/s at ~70k and 57.6 / 57.1 at ~176k; pooled 51.8–52.6 t/s (37 prompts);
-prefill pp2048 ~1,600 t/s. VRAM peak is 32,600–32,609 of 32,624 MiB. At that fill, server
-prefill at 70k runs ~7% below what the same work reaches with more headroom (autoresearch
-row VCTX). See FINDINGS 2026-09-29 and `autoresearch/results.tsv` (E2E8, GATES8, PF8).
+Fork branch `r9700-qwen` @ ede2e0779 (= `r9700-integrate10`: integrate8 + host GET_ROWS for
+token_embd with an input sync + lazy mmproj GPU residency; previous serving builds tagged
+`r9700-qwen-integrate8`, `r9700-qwen-integrate7` and `r9700-qwen-integrate2`). Qwen3.8-27B Q6_K,
+262,144 context, `-fa on`, `--parallel 1`, `-ctk q8_0 -ctv q8_0`, `--spec-type draft-mtp
+--spec-draft-n-max 4 -ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive`,
+`--mmproj mmproj-F16.gguf`, **`-lm none`**, environment **`MTMD_LAZY_GPU=1 GGML_VK_HOST_GET_ROWS=1`**.
+`GGML_VK_HOST_GET_ROWS=1` without `-lm none` corrupts decode (GATES10): set both or neither.
+Decode 63.5 t/s at ~70k and 60.5 at ~176k; pooled 55.7 t/s (37 prompts, quiet window);
+server prefill 1,160 t/s at ~70k and 802 at ~176k. The mmproj leaves VRAM when idle
+(~1.1 GB), so an image request costs ~2 s more. See `autoresearch/results.tsv` (VB, HGR10, GATES10, SERVE10).
 
 ## Layout
 

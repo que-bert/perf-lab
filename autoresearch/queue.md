@@ -1,6 +1,6 @@
 # Hypothesis queue (root rewrites; ranked by expected gain)
 
-Integration head: r9700-integrate8 = integrate7 + RSI + GR2 @ 0b5e351c8 — gates pass (GATES8). n4: 70k 60.42/59.37, 176k 57.59/57.06, pooled 51.756 (i7 same window 50.547). Serving r9700-qwen = integrate8 (SERVE8).
+Integration head: r9700-integrate10 = integrate8 + HGR (host GET_ROWS + sync) + VB (lazy mmproj) @ ede2e0779 — gates pass (GATES10), serving (SERVE10): 70k 63.5, 176k 60.5, pooled 55.7, prefill 70k 1160. Needs -lm none + MTMD_LAZY_GPU=1 + GGML_VK_HOST_GET_ROWS=1.
 Serving candidate flags: `-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive --spec-draft-n-max 4`.
 
 | id | hypothesis | est. gain | owner | state |
@@ -19,7 +19,7 @@ Serving candidate flags: `-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-
 | HGR | host GET_ROWS + sync (integrate9): decode +3.5..5.7%, prefill -14% (MTP pass only); HGR2 size-gating discard (broke accept) | +5.7% pooled | - | see HGR3 |
 | HGR3 | HGR prefill loss is the MTP prompt pass (-11%); likely large host inputs (hidden states ~10 MB/ubatch) read in place over PCIe -> in-place only for small inputs | keep +5.7% decode at 0% prefill | - | discard (cause was VRAM, see VB) |
 | MTPP | MTP prompt pass: gap is -9.7% after VB (was 19% under VRAM pressure); cost is 1-layer GPU compute, host-copy lever +0.4% | - | - | discard (overlap on 2nd queue capped ~3%) |
-| VB | lazy mmproj (MTMD_LAZY_GPU=1) frees ~1130 MiB: 70k prefill 1008 -> 1117, 176k 545 -> 662, ~+2 s per image request | +10.8% / +21% prefill | root | in integrate10; HGR A/B on it running (hgr10) |
+| VB | lazy mmproj (MTMD_LAZY_GPU=1) frees ~1130 MiB: 70k prefill 1008 -> 1117, 176k 545 -> 662, ~+2 s per image request | +10.8% / +21% prefill | root | serving (integrate10, SERVE10) |
 | TREE | tree drafting: MTP top-2 at draft pos 1 as two branches in one verify batch | tok/step | root | needs brainstorm/plan (multi-day) |
 
 Closed: P3-dec (i5 n3 = i4 n3 decode), MV4 MMVQ at n=4 (+0.7 ms), G2 gate+up GEMV fusion (-0.4 ms), RM rows/WG sweep (4 stays), UB ubatch (512 stays), P2c mask DB (0%), P1c (under 2% kill line), prefill 10 unfused gate+up layers (~0.75%, under kill line), W1 draft window (acceptance), POL p_min (all lose), POL5 n_max 5 (pooled loses), W2 n=4 dequant reuse (no change).
