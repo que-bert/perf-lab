@@ -1,6 +1,8 @@
 # Hypothesis queue (root rewrites; ranked by expected gain)
 
-Integration head: r9700-integrate10 = integrate8 + HGR (host GET_ROWS + sync) + VB (lazy mmproj) @ ede2e0779 — gates pass (GATES10), serving (SERVE10): 70k 63.5, 176k 60.5, pooled 55.7, prefill 70k 1160. Needs -lm none + MTMD_LAZY_GPU=1 + GGML_VK_HOST_GET_ROWS=1.
+Integration head: r9700-integrate11 (= r9700-qwen @ 901abb2a8, serving): 70k 63.5, 176k 60.5, pooled 55.7, prefill 70k 1160; llama-bench pp2048 d0 / d16384 1630.3 / 1424.3 (I8B, 2026-09-30). Needs -lm none + MTMD_LAZY_GPU=1 + GGML_VK_HOST_GET_ROWS=1.
+
+**Current target (set 2026-09-30, overnight run): server prefill with the serving config — ~32.5k prompt ≥ 1,400 t/s (from 1,304; mtp_prompt_ab.sh), 176k ≥ 800 stable (from 680–706).** Then exceed it. Secondary: pp2048 d0 ≥ 1,750 (from 1,630). Exact 8-bit GEMM is closed (I8H), so d0 is GEMM-bound at ~95 TF with no lever queued. Decomposition at 32.5k (MPD): llama-bench 1,424 = server no-spec 1,412 > server MTP 1,304 (−7.7%, of which MTP GPU ~3%).
 Serving candidate flags: `-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive --spec-draft-n-max 4`.
 
 | id | hypothesis | est. gain | owner | state |
@@ -23,6 +25,10 @@ Serving candidate flags: `-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-
 | TREE | tree drafting: oracle TREE0 says top-2 rescues 9.5% of steps, ceiling +8% tok/step gross, net ~0-4%, +0.75 GB VRAM | - | - | deprioritized |
 | FAC | FA prefill dequant scratch (whole KV to f16, 4 KiB/token) reallocated per ubatch -> 64 MiB steps | +3.7% 176k prefill | root | serving (integrate11, SERVE11) |
 | DF | multi-matrix MMVQ over same-input GEMVs: -0.62 ms verify, +0.3% e2e | - | - | discard (switch on r9700-ar-df) |
+| I8H | exact s8 Q6_K GEMM retry in harness: P0 (77.5 weighted) lost on LDS feed (s8 base only 36-47% of peak vs f16 55-60%) and an unpipelined per-16 epilogue; theory says exact s8 is ~1.33x f16 at equal feed efficiency. Success >= 115 TOPS weighted, kill < 105 | pp2048 d0 +10-20% if ported | - | discard (80.6, issue-bound) |
+| SPK | Q6K split-K factor sweep 1/2/4/8 at d0 | - | root | closed: default heuristic already best per shape |
+| FQ8 | prefill FA stages raw q8_0 K/V into LDS (no FA_DEQUANT_KV, no 4 KiB/token scratch): -11 ms/ubatch @64k, ~-30 @176k + VRAM relief | +2-3% 64k, +10% 176k | worker r9700-ar-fq8 | running |
+| MPH | MTP prompt pass host overhead ~17 ms/ubatch (graph rebuild, hidden-state round trip, GPU idle between graphs) | up to +4.7% server prefill | worker r9700-ar-mph | running |
 | FACA | chunked FA prefill (split-K partials in RDNA4 kernel) to bound scratch at 64-128 MiB | uncertain (GTT oscillation survived a cap) | - | open, multi-hour shader |
 
 Closed: P3-dec (i5 n3 = i4 n3 decode), MV4 MMVQ at n=4 (+0.7 ms), G2 gate+up GEMV fusion (-0.4 ms), RM rows/WG sweep (4 stays), UB ubatch (512 stays), P2c mask DB (0%), P1c (under 2% kill line), prefill 10 unfused gate+up layers (~0.75%, under kill line), W1 draft window (acceptance), POL p_min (all lose), POL5 n_max 5 (pooled loses), W2 n=4 dequant reuse (no change).
