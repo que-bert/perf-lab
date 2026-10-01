@@ -47,7 +47,7 @@ token_embd with an input sync + lazy mmproj GPU residency; previous serving buil
 `--mmproj mmproj-F16.gguf`, **`-lm none`**, environment **`MTMD_LAZY_GPU=1 GGML_VK_HOST_GET_ROWS=1`**.
 `GGML_VK_HOST_GET_ROWS=1` without `-lm none` corrupts decode (GATES10): set both or neither.
 Decode 63.5 t/s at ~70k and 60.5 at ~176k; pooled 55.7 t/s (37 prompts, quiet window);
-server prefill 1,160 t/s at ~70k and 802 at ~176k. The mmproj leaves VRAM when idle
+server prefill 1,160 t/s at ~70k; at ~176k 680–803 depending on VRAM state (past ~120k the card is full and pages oscillate to GTT, row VIMG). The mmproj leaves VRAM when idle
 (~1.1 GB), so an image request costs ~2 s more. See `autoresearch/results.tsv` (VB, HGR10, GATES10, SERVE10).
 
 ## Layout

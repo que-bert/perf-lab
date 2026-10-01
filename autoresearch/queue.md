@@ -20,6 +20,8 @@ Serving candidate flags: `-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-
 | HGR3 | HGR prefill loss is the MTP prompt pass (-11%); likely large host inputs (hidden states ~10 MB/ubatch) read in place over PCIe -> in-place only for small inputs | keep +5.7% decode at 0% prefill | - | discard (cause was VRAM, see VB) |
 | MTPP | MTP prompt pass: gap is -9.7% after VB (was 19% under VRAM pressure); cost is 1-layer GPU compute, host-copy lever +0.4% | - | - | discard (overlap on 2nd queue capped ~3%) |
 | VB | lazy mmproj (MTMD_LAZY_GPU=1) frees ~1130 MiB: 70k prefill 1008 -> 1117, 176k 545 -> 662, ~+2 s per image request | +10.8% / +21% prefill | root | serving (integrate10, SERVE10) |
-| TREE | tree drafting: MTP top-2 at draft pos 1 as two branches in one verify batch | tok/step | root | needs brainstorm/plan (multi-day) |
+| TREE | tree drafting: oracle TREE0 says top-2 rescues 9.5% of steps, ceiling +8% tok/step gross, net ~0-4%, +0.75 GB VRAM | - | - | deprioritized |
+| FAC | FA prefill dequant scratch (whole KV to f16, 4 KiB/token) reallocated per ubatch -> 64 MiB steps | +3.7% 176k prefill | root | integrate11 (promote pending) |
+| FACA | chunked FA prefill (split-K partials in RDNA4 kernel) to bound scratch at 64-128 MiB | uncertain (GTT oscillation survived a cap) | - | open, multi-hour shader |
 
 Closed: P3-dec (i5 n3 = i4 n3 decode), MV4 MMVQ at n=4 (+0.7 ms), G2 gate+up GEMV fusion (-0.4 ms), RM rows/WG sweep (4 stays), UB ubatch (512 stays), P2c mask DB (0%), P1c (under 2% kill line), prefill 10 unfused gate+up layers (~0.75%, under kill line), W1 draft window (acceptance), POL p_min (all lose), POL5 n_max 5 (pooled loses), W2 n=4 dequant reuse (no change).
