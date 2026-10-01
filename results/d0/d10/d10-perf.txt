@@ -1,0 +1,111 @@
+# verify n=2 kv~70k: 1 graphs, mean 52.26 ms
+# draft n=2 kv~70k: 1 graphs, mean 3.64 ms
+# verify n=38 kv~70k: 1 graphs, mean 132.04 ms
+# draft n=38 kv~70k: 1 graphs, mean 2.50 ms
+# verify n=4 kv~70k: 2 graphs, mean 52.56 ms
+# draft n=4 kv~70k: 2 graphs, mean 1.00 ms
+
+## draft n=1 kv~70k: 132 graphs, mean GPU 1.513 ms/graph
+     0.671 ms  x  1.0  MUL_MAT_VEC q6_K m=98304 n=1 k=5120
+     0.240 ms  x  2.0  MUL_MAT_VEC q6_K m=17408 n=1 k=5120
+     0.124 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=1 k=17408
+     0.120 ms  x  1.0  FLASH_ATTN_EXT dst(256,24,1,1),  q(256,1,24,1),  k(*,KV,4,1),  v(*,KV,4,1),  m(KV,1,1,1)
+     0.104 ms  x  1.0  MUL_MAT_VEC q8_0 m=5120 n=1 k=10240
+     0.094 ms  x  1.0  MUL_MAT_VEC q6_K m=12288 n=1 k=5120
+     0.052 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=1 k=6144
+     0.020 ms  x  5.0  RMS_NORM_MUL RMS_NORM(5120,1,1,1)
+     0.016 ms  x  2.0  MUL_MAT_VEC q6_K m=1024 n=1 k=5120
+     0.015 ms  x  3.0  GET_ROWS
+     0.009 ms  x  1.0  TOP_K K=10 (98304,1,1,1)
+     0.007 ms  x  2.0  ROPE
+     0.006 ms  x  1.0  PAD
+     0.005 ms  x  2.0  SET_ROWS
+
+## verify n=5 kv~70k: 32 graphs, mean GPU 45.139 ms/graph
+    17.357 ms  x128.0  MUL_MAT_VEC q6_K m=17408 n=5 k=5120
+     8.328 ms  x 64.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=5 k=17408
+     3.714 ms  x 48.0  MUL_MAT_VEC q6_K m=10240 n=5 k=5120
+     3.047 ms  x 48.0  MUL_MAT_VEC q8_0 m=5120 n=5 k=6144
+     2.415 ms  x 48.0  MUL_MAT_VEC q6_K m=6144 n=5 k=5120
+     2.198 ms  x 16.0  FLASH_ATTN_EXT dst(256,24,5,1),  q(256,5,24,1),  k(*,KV,4,1),  v(*,KV,4,1),  m(KV,5,1,1)
+     1.687 ms  x  1.0  MUL_MAT_VEC q6_K m=248320 n=5 k=5120
+     1.541 ms  x 16.0  MUL_MAT_VEC q6_K m=12288 n=5 k=5120
+     0.896 ms  x 16.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=5 k=6144
+     0.690 ms  x 48.0  GDN_CACHE GATED_DELTA_NET
+     0.590 ms  x129.0  RMS_NORM_MUL RMS_NORM(5120,5,1,1)
+     0.428 ms  x 96.0  MUL_MAT_VEC f32 m=48 n=5 k=5120
+     0.282 ms  x 48.0  RMS_NORM_MUL_SILU_MUL RMS_NORM(128,48,5,1)
+     0.247 ms  x 96.0  RMS_NORM_SCALE RMS_NORM(128,16,5,1)
+
+## draft n=5 kv~70k: 32 graphs, mean GPU 0.963 ms/graph
+     0.260 ms  x  2.0  MUL_MAT_VEC q6_K m=17408 n=5 k=5120
+     0.154 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=5 k=17408
+     0.144 ms  x  1.0  FLASH_ATTN_EXT dst(256,24,5,1),  q(256,5,24,1),  k(*,KV,4,1),  v(*,KV,4,1),  m(KV,5,1,1)
+     0.118 ms  x  1.0  MUL_MAT_VEC q6_K m=12288 n=5 k=5120
+     0.106 ms  x  1.0  MUL_MAT_VEC q8_0 m=5120 n=5 k=10240
+     0.061 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=5 k=6144
+     0.047 ms  x  5.0  RMS_NORM_MUL RMS_NORM(5120,5,1,1)
+     0.018 ms  x  2.0  MUL_MAT_VEC q6_K m=1024 n=5 k=5120
+     0.007 ms  x  2.0  ROPE
+     0.007 ms  x  1.0  GET_ROWS
+     0.005 ms  x  2.0  SET_ROWS
+     0.005 ms  x  1.0  CONT
+     0.005 ms  x  1.0  RMS_NORM_MUL RMS_NORM(256,24,5,1)
+     0.004 ms  x  1.0  CONCAT
+# prefill n=512 kv~0: 996 graphs, mean 318.03 ms
+# prefill n=293 kv~0: 2 graphs, mean 216.56 ms
+# verify n=3 kv~70k: 1 graphs, mean 48.31 ms
+# draft n=3 kv~70k: 1 graphs, mean 1.07 ms
+# prefill n=101 kv~0: 2 graphs, mean 219.47 ms
+# verify n=4 kv~176k: 1 graphs, mean 61.99 ms
+# draft n=4 kv~176k: 1 graphs, mean 1.45 ms
+
+## draft n=1 kv~176k: 52 graphs, mean GPU 2.019 ms/graph
+     0.665 ms  x  1.0  FLASH_ATTN_EXT dst(256,24,1,1),  q(256,1,24,1),  k(*,KV,4,1),  v(*,KV,4,1),  m(KV,1,1,1)
+     0.652 ms  x  1.0  MUL_MAT_VEC q6_K m=98304 n=1 k=5120
+     0.237 ms  x  2.0  MUL_MAT_VEC q6_K m=17408 n=1 k=5120
+     0.124 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=1 k=17408
+     0.095 ms  x  1.0  MUL_MAT_VEC q8_0 m=5120 n=1 k=10240
+     0.093 ms  x  1.0  MUL_MAT_VEC q6_K m=12288 n=1 k=5120
+     0.049 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=1 k=6144
+     0.020 ms  x  5.0  RMS_NORM_MUL RMS_NORM(5120,1,1,1)
+     0.016 ms  x  2.0  MUL_MAT_VEC q6_K m=1024 n=1 k=5120
+     0.016 ms  x  3.0  GET_ROWS
+     0.009 ms  x  1.0  TOP_K K=10 (98304,1,1,1)
+     0.007 ms  x  2.0  ROPE
+     0.005 ms  x  1.0  RMS_NORM_MUL RMS_NORM(256,24,1,1)
+     0.005 ms  x  1.0  RMS_NORM_MUL RMS_NORM(256,4,1,1)
+
+## verify n=5 kv~176k: 12 graphs, mean GPU 54.791 ms/graph
+    17.384 ms  x128.0  MUL_MAT_VEC q6_K m=17408 n=5 k=5120
+    11.726 ms  x 16.0  FLASH_ATTN_EXT dst(256,24,5,1),  q(256,5,24,1),  k(*,KV,4,1),  v(*,KV,4,1),  m(KV,5,1,1)
+     8.357 ms  x 64.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=5 k=17408
+     3.717 ms  x 48.0  MUL_MAT_VEC q6_K m=10240 n=5 k=5120
+     3.046 ms  x 48.0  MUL_MAT_VEC q8_0 m=5120 n=5 k=6144
+     2.424 ms  x 48.0  MUL_MAT_VEC q6_K m=6144 n=5 k=5120
+     1.687 ms  x  1.0  MUL_MAT_VEC q6_K m=248320 n=5 k=5120
+     1.546 ms  x 16.0  MUL_MAT_VEC q6_K m=12288 n=5 k=5120
+     0.916 ms  x 16.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=5 k=6144
+     0.699 ms  x 48.0  GDN_CACHE GATED_DELTA_NET
+     0.592 ms  x129.0  RMS_NORM_MUL RMS_NORM(5120,5,1,1)
+     0.429 ms  x 96.0  MUL_MAT_VEC f32 m=48 n=5 k=5120
+     0.290 ms  x 48.0  RMS_NORM_MUL_SILU_MUL RMS_NORM(128,48,5,1)
+     0.252 ms  x 32.0  MUL_MAT_VEC q6_K m=1024 n=5 k=5120
+
+## draft n=5 kv~176k: 12 graphs, mean GPU 1.545 ms/graph
+     0.738 ms  x  1.0  FLASH_ATTN_EXT dst(256,24,5,1),  q(256,5,24,1),  k(*,KV,4,1),  v(*,KV,4,1),  m(KV,5,1,1)
+     0.256 ms  x  2.0  MUL_MAT_VEC q6_K m=17408 n=5 k=5120
+     0.140 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=5 k=17408
+     0.107 ms  x  1.0  MUL_MAT_VEC q8_0 m=5120 n=5 k=10240
+     0.094 ms  x  1.0  MUL_MAT_VEC q6_K m=12288 n=5 k=5120
+     0.070 ms  x  5.0  RMS_NORM_MUL RMS_NORM(5120,5,1,1)
+     0.058 ms  x  1.0  MUL_MAT_ADD MUL_MAT_VEC q6_K m=5120 n=5 k=6144
+     0.028 ms  x  2.0  MUL_MAT_VEC q6_K m=1024 n=5 k=5120
+     0.007 ms  x  2.0  ROPE
+     0.007 ms  x  1.0  GET_ROWS
+     0.006 ms  x  1.0  CONT
+     0.005 ms  x  1.0  RMS_NORM_MUL RMS_NORM(256,4,5,1)
+     0.004 ms  x  2.0  SET_ROWS
+     0.004 ms  x  1.0  CONCAT
+# verify n=3 kv~176k: 1 graphs, mean 54.56 ms
+# draft n=3 kv~176k: 1 graphs, mean 1.44 ms
