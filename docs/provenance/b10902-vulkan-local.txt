@@ -1,0 +1,51 @@
+llama.cpp b10902 (df03399b8) - built HERE from source, Vulkan backend.
+
+Built 2026-09-10 in the worktree /home/bbuckham/git/llama.cpp-master, GCC 15.2.0,
+Release, -DGGML_VULKAN=ON -DGGML_NATIVE=ON -DLLAMA_CURL=OFF. Shaders compiled by
+the distro glslc (Vulkan SDK 1.4.341), which is why this build could not exist
+before 2026-09-10: glslc, libvulkan-dev and cmake were installed that day.
+
+SPIRV-Headers is NOT packaged on this host and `apt install spirv-headers` was
+not run. It is header-only, so it is cloned at tag vulkan-sdk-1.4.341.0 and
+installed under ~/.local. ggml's Vulkan CMakeLists finds the package but does
+not propagate its include directory, so the configure line also needs
+-DCMAKE_CXX_FLAGS=-I$HOME/.local/include. Without that the build dies at
+ggml-vulkan.cpp:48 on a missing spirv/unified1/spirv.hpp.
+
+  cmake -B build -DGGML_VULKAN=ON -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF \
+        -DLLAMA_BUILD_TESTS=OFF -DGGML_NATIVE=ON \
+        -DCMAKE_PREFIX_PATH=$HOME/.local \
+        -DCMAKE_CXX_FLAGS=-I$HOME/.local/include \
+        -DCMAKE_C_FLAGS=-I$HOME/.local/include
+  cmake --build build -j 20
+
+This is a VULKAN build and it works. The 2026-08 finding in FINDINGS.md that
+"the local GCC 15 build is broken" was about a from-source ROCm build whose
+llama-server segfaulted in ggml_cuda_op_scale on every model; it does not
+generalise to this one, and nothing here should be read as reversing it.
+
+WHY IT EXISTS. Three ollama-shipped GGUFs would not load on the b10472 or
+b10883 prebuilts, and the question was whether upstream had since fixed them.
+It has not:
+
+  qwen3.5:9b     key qwen35.rope.dimension_sections has wrong array length;
+                 expected 4, got 3.  src/models/qwen35.cpp:6 reads it with a
+                 required length of 4. Padding the key to [11,11,10,0] with
+                 harness/gguf_patch.py clears that check and then fails on
+                 `blk.0.ssm_dt.bias` not found -- ollama's export also names
+                 tensors differently. Two divergences deep, patching was
+                 abandoned as a rabbit hole.
+  gemma4:e4b     done_getting_tensors: wrong number of tensors; expected 2131,
+  gemma4:e2b     got 720. Upstream's gemma4 builds the 720 text tensors only;
+                 ollama ships text + vision + audio + per-layer embeddings in
+                 one file where upstream wants the multimodal half split into
+                 a separate mmproj.
+
+Identical failures on b10472, b10883 and this build, so these are exporter
+divergences rather than a version gap. Those three models are measured through
+ollama's own runtime instead -- capability only, never speed.
+
+NOT ADOPTED as the lab's build. Nothing here has been measured against b10472
+on the canary set, and b10472 is pinned for reasons recorded in its own
+PROVENANCE.txt. Treat this as a tool for loading models b10472 cannot, and as
+the base for ../b10902-adaptive-mtp.

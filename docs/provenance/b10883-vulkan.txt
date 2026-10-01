@@ -1,0 +1,51 @@
+llama.cpp b10883 (91f6a6cf3) - official upstream Vulkan prebuilt for linux x64.
+Downloaded 2026-09-09 from github.com/ggml-org/llama.cpp releases, asset
+llama-b10883-bin-ubuntu-vulkan-x64.tar.gz. Runs on RADV (Mesa), not ROCm.
+
+Installed 2026-09-09 to answer one question: has upstream improved anything
+worth taking, 411 builds after b10472? Measured, not assumed -- b10438 once
+measured 22.5% SLOWER at deep prefill than the older b10082, so on this stack a
+newer tag is a hypothesis rather than an upgrade.
+
+PREFILL: YES, ABOUT 4-5% -- b10472 vs b10883, Qwen3.8-27B-Q6_K on the R9700,
+llama-bench -p 2048 -n 64 -fa on -ngl 99 -t 8, 3 reps, medians. Both builds
+measured back to back under IDENTICAL conditions, with an ollama embedding
+server resident on the card (~750 MiB), because it could not be evicted without
+root:
+
+                          b10472    b10883    delta
+  q8_0/q8_0 KV            879.89    915.47    +4.0%
+  q8_0/q4_0 KV            874.36    921.40    +5.4%
+
+The contention is controlled for: b10472 measured 904.27 / 900.28 on a clean
+card earlier the same day, so contention costs about 2.7-2.9%. b10883 CONTENDED
+still beats b10472 CLEAN, which puts the improvement outside the noise the
+occupant introduces.
+
+DECODE: NOT RESOLVED. tg64 medians moved 18.45 -> 18.71 (q8_0/q8_0) and
+17.72 -> 23.90 (q8_0/q4_0), but decode on this rig scattered from 13.5 to 24.77
+t/s WITHIN a single build on the same day. Three reps cannot separate a real
+change from that. Do not quote the +34.9%.
+
+Not measured here: prefill at depth, which is the regime that actually decides
+a serving build and the axis on which b10472 beat b10082. The 2048-token canary
+probe says nothing about 16k or 32k depth. Adopting b10883 for serving needs
+that number first.
+
+Fingerprints in the perf-lab ledger under tags kvcmp-b10472-20260909,
+kvcmp-guarded-b10472-20260909 and kvcmp-guarded-b10883-20260909. The guarded
+tags were taken with PERF_LAB_GUARD_MIB raised to 2000 so the busy-card guard
+would not skip them; they are contended by construction and are marked as such.
+
+Version banner is the newer upstream format,
+  version: 0.4.0-dev (build 10883, commit 91f6a6cf3)
+which perf-lab's emit_row.py has parsed since 2026-08-23. The older parser
+would have refused every row from this build.
+
+Select the GPU with GGML_VK_VISIBLE_DEVICES; the index is resolved from the gfx
+target by harness/vulkan_index.py, never assumed. On this host Vulkan1 is the
+R9700 and Vulkan0 is the 16 GB 9060 XT.
+
+NOT ADOPTED. b10472 remains ~/.mimir/bin/llama-server. This build has a
+measured prefill win at 2048 tokens and no depth measurement, no long-context
+serving test, and no soak. See FINDINGS.md.

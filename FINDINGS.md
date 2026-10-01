@@ -1357,7 +1357,7 @@ is not installed**, and ggml's Vulkan CMakeLists finds the package but does not
 propagate its include directory, so the build dies at `ggml-vulkan.cpp:48` on a
 missing `spirv/unified1/spirv.hpp`. Cloning it at the matching SDK tag into
 `~/.local` and adding `-DCMAKE_CXX_FLAGS=-I$HOME/.local/include` is enough; no
-root needed. Full recipe in `~/llama.cpp/b10902-vulkan-local/PROVENANCE.txt`.
+root needed. Full recipe in `docs/provenance/b10902-vulkan-local.txt` (copied from the deleted `~/llama.cpp/b10902-vulkan-local/`).
 
 **`harness/install.sh` fires a nightly the moment it runs.** The timers are
 `Persistent=true`, so enabling them after twelve days of downtime immediately

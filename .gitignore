@@ -14,6 +14,8 @@ bin/
 models/
 runners/llama.cpp/bonsai-prism/
 runners/llama.cpp/qwen3.8-r9700-next/
+runners/llama.cpp/qwen3.8-r9700-mpd2b/
+runners/llama.cpp/qwen3.8-r9700-rb/
 *.dkld
 harness/wmma_peak/wmma_peak
 .opencode/
