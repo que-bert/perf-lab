@@ -1,0 +1,164 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 66.664,
+   "tok_step": 3.5142,
+   "accept": 0.644,
+   "n": 3841,
+   "ms_step": 52.715
+  },
+  "pooled": {
+   "tps": 66.664,
+   "tok_step": 3.5142,
+   "accept": 0.644,
+   "n": 3841,
+   "ms_step": 52.715
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 3691.345,
+   "dn": 274,
+   "da": 186,
+   "text": " older low-end devices.\n\n## Build CLI using Termux\n\n1. Install [Termux](https://termux.dev)\n2. Install dependencies:\n   ```sh\n   pkg install cmake clang make\n   ```\n3. Clone the repository:\n   ```sh\n   git clone https://github.com/ggml-org/llama.cpp\n   ```\n4. Build:\n   ```sh\n   cd llama.cpp\n   cmake -B build -DGGML_NATIVE=OFF\n   cmake --build build --config Release -j\n   ```\n5. Run:\n   ```sh\n   ./build/bin/llama-cli -m <model>\n   ```\n\n## Build CLI using Nix\n\n1. Install [Nix](https://nixos.org/download)\n2. Clone the repository:\n   ```sh\n   git clone https://github.com/ggml-org/llama.cpp\n   ```\n3. Build:\n   ```sh\n   cd llama.cpp\n   nix build .#llama-cpp\n   ```\n4. Run:\n   ```sh\n   nix run .#llama-cpp -- -m <model>\n   ```\n\n## Build CLI"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 4162.784,
+   "dn": 305,
+   "da": 177,
+   "text": "\n...\n[truncated]\n...\n==== license/MIT ====\nMIT License\n\nCopyright (c) 2025 gg\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\n==== license/README.md ====\n# Licenses\n\nThe llama.cpp code base"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 4256.995,
+   "dn": 314,
+   "da": 175,
+   "text": " GNU GENERAL PUBLIC LICENSE\n               Version 1, February 1989\n\n Copyright (C) 1989 Free Software Foundation, Inc.\n 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA\n Everyone is permitted to copy and distribute verbatim copies\n of this license document, but changing it is not allowed.\n\n                            Preamble\n\n  The licenses for most software are designed to take away your\nfreedom to share and change it.  By contrast, the GNU General Public\nLicense is intended to guarantee your freedom to share and change free\nsoftware--to make sure the software is free for all its users.  This\nGeneral Public License applies to most of the Free Software\nFoundation's software and to any other program whose authors commit to\nusing it.  (Some other Free Software Foundation software is covered by\nthe GNU Library General Public License instead.)  You can apply it to\nyour programs, too.\n\n  When we speak of free software, we are referring to freedom, not\nprice.  Our General Public Licenses are designed to make sure that you\nhave the freedom to distribute copies of free software (and charge for\nthis service"
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 256,
+   "ms": 3118.518,
+   "dn": 230,
+   "da": 197,
+   "text": "2.5-coder-7b-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/Phi-3-mini-4k-instruct-Q4_K_M](https://huggingface.co/bartowski/Phi-3-mini-4k-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/Phi-4-mini-instruct-Q4_K_M](https://huggingface.co/bartowski/Phi-4-mini-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/gemma-2-2b-it-Q4_K_M](https://huggingface.co/bartowski/gemma-2-2b-it-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/gemma-3-4b-it-Q4_K_M](https://huggingface.co/bartowski/gemma-3-4b-it-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  | "
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 3486.263,
+   "dn": 258,
+   "da": 190,
+   "text": "ollow the [installation guide](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2025-1/2025-1.html) to install the packages.\n\n*Note*:\n  - The **Intel® oneAPI Base toolkit** and **Intel® Deep Learning Essentials** are available for Linux and Windows.\n  - The **Intel® Deep Learning Essentials** is only available for Linux.\n  - The **Intel® oneAPI Base toolkit** and **Intel® Deep Learning Essentials** are available for both FP32 and FP16.\n  - The **Intel® oneAPI Base toolkit** and **Intel® Deep Learning Essentials** are available for both Intel GPU and other vendor GPU.\n\n- **For other vendor GPU**\n\nAll above are included in **Intel® oneAPI Base toolkit** package.\n\nPlease foollow the [installation guide](https://www.intel.com/content/www/us/en/docs/oneapi/installation-guide-linux/2025-1/2025-1.html) to install the packages.\n\n*Note*:\n  - The **Intel® oneAPI Base toolkit** is available for Linux and Windows.\n  - The **"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 4319.564,
+   "dn": 322,
+   "da": 174,
+   "text": " system and a licensee cannot\nimpose that choice.\n\nThis section is intended to make thoroughly clear what is believed to\nbe a consequence of the rest of this License.\n\n  12. If the distribution and/or use of the Library is restricted in\ncertain countries either by patents or by copyrighted interfaces, the\noriginal copyright holder who places the Library under this License may add\nan explicit geographical distribution limitation excluding those countries,\nso that distribution is permitted only in or among countries not thus\nexcluded.  In such case, this License incorporates the limitation as if\nwritten in the body of this License.\n\n  13. The Free Software Foundation may publish revised and/or new\nversions of the Lesser General Public License from time to time.\nSuch new versions will be similar in spirit to the present version,\nbut may differ in detail to address new problems or concerns.\n\nEach version is given a distinguishing version number.  If the Library\nspecifies a version number of this License which applies to it and\n\"any later version\", you have the option of following the terms and\nconditions either of that version or of any later version published by\nthe Free Software Foundation.  If the Library does not specify a license\nversion"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 256,
+   "ms": 4550.416,
+   "dn": 336,
+   "da": 170,
+   "text": ".g. an Open Source license that may be attached to the\n    Specific License, such as the BSD License, the Apache License,\n    the GNU Lesser General Public License, or the Mozilla Public\n    License version 1.1.\n\n1.13. \"Source Code Form\"\n    means the form of the work preferred for making modifications.\n\n1.14. \"Use\"\n    means use by the method of making, using, selling, offering for\n    sale, having made, import, and transfer or otherwise making\n    available.\n\n1.15. \"You\" (or \"Your\")\n    means an individual or a legal entity exercising rights under this\n    License. For legal entities, \"You\" includes any entity that\n    controls, is controlled by, or is under common control with You. For\n    purposes of this definition, \"control\" means (a) the power, direct\n    or indirect, to cause the direction or management of such entity,\n    whether by contract or otherwise, or (b) ownership of more than\n    fifty percent (50%) of the outstanding shares or beneficial\n    ownership of such entity.\n\n2. License Grants and Conditions\n--------------------------------\n\n2"
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 3430.922,
+   "dn": 256,
+   "da": 191,
+   "text": " 100 | \n   101 |     def test_get_all(self):\n   102 |         \"\"\"Test getting all items.\"\"\"\n   103 |         items = self.store.get_all()\n   104 |         self.assertEqual(len(items), 3)\n   105 | \n   106 |     def test_get_all_with_filter(self):\n   107 |         \"\"\"Test getting all items with filter.\"\"\"\n   108 |         items = self.store.get_all(category=\"electronics\")\n   109 |         self.assertEqual(len(items), 2)\n   110 | \n   111 |     def test_get_all_with_limit(self):\n   112 |         \"\"\"Test getting all items with limit.\"\"\"\n   113 |         items = self.store.get_all(limit=2)\n   114 |         self.assertEqual(len(items), 2)\n   115 | \n   116 |     def test_get_all_with_offset(self):\n   117 |         \"\"\"Test getting all items with offset.\"\"\"\n   118 |"
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 3435.645,
+   "dn": 255,
+   "da": 191,
+   "text": ":\n                mytz = self.replace(tzinfo=None)._local_timezone()\n                myoffset = mytz.utcoffset(self)\n                if myoffset is None:\n                    mytz = timezone.utc\n                    myoffset = timedelta(0)\n                    self = self.replace(tzinfo=mytz)\n\n        if tz is mytz:\n            return self\n\n        # Convert self to UTC, and attach the new time zone object.\n        utc = (self - myoffset).replace(tzinfo=tz)\n\n        # Convert from UTC to tz's local time.\n        return tz.fromutc(utc)\n\n    # Pickle support.\n\n    def _getstate(self, protocol=3):\n        us2, us3 = divmod(self._microsecond, 256)\n        us1, us2 = divmod(us2, 256)\n        h = self._hour\n        basestate = bytes([self._year, self._month, self._day,\n                           h, self._minute, self._second,\n                           us1, us2, us3])\n        if self._fold and protocol > 3:\n            h += 128"
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 1,
+   "ms": 0.001,
+   "dn": 0,
+   "da": 0,
+   "text": ""
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 3221.754,
+   "dn": 239,
+   "da": 195,
+   "text": " \"\"\"\n        a = _convert_other(a, raiseit=True)\n        return a.compare_total(b, context=self)\n\n    def compare_total_mag(self, a, b):\n        \"\"\"Compares two operands using their abstract representation\n        (unsigned).\n\n        Like compare_total, but as if the operands both were positive.  This\n        allows the values to be compared without regard to sign.\n\n        >>> ExtendedContext.compare_total_mag(Decimal('12.7'),  Decimal('127'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('-127'), Decimal('12'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.3'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.30'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('12.300'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('NaN'))\n        Decimal('-"
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 4430.389,
+   "dn": 331,
+   "da": 172,
+   "text": " Note: using the module __builtin__.io is deprecated.\n    \"\"\"\n\n    _closed = False\n\n    def close(self):\n        \"\"\"Close the file.\n\n        After the file is closed, any other operation on it will\n        raise a ValueError.\n        \"\"\"\n        if self._closed:\n            return\n        self._closed = True\n\n    @property\n    def closed(self):\n        \"\"\"A boolean saying whether the file is closed.\"\"\"\n        return self._closed\n\n    __del__ = close\n\n    def __enter__(self):\n        \"\"\"Context management protocol.  Returns self.\"\"\"\n        if self._closed:\n            raise ValueError(\"I/O operation on closed file\")\n        return self\n\n    def __exit__(self, type, value, traceback):\n        \"\"\"Context management protocol.  Closes the file.\"\"\"\n        self.close()\n\n    def __iter__(self):\n        \"\"\"Iterate over the lines of the file.\"\"\"\n        return iter(self.readline, b\"\")\n\n    def __reversed__(self):\n        \"\"\"Iterate over the lines of the file in reverse order.\"\"\"\n        self._checkSeekable()\n        if not self._checkReadable():\n           "
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 3854.264,
+   "dn": 287,
+   "da": 183,
+   "text": "ally-represented\n    # value in a decimal context with precision set to MAX_PREC.\n    #\n    # The algorithm is:\n    #\n    # 1. Split the number into two halves, high and low.\n    # 2. Recursively convert the high half to decimal.\n    # 3. Multiply the high half by 10**len(low).\n    # 4. Recursively convert the low half to decimal.\n    # 5. Add the results of steps 3 and 4.\n    #\n    # The key insight is that the multiplication in step 3 is a\n    # power-of-2 to power-of-2 multiplication, which is fast.\n    #\n    # The algorithm is O(n log n) where n is the number of digits.\n    #\n    # The algorithm is not used for small numbers, as the overhead of\n    # the recursive calls is not worth it.  The threshold is 1000\n    # digits.\n\n    # The algorithm is not used for small numbers, as the overhead of\n    # the recursive calls is not worth it.  The threshold is 1000\n   "
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 3998.175,
+   "dn": 296,
+   "da": 180,
+   "text": "-guide/index.html#environmental-variables) to control the runtime behavior.\n\nFor example, you can set `CUDA_VISIBLE_DEVICES` to select which GPU(s) to use.\n\n```bash\nCUDA_VISIBLE_DEVICES=0,1 ./build/bin/llama-cli -m model.gguf\n```\n\n### CUDA 12.8+\n\nCUDA 12.8+ requires CMake 3.25+ to build.\n\n## MUSA\n\nThis provides GPU acceleration using a Moore Threads GPU. Make sure to have the [MUSA toolkit](https://developer.mthreads.com/) installed.\n\n```bash\ncmake -B build -DGGML_MUSA=ON\ncmake --build build --config Release\n```\n\n## HIP\n\nThis provides GPU acceleration using an AMD GPU. Make sure to have the [ROCm](https://www.rocm.com/) toolkit installed.\n\n```bash\ncmake -B build -DGGML_HIP=ON\ncmake --build build --config Release\n```\n\n### Non-Native Builds\n\nBy default llama.cpp will be built for the hardware that is connected to the system at that time.\nFor a build covering all AMD GPUs, disable `GGML_NATIVE`:\n\n```"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 4029.046,
+   "dn": 296,
+   "da": 180,
+   "text": "DCLOSED': 0,\n    'HAVE_COPY_FILE_RANGE': 1,\n    'HAVE_COPYSIGN': 1,\n    'HAVE_COPYSIGNL': 1,\n    'HAVE_CRYPT': 1,\n    'HAVE_CRYPT_H': 1,\n    'HAVE_CURSES_H': 1,\n    'HAVE_CURSES_SET_WINDOW': 1,\n    'HAVE_CURS_SET_WINDOW': 1,\n    'HAVE_DECL_H_ERRNO': 1,\n    'HAVE_DECL_PTHREAD_YIELD': 1,\n    'HAVE_DECL_ST_RDEV': 1,\n    'HAVE_DECL_TZNAME': 1,\n    'HAVE_DIRENT_H': 1,\n    'HAVE_DIRFD': 1,\n    'HAVE_DLFCN_H': 1,\n    'HAVE_DLOPEN': 1,\n    'HAVE_DLSYM_UNDEFINED': 0,\n    'HAVE_DTRACE': 1,\n    'HAVE_DUP2': 1,\n    'HAVE_DUP3': 1,\n    'HAVE_DUPLOCALE': 1,\n    'HAVE_EACCESS"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 3631.236,
+   "dn": 268,
+   "da": 187,
+   "text": " N`) flag that configures the number of CPU threads to use. If you set this to a value that is too high, then the CPU will be oversaturated, and performance will suffer. For example, if you have a 16-core CPU, and you set `-t 16`, then the CPU will be oversaturated, and performance will suffer. In this case, you should set `-t 14` or `-t 12` to avoid oversaturation.\n\n## Verifying that the CPU is not throttling\nIf the CPU is throttling, then performance will suffer. This can happen if the CPU is overheating, or if the power supply is not providing enough power. You can check the CPU temperature with a tool like `htop` or `coretemp`. If the CPU is overheating, then you should improve the cooling of the CPU, or reduce the workload.\n\n## Verifying that the GPU is not throttling\nIf the GPU is throttling, then performance will suffer. This can happen if the GPU is overheating, or if the power supply is not providing enough power. You can check the GPU temperature with a tool like `nvidia-smi`. If the GPU is overheating, then you"
+  }
+ ]
+}

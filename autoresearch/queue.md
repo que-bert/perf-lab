@@ -1,6 +1,6 @@
 # Hypothesis queue (root rewrites; ranked by expected gain)
 
-Integration head: r9700-integrate12 @ 93dd11a2f (integrate11 + MPH KV-only): 70k prefill 1189, 176k 792, pooled 55.96, texts 37/37 = serving (I12). Serving: r9700-integrate11 (= r9700-qwen @ 901abb2a8): 70k 63.5, 176k 60.5, pooled 55.7, prefill 70k 1160; llama-bench pp2048 d0 / d16384 1630.3 / 1424.3 (I8B, 2026-09-30). Needs -lm none + MTMD_LAZY_GPU=1 + GGML_VK_HOST_GET_ROWS=1.
+Integration head: r9700-integrate13 @ fdebb22f5 (integrate11 + MPH KV-only + FOV + FV2 prefill FA): 70k prefill 1219, 176k 844, pooled 55.73; GATES13 pass (I13). Promote candidate, awaiting operator. Serving: r9700-integrate11 (= r9700-qwen @ 901abb2a8): 70k 63.5, 176k 60.5, pooled 55.7, prefill 70k 1160; llama-bench pp2048 d0 / d16384 1630.3 / 1424.3 (I8B, 2026-09-30). Needs -lm none + MTMD_LAZY_GPU=1 + GGML_VK_HOST_GET_ROWS=1.
 
 **Current target (set 2026-09-30, overnight run): server prefill with the serving config — ~32.5k prompt ≥ 1,400 t/s (from 1,304; mtp_prompt_ab.sh), 176k ≥ 800 stable (from 680–706).** Then exceed it. Secondary: pp2048 d0 ≥ 1,750 (from 1,630). Exact 8-bit GEMM is closed (I8H), so d0 is GEMM-bound at ~95 TF with no lever queued. Decomposition at 32.5k (MPD): llama-bench 1,424 = server no-spec 1,412 > server MTP 1,304 (−7.7%, of which MTP GPU ~3%).
 Serving candidate flags: `-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive --spec-draft-n-max 4`.
@@ -30,7 +30,7 @@ Serving candidate flags: `-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-
 | FQ8 | prefill FA stages raw q8_0 K/V into LDS | - | - | discard (+24 ms: re-dequant per query block) |
 | MPH | MTP prompt pass: KV-only draft graph (default ON) + deferred pass (opt-in LLAMA_MTP_PIPE, changes a text) | +2.6% 70k, +12% 176k prefill | root | kept in integrate12 @93dd11a2f (promote candidate) |
 | FPQ | prefill FA traffic probe | - | - | discard: not traffic-bound (zero-traffic -8 ms); MMA ~104 ms + 50 ms VALU floor serial |
-| FOV | prefill FA: overlap softmax/VALU with MMA (more resident waves or producer/consumer) | up to -50 ms/ubatch @64k | worker r9700-ar-fov | running |
+| FOV | prefill FA: overlap softmax/VALU with MMA (more resident waves or producer/consumer) | -14 ms/ubatch @64k with FV2 | root | kept in integrate13 (FV3, GQV/I14, GQ2, MFL discarded: see results.tsv) |
 | FACA | chunked FA prefill (split-K partials in RDNA4 kernel) to bound scratch at 64-128 MiB | uncertain (GTT oscillation survived a cap) | - | open, multi-hour shader |
 
 Closed: P3-dec (i5 n3 = i4 n3 decode), MV4 MMVQ at n=4 (+0.7 ms), G2 gate+up GEMV fusion (-0.4 ms), RM rows/WG sweep (4 stays), UB ubatch (512 stays), P2c mask DB (0%), P1c (under 2% kill line), prefill 10 unfused gate+up layers (~0.75%, under kill line), W1 draft window (acceptance), POL p_min (all lose), POL5 n_max 5 (pooled loses), W2 n=4 dequant reuse (no change).
