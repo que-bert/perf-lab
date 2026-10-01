@@ -10,13 +10,19 @@ one.
 The serving config is fixed (Qwen3.8-27B Q6_K, KV q8_0/q8_0, ctx 262144,
 `-fa on`, `--parallel 1`, MTP draft). Weight and KV storage formats never change.
 
-| metric | arbiter | target | stretch |
-|---|---|---:|---:|
-| decode ~176k | `harness/depth.sh` DEPTHS=4000 | ≥ 55 t/s | ≥ 62 |
-| decode ~70k | `harness/depth.sh` DEPTHS=1600 | ≥ 60 t/s | ≥ 67 |
-| pooled decode t/s, 37 prompts | `autoresearch/pool.py --set all` | ≥ the kept baseline −1% | — |
-| pp2048 d0 / d16384 | llama-bench | ≥ 1,700 / ≥ 1,480 | 1,850 / 1,600 |
-| pp512 d131072 | llama-bench | ≥ 850 | ≥ 1,000 |
+Reset 2026-10-01 after integrate16 was promoted. Decode targets are met and are now
+no-regression guards; the d0 and 131k prefill targets are retired (no lever left on this
+card: GEMM is VALU+WMMA issue-bound, FA tuned, rows I8H/PKF/GQ2/FDO/GDC). Phase 1 ends
+with MPD2b; phase 2 (queue.md) moves to upstream rebase and other models/quants.
+
+| metric | arbiter | target | status |
+|---|---|---:|---|
+| decode ~176k | `harness/depth.sh` DEPTHS=4000 | ≥ 59 t/s (no regression) | 59.4–59.9 |
+| decode ~70k | `harness/depth.sh` DEPTHS=1600 | ≥ 62 t/s (no regression) | 62.5–62.8 |
+| pooled decode t/s, 37 prompts | `autoresearch/pool.py --set all` | ≥ 56.17 −1% | 56.17 |
+| server prompt 32.5k | `results/d0/scripts/mtp_prompt_ab.sh` | ≥ 1,400 | ~1,385 (MPD2b) |
+| server prefill ~176k | `harness/depth.sh` | ≥ 840 (no regression) | 846–852 |
+| pp2048 d0 / pp512 d131072 | llama-bench | retired | ~1,620 / ~828 GPU |
 
 A decode change that raises depth.sh but lowers pooled t/s by more than 1% is
 not kept: depth.sh is one degenerate prompt.

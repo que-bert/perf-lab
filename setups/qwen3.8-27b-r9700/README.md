@@ -7,13 +7,13 @@ PRO R9700 (RDNA4, 32 GB) through Vulkan, with MTP speculative decoding.
 
 | role | branch (github.com/que-bert/llama.cpp) | local build |
 |---|---|---|
-| serving | `r9700-qwen` @ 901abb2a8 (= integrate11) | `runners/llama.cpp/qwen3.8-r9700/build/bin` (submodule) |
-| next (integration head) | `r9700-integrate16` @ 02ea7fe9f | `runners/llama.cpp/qwen3.8-r9700-next/build/bin` (worktree) |
+| serving | `r9700-qwen` @ 02ea7fe9f (= integrate16, promoted 2026-10-01) | `runners/llama.cpp/qwen3.8-r9700/build/bin` (submodule) |
+| next (integration head) | `r9700-integrate16` @ 02ea7fe9f (next experiments branch from here) | `runners/llama.cpp/qwen3.8-r9700-next/build/bin` (worktree) |
 
 Every experiment is a branch on the fork: `r9700-ar-<id>` for autoresearch experiments,
 `r9700-integrate<N>` for integration heads, `r9700-{p,r,d}<n>-*` for the earlier plan phases.
 Each id has a row in `autoresearch/results.tsv` saying what it changed, what it measured and why it
-was kept or discarded. Old serving builds are tagged `r9700-qwen-integrate{2,7,8,10}`.
+was kept or discarded. Old serving builds are tagged `r9700-qwen-integrate{2,7,8,10,11}`.
 
 Build (Vulkan SDK + glslc; `/tmp` on this box is a small tmpfs):
 
@@ -38,7 +38,7 @@ context the card is full and pages oscillate to GTT (row VIMG).
 
 ## Where it stands (2026-10-01)
 
-| metric | serving (integrate11) | integrate13 | integrate16 | target |
+| metric | integrate11 (old serving) | integrate13 | integrate16 (serving) | target |
 |---|---:|---:|---:|---:|
 | decode ~70k t/s | 63.5 | 62.0 | 62.5–62.8 | ≥ 60 |
 | decode ~176k t/s | 60.5 | 59.0 | 59.4–59.9 | ≥ 55 |
@@ -48,8 +48,8 @@ context the card is full and pages oscillate to GTT (row VIMG).
 | server prompt 32.5k t/s | ~1,324 | ~1,349 | 1,380–1,392 | ≥ 1,400 |
 
 integrate13 lowers depth.sh decode on its one prompt through acceptance (ms/step unchanged); the
-pooled number is the arbiter. integrate16 = integrate13 + MFL + SOP + VSUB; promotion to serving
-waits on the operator (rows I13, I15, I16 in `autoresearch/results.tsv`).
+pooled number is the arbiter. integrate16 = integrate13 + MFL + SOP + VSUB, promoted to serving 2026-10-01 (SERVE16); goals reset in autoresearch/program.md
+(rows I13, I15, I16, GATES16 in `autoresearch/results.tsv`).
 
 ## Layout
 
