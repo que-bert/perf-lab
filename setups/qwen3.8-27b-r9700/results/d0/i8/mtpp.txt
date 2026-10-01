@@ -1,0 +1,6 @@
+# verify n=2 kv~70k: 1 graphs, mean 50.17 ms
+# draft n=2 kv~70k: 1 graphs, mean 3.49 ms
+# prefill n=512 kv~0: 126 graphs, mean 184.93 ms
+# prefill n=291 kv~0: 2 graphs, mean 162.72 ms
+# verify n=4 kv~70k: 1 graphs, mean 52.76 ms
+# draft n=4 kv~70k: 1 graphs, mean 0.90 ms

@@ -11,7 +11,7 @@
 # taken round-robin one file per genre, then truncated to exactly MAX_BYTES. Diversity (prose / markdown / C++ / Python /
 # legal) keeps the scored windows at 70k and 176k tokens from being one genre.
 # 1.5 MB -> >190k tokens; the tool needs depth+score+1 = 176513 tokens at the deepest gate.
-# The output sha256 is recorded in results/p0/kld-base/README.md; a different sha
+# The output sha256 is recorded in setups/qwen3.8-27b-r9700/results/p0/kld-base/README.md; a different sha
 # means the base logits are not comparable.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"

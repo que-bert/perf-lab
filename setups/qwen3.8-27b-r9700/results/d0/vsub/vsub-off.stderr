@@ -1,0 +1,431 @@
+0.00.000.295 I srv  llama_server: initializing ...
+WARNING: radv is not a conformant Vulkan implementation, testing use only.
+WARNING: radv is not a conformant Vulkan implementation, testing use only.
+0.00.042.401 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.042.492 I srv          init: The UI is disabled
+0.00.042.493 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.042.545 W srv  llama_server: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.043.729 I srv    load_model: loading model '/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf'
+0.00.956.143 W common_fit_params: failed to fit params to free device memory: n_gpu_layers already set by user to 99, abort
+0.18.857.616 W common_init_result: --spec-draft-vocab without --spec-draft-vocab-file: using specials + lowest token ids
+0.20.361.749 I cmn          init: llama threadpool init, n_threads = 8
+0.20.441.910 I common_speculative_init_result: creating MTP draft context against the target model '/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf'
+0.20.480.194 W load_hparams: Qwen-VL models require at minimum 1024 image tokens to function correctly on grounding tasks
+0.20.480.199 W load_hparams: if you encounter problems with accuracy, try adding --image-min-tokens 1024
+0.20.480.199 W load_hparams: more info: https://github.com/ggml-org/llama.cpp/issues/16842
+
+0.21.996.982 I srv    load_model: loaded multimodal model, '/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/mmproj-F16.gguf'
+0.21.997.004 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 262144, kv_unified = 'false'
+0.21.997.126 I spec common_specu: adaptive draft vocab: subset 98304 rows while <= 3 per 256 recent context tokens fall outside it
+0.22.038.606 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.22.038.644 I srv  llama_server: model loaded
+0.22.038.647 I srv  llama_server: listening on http://127.0.0.1:8097
+0.25.137.424 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.25.137.461 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.25.437.816 I spec        begin: adaptive draft vocab: cumulative draft steps subset 0 / 0 (0.0000), switches 0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     2      1 100.0  27218.3   5494.7    133.6  20748.3      0.0
+LLAMA_DECODE_TIMING c0     4      1 100.0  16158.5   5616.2     43.1  10451.0  98715.6
+LLAMA_DECODE_TIMING c0     5      9  11.1   6296.3    656.1     27.9   4311.1   1456.0
+LLAMA_DECODE_TIMING c0    38      1 100.0 111905.3   5568.4     40.0  95732.3 3107077.5
+LLAMA_DECODE_TIMING c1     1     36  25.0    331.4     51.7     13.0    248.5   1322.5
+LLAMA_DECODE_TIMING c1     2      1 100.0  30132.4    150.1    122.4   4421.8 1611583.5
+LLAMA_DECODE_TIMING c1     4      1 100.0    298.9    112.3     32.3    119.7  40353.1
+LLAMA_DECODE_TIMING c1     5      9 100.0    243.9     96.3     17.3    105.5  40575.6
+LLAMA_DECODE_TIMING c1    38      1 100.0   6319.8    137.2    185.7   1104.1  26223.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     11     35.7     44.4  -2770.1     71.4     71.7   3.7  90.9
+VK_STEP_TIMING     68      1    125.3 -1637318.4 -1637318.4    137.6    141.0   0.0   0.0
+VK_STEP_TIMING     69     36     13.6     33.1    247.6   1229.9   1243.5   9.0   0.0
+VK_STEP_TIMING   4523     12     40.3 -6024897196.8 -6025157503.7  27608.3  27620.7   9.5   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 829.5 xfer 3.8 prealloc 3.3 first_batch_loop 273.4 first_batch_nodes 144.8
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3790.8      0.9     30.4   3731.0   1479.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    287.0     52.6     13.7    203.1   1266.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    294.7    110.6     23.8    127.2  40151.4
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     25.4     53.1    125.4      0.0      0.0   4.0 100.0
+VK_STEP_TIMING     69     40     14.4     33.8    202.1   1291.1   1305.1   9.0   0.0
+VK_STEP_TIMING   4523     10     31.0   1005.4   3729.8  40067.7  40085.3  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 879.6 xfer 3.7 prealloc 2.6 first_batch_loop 119.5 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3820.9      0.8     26.2   3768.2   1478.5
+LLAMA_DECODE_TIMING c1     1     40  25.0    278.3     50.8     12.2    199.0   1348.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    238.8     93.9     17.5    102.3  40119.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     18.4     36.0    101.1      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     12.9     32.6    198.1   1290.1   1303.5   9.0   0.0
+VK_STEP_TIMING   4523     10     26.7   1025.4   3767.3  40046.8  40063.1  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 904.8 xfer 3.6 prealloc 2.1 first_batch_loop 114.8 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3616.1      0.8     25.6   3565.0   1486.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    283.5     47.8     11.7    208.3   1261.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    231.9     88.1     15.7    105.4  40252.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     16.4     32.2    104.4      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     12.3     32.4    207.4   1253.5   1266.8   9.0   0.0
+VK_STEP_TIMING   4523     10     26.2    942.3   3564.1  40174.6  40189.6  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 827.9 xfer 3.4 prealloc 2.0 first_batch_loop 109.0 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3661.2      0.9     25.8   3609.9   1454.7
+LLAMA_DECODE_TIMING c1     1     40  25.0    284.0     48.7     11.9    207.6   1243.0
+LLAMA_DECODE_TIMING c1     5     10 100.0    249.8     95.8     18.2    110.3  40224.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     19.1     39.6    109.1      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     12.6     31.2    206.6   1252.0   1265.7   9.0   0.0
+VK_STEP_TIMING   4523     10     26.3    952.2   3608.9  40141.3  40157.6  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 835.3 xfer 4.0 prealloc 1.9 first_batch_loop 110.9 first_batch_nodes 161.0
+0.28.476.691 I slot print_timing: id  0 | task 0 | n_gen =    167, tg =  54.64 t/s, tg_3s =  54.96 t/s
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3592.7      0.8     26.1   3541.6   1465.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    276.4     49.3     12.2    199.6   1268.3
+LLAMA_DECODE_TIMING c1     5     10 100.0    234.5     92.4     16.4    101.6  40278.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     17.1     34.3    100.7      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     12.8     31.2    198.7   1269.7   1283.1   9.0   0.0
+VK_STEP_TIMING   4523     10     26.6    937.9   3540.7  40201.2  40215.7  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 823.3 xfer 3.9 prealloc 1.9 first_batch_loop 108.9 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3681.7      0.9     28.8   3624.7   1499.9
+LLAMA_DECODE_TIMING c1     1     40  25.0    277.5     51.1     13.4    195.9   1341.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    260.9    101.5     21.5    108.6  40271.7
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     22.5     41.4    107.3      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     14.1     32.5    194.9   1292.8   1306.1   9.0   0.0
+VK_STEP_TIMING   4523     10     29.4    995.5   3623.6  40184.9  40200.5  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 873.1 xfer 4.6 prealloc 2.3 first_batch_loop 115.5 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4522.0    586.3     26.7   3884.4   1477.3
+LLAMA_DECODE_TIMING c1     1     40  32.5    286.6     61.3     12.0    197.4   1286.2
+LLAMA_DECODE_TIMING c1     5     10 100.0    234.5     90.6     17.3    103.7  40170.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     18.1     36.5    102.6      0.0      0.0   4.0 100.0
+VK_STEP_TIMING     69     40     12.7     32.6    196.5   1260.0   1273.3   9.0   0.0
+VK_STEP_TIMING   4523     10     27.2    946.5   2478.8  36584.0  36597.8  12.7   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 829.5 xfer 4.3 prealloc 1.9 first_batch_loop 110.9 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     3      1 100.0  10937.6   5841.7     27.8   5045.1   1507.9
+LLAMA_DECODE_TIMING c0     5      9   0.0   3664.5      0.8     27.1   3611.7   1452.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    274.1     49.6     11.6    197.4   1278.5
+LLAMA_DECODE_TIMING c1     3      1 100.0    241.7     99.8     21.0    100.0  38850.1
+LLAMA_DECODE_TIMING c1     5      9 100.0    254.5    100.0     19.4    109.3  40410.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     20.4     40.0    107.2      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     12.2     31.5    196.5   1257.7   1271.0   9.0   0.0
+VK_STEP_TIMING   4523     10     27.7   1103.4   3754.2  40170.3  40186.3  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 838.2 xfer 4.2 prealloc 2.0 first_batch_loop 259.0 first_batch_nodes 168.1
+0.30.103.476 I slot print_timing: id  0 | task 0 | prompt eval time =     300.82 ms /    42 tokens (    7.16 ms per token,   139.62 tokens per second)
+0.30.103.479 I slot print_timing: id  0 | task 0 |        eval time =    4664.92 ms /   256 tokens (   18.29 ms per token,    54.66 tokens per second)
+0.30.103.480 I slot print_timing: id  0 | task 0 |       total time =    4965.74 ms /   298 tokens
+0.30.103.484 I slot print_timing: id  0 | task 0 |    graphs reused =         86
+0.30.103.488 I slot print_timing: id  0 | task 0 | draft acceptance = 0.46893 (  166 accepted /   354 generated), mean len =  2.87
+0.30.103.530 I slot      release: id  0 | task 0 | stop processing: n_tokens = 297, truncated = 0
+0.30.105.105 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.141
+0.30.279.571 I slot launch_slot_: id  0 | task 92 | processing task, is_child = 0
+0.30.467.737 I spec        begin: adaptive draft vocab: cumulative draft steps subset 356 / 356 (1.0000), switches 1
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     4      1 100.0   9001.2   5622.8     43.1   3287.2 311220.8
+LLAMA_DECODE_TIMING c0     5      9  11.1   4301.3    611.5     26.4   3637.3   1517.4
+LLAMA_DECODE_TIMING c1     1     40  25.0    280.6     51.8     12.6    200.2   1325.3
+LLAMA_DECODE_TIMING c1     4      1 100.0    321.3    115.8     32.0    145.4  45052.9
+LLAMA_DECODE_TIMING c1     5      9 100.0    250.5    100.2     19.0    106.7  40315.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     21.2     38.9    109.4      0.0      0.1   4.2 100.0
+VK_STEP_TIMING     69     40     13.3     33.5    199.2   1243.9   1257.6   9.0   0.0
+VK_STEP_TIMING   4523     10     28.8    965.5   3601.2  40705.2  40721.5  14.2   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 844.5 xfer 3.6 prealloc 2.3 first_batch_loop 115.1 first_batch_nodes 158.6
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3716.0      0.8     26.7   3665.0   1445.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    273.6     49.7     12.0    196.7   1243.3
+LLAMA_DECODE_TIMING c1     5     10 100.0    250.0     96.8     19.5    108.3  40281.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     20.4     39.5    107.1      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     12.6     31.7    195.8   1250.1   1263.6   9.0   0.0
+VK_STEP_TIMING   4523     10     27.1    970.3   3664.1  40199.3  40214.5  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 853.5 xfer 3.9 prealloc 1.8 first_batch_loop 111.1 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3715.5      0.9     27.4   3661.4   1444.6
+LLAMA_DECODE_TIMING c1     1     40  25.0    281.9     51.9     12.5    201.1   1336.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    261.6    105.4     20.2    109.7  40336.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     21.2     41.5    108.4      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     13.2     33.9    200.1   1246.9   1260.4   9.0   0.0
+VK_STEP_TIMING   4523     10     27.9   1001.4   3660.5  40249.5  40266.2  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 882.8 xfer 4.0 prealloc 1.9 first_batch_loop 112.8 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3651.2      0.8     26.4   3598.6   1448.1
+LLAMA_DECODE_TIMING c1     1     40  25.0    272.3     49.3     11.6    196.4   1261.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    240.8     94.7     17.5    105.2  40386.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     18.3     38.1    104.0      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     12.1     31.6    195.5   1258.8   1272.3   9.0   0.0
+VK_STEP_TIMING   4523     10     26.9    972.7   3597.8  40307.4  40322.6  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 857.2 xfer 3.6 prealloc 1.9 first_batch_loop 110.1 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3714.6      0.8     27.7   3660.6   1449.6
+LLAMA_DECODE_TIMING c1     1     40  25.0    281.5     52.0     13.0    199.7   1275.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    272.3    105.5     24.3    114.4  40338.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     25.5     43.2    112.9      0.0      0.0   4.0 100.0
+VK_STEP_TIMING     69     40     13.7     33.6    198.8   1253.0   1266.8   9.0   0.0
+VK_STEP_TIMING   4523     10     28.3   1003.4   3659.6  40248.5  40266.0  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 886.3 xfer 4.7 prealloc 1.9 first_batch_loop 110.5 first_batch_nodes 161.0
+0.33.489.147 I slot print_timing: id  0 | task 92 | n_gen =    167, tg =  54.95 t/s, tg_3s =  55.28 t/s
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3621.1      0.8     25.6   3569.8   1468.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    267.6     48.4     11.5    192.7   1265.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    231.7     91.9     17.1    100.0  40393.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     18.0     34.9     98.9      0.0      0.0   4.0 100.0
+VK_STEP_TIMING     69     40     12.1     30.6    191.9   1265.8   1279.0   9.0   0.0
+VK_STEP_TIMING   4523     10     26.1    956.6   3569.0  40315.0  40329.9  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 840.2 xfer 3.3 prealloc 1.8 first_batch_loop 111.3 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3648.0      0.9     26.9   3594.8   1453.4
+LLAMA_DECODE_TIMING c1     1     40  25.0    268.4     47.2     11.6    194.6   1280.7
+LLAMA_DECODE_TIMING c1     5     10 100.0    223.2     91.0     15.6     95.5  40366.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     16.3     32.3     94.6      0.0      0.0   4.0 100.0
+VK_STEP_TIMING     69     40     12.2     31.9    193.7   1257.5   1271.0   9.0   0.0
+VK_STEP_TIMING   4523     10     27.3    975.1   3594.0  40291.4  40306.2  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 860.1 xfer 3.3 prealloc 1.8 first_batch_loop 109.8 first_batch_nodes 161.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4218.2    585.6     26.3   3581.2   1447.3
+LLAMA_DECODE_TIMING c1     1     40  32.5    287.0     60.1     12.2    198.9   1283.3
+LLAMA_DECODE_TIMING c1     5     10 100.0    247.4     94.8     19.7    107.8  40520.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     20.8     40.7    106.4      0.0      0.0   4.0 100.0
+VK_STEP_TIMING     69     40     12.8     33.5    197.9   1250.4   1264.1   9.0   0.0
+VK_STEP_TIMING   4523     10     26.8    966.2   3580.4  40437.6  40452.9  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 849.3 xfer 3.4 prealloc 2.0 first_batch_loop 111.5 first_batch_nodes 161.0
+0.35.109.359 I slot print_timing: id  0 | task 92 | prompt eval time =     188.62 ms /     4 tokens (   47.16 ms per token,    21.21 tokens per second)
+0.35.109.362 I slot print_timing: id  0 | task 92 |        eval time =    4640.88 ms /   256 tokens (   18.20 ms per token,    54.95 tokens per second)
+0.35.109.362 I slot print_timing: id  0 | task 92 |       total time =    4829.50 ms /   260 tokens
+0.35.109.363 I slot print_timing: id  0 | task 92 |    graphs reused =        172
+0.35.109.366 I slot print_timing: id  0 | task 92 | draft acceptance = 0.46893 (  166 accepted /   354 generated), mean len =  2.87
+0.35.109.391 I slot      release: id  0 | task 92 | stop processing: n_tokens = 297, truncated = 0
+0.35.228.258 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 72313414242
+0.35.229.288 I slot launch_slot_: id  0 | task 183 | processing task, is_child = 0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     17.3     34.0     99.9      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     36     11.8     29.8    189.6   1261.1   1274.7   9.0   0.0
+VK_STEP_TIMING   4523     14    305.6    909.1 -52676.9  32362.2  32374.1  10.5   0.0
+VK_STEP_TIMING_PRE (us mean over 14) prepass 790.3 xfer 3.1 prealloc 3.1 first_batch_loop 112.7 first_batch_nodes 138.6
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     3      1 100.0   8684.2   5469.6     26.6   3166.0   1431.6
+LLAMA_DECODE_TIMING c0     5      9   0.0   3609.9      0.7     25.4   3559.4   1450.1
+LLAMA_DECODE_TIMING c0  2048      2 100.0 1008966.9  21398.8 758587.3 227410.9  82004.5
+LLAMA_DECODE_TIMING c1     1     36  25.0    262.7     46.8     11.2    190.4   1241.7
+LLAMA_DECODE_TIMING c1     3      1 100.0    337.6    124.8     27.9    147.7  39658.6
+LLAMA_DECODE_TIMING c1     5      9 100.0    219.3     87.5     15.2     95.7  40427.1
+LLAMA_DECODE_TIMING c1  2048      2 100.0  28477.2    533.6  10532.1   1613.1 317744.0
+0.39.370.145 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =   6144, progress = 0.08, t =   3.79 s / 1619.95 tokens per second
+0.40.772.371 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =   8192, progress = 0.11, t =   5.19 s / 1578.95 tokens per second
+0.42.196.082 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  10240, progress = 0.14, t =   6.61 s / 1549.63 tokens per second
+0.43.641.556 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  12288, progress = 0.17, t =   8.05 s / 1526.88 tokens per second
+0.45.105.434 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  14336, progress = 0.20, t =   9.51 s / 1507.90 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     32    974.6     78.1 -10628.6   1626.1   1629.6   4.9  25.0
+VK_STEP_TIMING   4523     28   1253.0    988.2 -247603.2  17261.2  17264.2   2.0   0.0
+VK_STEP_TIMING_PRE (us mean over 28) prepass 839.4 xfer 3.7 prealloc 7.6 first_batch_loop 137.4 first_batch_nodes 83.0
+0.46.589.982 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  16384, progress = 0.23, t =  10.99 s / 1491.34 tokens per second
+0.48.094.546 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  18432, progress = 0.25, t =  12.49 s / 1476.24 tokens per second
+0.49.618.795 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  20480, progress = 0.28, t =  14.00 s / 1462.37 tokens per second
+0.51.161.315 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  22528, progress = 0.31, t =  15.54 s / 1449.36 tokens per second
+0.52.724.559 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  24576, progress = 0.34, t =  17.10 s / 1437.16 tokens per second
+0.54.305.809 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  26624, progress = 0.37, t =  18.68 s / 1425.48 tokens per second
+0.55.905.612 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  28672, progress = 0.40, t =  20.27 s / 1414.25 tokens per second
+0.57.526.639 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  30720, progress = 0.42, t =  21.89 s / 1403.40 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     28    960.5     76.1    180.7   1661.5   1665.6   5.0  25.0
+VK_STEP_TIMING   4523     32    918.5   1048.4 -274592.5  17628.7  17631.8   2.4   0.0
+VK_STEP_TIMING_PRE (us mean over 32) prepass 900.5 xfer 3.6 prealloc 7.3 first_batch_loop 136.9 first_batch_nodes 83.0
+0.59.158.156 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  32768, progress = 0.45, t =  23.52 s / 1393.30 tokens per second
+1.00.807.415 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  34816, progress = 0.48, t =  25.16 s / 1383.60 tokens per second
+1.02.471.202 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  36864, progress = 0.51, t =  26.82 s / 1374.27 tokens per second
+1.04.149.353 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  38912, progress = 0.54, t =  28.50 s / 1365.44 tokens per second
+1.05.843.039 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  40960, progress = 0.57, t =  30.19 s / 1356.80 tokens per second
+1.07.555.384 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  43008, progress = 0.59, t =  31.90 s / 1348.41 tokens per second
+1.09.286.087 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  45056, progress = 0.62, t =  33.62 s / 1340.04 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     32    944.1     78.1    180.5   1650.4   1654.1   5.0  25.0
+VK_STEP_TIMING   4523     28   1342.1   1193.3 -298348.9  17421.5  17424.9   3.0   0.0
+VK_STEP_TIMING_PRE (us mean over 28) prepass 1033.2 xfer 4.8 prealloc 8.3 first_batch_loop 147.0 first_batch_nodes 83.0
+1.11.033.382 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  47104, progress = 0.65, t =  35.37 s / 1331.93 tokens per second
+1.12.798.340 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  49152, progress = 0.68, t =  37.13 s / 1323.92 tokens per second
+1.14.581.476 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  51200, progress = 0.71, t =  38.90 s / 1316.04 tokens per second
+1.16.383.141 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  53248, progress = 0.73, t =  40.70 s / 1308.25 tokens per second
+1.18.204.246 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  55296, progress = 0.76, t =  42.52 s / 1300.52 tokens per second
+1.20.043.062 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  57344, progress = 0.79, t =  44.35 s / 1292.91 tokens per second
+1.21.901.100 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  59392, progress = 0.82, t =  46.21 s / 1285.37 tokens per second
+1.23.777.389 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  61440, progress = 0.85, t =  48.08 s / 1277.92 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     28    945.6     79.7    181.4   1635.8   1639.3   5.0  25.0
+VK_STEP_TIMING   4523     32   2135.4   1318.2 -323584.2  17271.4  17274.9   3.0   0.0
+VK_STEP_TIMING_PRE (us mean over 32) prepass 1153.3 xfer 5.0 prealloc 8.8 first_batch_loop 151.2 first_batch_nodes 83.0
+1.25.674.855 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  63488, progress = 0.88, t =  49.97 s / 1270.50 tokens per second
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0  2048     30 100.0 1237134.0  21673.1 1126215.1  87574.0  11475.8
+LLAMA_DECODE_TIMING c1  2048     30 100.0  18891.9    515.5  10391.7    734.0 385701.7
+1.27.589.705 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  65536, progress = 0.90, t =  51.88 s / 1263.20 tokens per second
+1.29.525.029 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  67584, progress = 0.93, t =  53.81 s / 1255.93 tokens per second
+1.31.479.352 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  69632, progress = 0.96, t =  55.76 s / 1248.76 tokens per second
+1.33.452.064 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  71680, progress = 0.99, t =  57.73 s / 1241.65 tokens per second
+1.33.857.952 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  71973, progress = 0.99, t =  58.25 s / 1235.51 tokens per second
+1.34.557.652 I slot print_timing: id  0 | task 183 | prompt processing, n_tokens =  72485, progress = 1.00, t =  58.86 s / 1231.41 tokens per second
+1.34.821.160 I spec        begin: adaptive draft vocab: cumulative draft steps subset 712 / 712 (1.0000), switches 1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     26    785.5     73.1    167.5   1258.0   1261.0   4.8  42.3
+VK_STEP_TIMING     69     12    180.6     36.5    232.8   1462.9   1476.1   9.5   0.0
+VK_STEP_TIMING   4523     22   2407.7   1394.4 -260382.0  23202.1  23208.2   4.9   0.0
+VK_STEP_TIMING_PRE (us mean over 22) prepass 1218.5 xfer 5.1 prealloc 8.1 first_batch_loop 162.7 first_batch_nodes 115.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     4      1 100.0   9275.2   5455.1    151.6   3571.1 203136.5
+LLAMA_DECODE_TIMING c0     5      8  12.5   4716.6    688.7     87.9   3907.3   1687.6
+LLAMA_DECODE_TIMING c0   293      1 100.0  30693.6   5557.3   1702.2  23061.3  11414.7
+LLAMA_DECODE_TIMING c0   512      1 100.0  40516.4   5482.7   3048.6  31461.5 195873.1
+LLAMA_DECODE_TIMING c0  2048      3 100.0 1465090.4  22155.7 1351889.4  89299.0  11491.7
+LLAMA_DECODE_TIMING c1     1     32  25.0    370.7     53.0     79.0    216.0   1611.4
+LLAMA_DECODE_TIMING c1     4      1 100.0   4259.0   4094.0     31.0     78.0  50170.7
+LLAMA_DECODE_TIMING c1     5      8 100.0    254.2    102.2     18.2    106.8  45587.5
+LLAMA_DECODE_TIMING c1   293      1 100.0   1719.7    117.3    446.9    196.2 371252.3
+LLAMA_DECODE_TIMING c1   512      1 100.0   3232.3    126.3    968.6    255.0 458515.9
+LLAMA_DECODE_TIMING c1  2048      3 100.0  19101.5    536.8  10418.7    717.8 458456.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     20.4     47.2    116.5      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     19.6     35.8    208.1   1510.5   1523.8   9.5   0.0
+VK_STEP_TIMING   4523     10     83.2   1345.1   3952.9  45249.3  45265.1  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1190.7 xfer 3.9 prealloc 2.1 first_batch_loop 148.3 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4077.8      0.9     87.0   3959.3   1688.7
+LLAMA_DECODE_TIMING c1     1     40  25.0    299.2     53.3     18.4    208.9   1591.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    265.6    105.9     18.5    112.4  45344.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     17.1     33.5     98.5      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     17.8     32.4    202.9   1514.3   1527.6   9.5   0.0
+VK_STEP_TIMING   4523     10     86.8   1322.3   3929.0  45258.7  45274.6  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1169.1 xfer 3.8 prealloc 2.0 first_batch_loop 147.4 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4074.2      0.9     86.6   3957.0   1693.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    296.3     53.2     17.9    207.4   1573.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    274.9    103.8     19.5    120.0  45353.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     26.2     60.0    133.5      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     19.2     34.8    208.2   1515.0   1528.4   9.5   0.0
+VK_STEP_TIMING   4523     10     91.5   1376.6   4005.7  45240.0  45256.9  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1217.3 xfer 4.0 prealloc 2.1 first_batch_loop 153.3 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4101.7      0.9     87.4   3983.4   1709.4
+LLAMA_DECODE_TIMING c1     1     40  25.0    296.6     53.4     18.1    206.2   1564.7
+LLAMA_DECODE_TIMING c1     5     10 100.0    274.9    107.5     21.3    114.2  45335.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     16.2     33.2     96.8      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     18.2     33.7    205.3   1520.2   1533.2   9.5   0.0
+VK_STEP_TIMING   4523     10     82.4   1335.9   3959.5  45267.3  45282.4  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1179.5 xfer 3.8 prealloc 2.2 first_batch_loop 150.3 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4063.5      1.0     82.3   3952.2   1699.1
+LLAMA_DECODE_TIMING c1     1     40  25.0    292.1     51.1     17.5    205.9   1533.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    248.1    101.1     17.6    103.8  45370.2
+1.37.832.900 I slot print_timing: id  0 | task 183 | n_gen =    199, tg =  65.76 t/s, tg_3s =  66.09 t/s
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     18.4     37.9    103.7      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     18.1     33.2    204.0   1514.7   1528.2   9.5   0.0
+VK_STEP_TIMING   4523     10     82.7   1327.6   3930.5  45294.9  45310.1  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1174.9 xfer 3.8 prealloc 2.1 first_batch_loop 146.8 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4528.6    543.4     83.3   3871.3   1712.0
+LLAMA_DECODE_TIMING c1     1     40  30.0    298.4     59.0     17.8    204.3   1502.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    226.3     91.2     14.6     98.3  45406.7
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     18.5     36.8    102.5      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     18.7     33.5    204.1   1514.1   1527.4   9.5   0.0
+VK_STEP_TIMING   4523     10     83.4   1297.1   3881.2  45320.9  45336.1  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1142.4 xfer 3.7 prealloc 2.2 first_batch_loop 148.8 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4038.7      0.9     81.4   3925.5   1717.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    290.1     51.1     17.3    203.9   1517.0
+LLAMA_DECODE_TIMING c1     5     10 100.0    242.8     97.6     17.5    103.0  45367.7
+1.38.944.856 I slot print_timing: id  0 | task 183 | prompt eval time =   59592.33 ms / 72489 tokens (    0.82 ms per token,  1216.41 tokens per second)
+1.38.944.859 I slot print_timing: id  0 | task 183 |        eval time =    4123.22 ms /   256 tokens (   16.17 ms per token,    61.84 tokens per second)
+1.38.944.860 I slot print_timing: id  0 | task 183 |       total time =   63715.55 ms / 72745 tokens
+1.38.944.861 I slot print_timing: id  0 | task 183 |    graphs reused =        239
+1.38.944.864 I slot print_timing: id  0 | task 183 | draft acceptance = 0.67029 (  185 accepted /   276 generated), mean len =  3.68
+1.38.945.994 I slot      release: id  0 | task 183 | stop processing: n_tokens = 72744, truncated = 0
+1.39.063.863 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.996
+1.39.063.927 I slot launch_slot_: id  0 | task 292 | processing task, is_child = 0
+1.39.420.629 I spec        begin: adaptive draft vocab: cumulative draft steps subset 988 / 988 (1.0000), switches 1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     11     21.3     37.2    105.3      0.0      0.1   4.3 100.0
+VK_STEP_TIMING     69     38     22.4     32.8    205.0   1508.3   1521.4   9.6   0.0
+VK_STEP_TIMING   4523     11     85.5   1379.1   4004.6  45375.7  45391.7  14.8   0.0
+VK_STEP_TIMING_PRE (us mean over 11) prepass 1107.0 xfer 3.8 prealloc 3.0 first_batch_loop 265.3 first_batch_nodes 226.9
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     1      1 100.0  10272.7   5461.0     48.9   4725.6   1886.4
+LLAMA_DECODE_TIMING c0     4      1 100.0   9998.5   5513.4    121.5   4310.8 414899.4
+LLAMA_DECODE_TIMING c0     5      9  11.1   4634.8    611.9     84.1   3907.9   1691.7
+LLAMA_DECODE_TIMING c1     1     39  28.2    304.1     57.7     22.9    204.5   2597.6
+LLAMA_DECODE_TIMING c1     4      1 100.0    348.5    107.8     34.6    170.4  50792.3
+LLAMA_DECODE_TIMING c1     5      9 100.0    270.0    105.3     19.5    115.1  45342.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     19.6     44.1    113.7      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     18.8     34.0    205.7   1514.5   1528.4   9.5   0.0
+VK_STEP_TIMING   4523     10     82.9   1338.3   3940.4  45246.5  45262.0  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1184.2 xfer 3.8 prealloc 2.1 first_batch_loop 148.1 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4031.2      0.9     82.7   3917.2   1698.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    292.2     51.7     17.5    205.3   1561.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    250.1    101.1     17.2    103.7  45369.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     19.2     36.5    101.2      0.0      0.0   4.0 100.0
+VK_STEP_TIMING     69     40     18.0     32.1    203.5   1511.9   1525.3   9.5   0.0
+VK_STEP_TIMING   4523     10     83.5   1318.0   3919.2  45280.8  45296.0  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1164.0 xfer 3.9 prealloc 2.1 first_batch_loop 148.0 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4051.4      0.9     84.0   3937.0   1707.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    293.5     51.3     17.9    206.8   1573.0
+LLAMA_DECODE_TIMING c1     5     10 100.0    239.2     97.9     16.6     99.0  45369.4
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     17.1     36.5    101.0      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     18.6     33.2    204.7   1517.1   1530.3   9.5   0.0
+VK_STEP_TIMING   4523     10     83.4   1314.4   3912.6  45294.2  45309.4  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1158.2 xfer 5.3 prealloc 1.9 first_batch_loop 149.0 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4034.4      0.9     81.9   3923.3   1714.9
+LLAMA_DECODE_TIMING c1     1     40  25.0    292.7     52.3     18.1    205.0   1550.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    264.5    105.9     19.2    109.5  45377.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     21.5     44.5    113.6      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     18.7     33.5    204.4   1513.9   1527.3   9.5   0.0
+VK_STEP_TIMING   4523     10     87.1   1346.1   3951.3  45289.6  45305.3  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1190.1 xfer 3.7 prealloc 2.1 first_batch_loop 150.2 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4049.0      0.9     86.4   3930.8   1715.7
+LLAMA_DECODE_TIMING c1     1     40  25.0    293.6     52.1     17.6    205.8   1536.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    257.1    102.6     17.9    108.9  45383.4
+1.42.425.391 I slot print_timing: id  0 | task 292 | n_gen =    199, tg =  65.91 t/s, tg_3s =  66.24 t/s
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     18.8     39.3    104.1      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     18.4     32.9    205.4   1511.8   1525.3   9.5   0.0
+VK_STEP_TIMING   4523     10     82.9   1334.9   3925.7  45283.4  45298.8  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1174.6 xfer 3.8 prealloc 2.2 first_batch_loop 154.3 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4582.7    549.1     84.3   3918.6   1717.1
+LLAMA_DECODE_TIMING c1     1     40  30.0    301.7     58.4     19.9    205.9   1497.2
+LLAMA_DECODE_TIMING c1     5     10 100.0    250.2     98.1     18.1    105.5  45429.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     26     10     14.9     32.1     94.0      0.0      0.1   4.0 100.0
+VK_STEP_TIMING     69     40     20.1     32.6    203.9   1515.4   1528.6   9.5   0.0
+VK_STEP_TIMING   4523     10     83.7   1294.0   3897.4  45325.6  45340.5  14.0   0.0
+VK_STEP_TIMING_PRE (us mean over 10) prepass 1129.4 xfer 3.7 prealloc 2.2 first_batch_loop 158.6 first_batch_nodes 230.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3998.6      0.9     80.7   3886.1   1710.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    287.1     49.9     17.2    203.1   1494.5
+LLAMA_DECODE_TIMING c1     5     10 100.0    232.8     96.1     14.9     97.6  45381.9
+1.43.537.042 I slot print_timing: id  0 | task 292 | prompt eval time =     357.15 ms /     4 tokens (   89.29 ms per token,    11.20 tokens per second)
+1.43.537.045 I slot print_timing: id  0 | task 292 |        eval time =    4115.95 ms /   256 tokens (   16.14 ms per token,    61.95 tokens per second)
+1.43.537.046 I slot print_timing: id  0 | task 292 |       total time =    4473.10 ms /   260 tokens
+1.43.537.047 I slot print_timing: id  0 | task 292 |    graphs reused =        306
+1.43.537.051 I slot print_timing: id  0 | task 292 | draft acceptance = 0.67029 (  185 accepted /   276 generated), mean len =  3.68
+1.43.538.225 I slot      release: id  0 | task 292 | stop processing: n_tokens = 72744, truncated = 0
+1.43.554.773 I srv    operator(): operator(): cleaning up before exit...

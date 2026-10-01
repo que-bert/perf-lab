@@ -17,7 +17,7 @@ OUT="${1:-$(dirname "$HERE")/.scratch/kcache-quality}"
 mkdir -p "$OUT"
 
 MODEL="${PERFLAB_MODEL:-/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf}"
-BIN="${PERFLAB_BIN:-$HOME/llama.cpp/b10472-vulkan}"
+BIN="${PERFLAB_BIN:-$HOME/git/perf-lab/bin/upstream-vulkan/b10472-vulkan}"
 PORT="${PERFLAB_PORT:-8921}"
 CTX="${PERFLAB_CTX:-131072}"
 # Characters, not tokens: ~4 chars/token, so these land near 30k / 60k / 110k.

@@ -21,7 +21,7 @@ set -u
 LABEL=$1; MODEL=$2; PORT=$3; GPU=$4; CTX=${5:-65536}; BUDGET=${6:-2048}
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(dirname "$HERE")"
-BIN="${PERFLAB_BIN:-$HOME/llama.cpp/b10472-vulkan}"
+BIN="${PERFLAB_BIN:-$HOME/git/perf-lab/bin/upstream-vulkan/b10472-vulkan}"
 OUT="$REPO/results"
 STAMP=$(date +%Y%m%d)
 SUITES="code,math,instruct,extract,research"

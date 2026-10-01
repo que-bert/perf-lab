@@ -21,7 +21,7 @@
 # XT) has 17.1 GB with ollama already holding ~2.7 GB of it.
 set -u
 MODEL=$1; PORT=$2; CTX=$3; shift 3
-B="${PERFLAB_BIN:-$HOME/llama.cpp/b10472-vulkan}"
+B="${PERFLAB_BIN:-$HOME/git/perf-lab/bin/upstream-vulkan/b10472-vulkan}"
 GPU="${PERFLAB_GPU:-1}"
 CTK="${PERFLAB_CTK:-q8_0}"
 CTV="${PERFLAB_CTV:-q4_0}"

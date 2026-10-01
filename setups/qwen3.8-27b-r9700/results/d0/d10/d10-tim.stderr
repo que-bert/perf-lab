@@ -1,0 +1,808 @@
+0.00.000.301 I srv  llama_server: initializing ...
+WARNING: radv is not a conformant Vulkan implementation, testing use only.
+WARNING: radv is not a conformant Vulkan implementation, testing use only.
+0.00.127.655 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.127.869 I srv          init: The UI is disabled
+0.00.127.870 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.128.126 W srv  llama_server: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.129.311 I srv    load_model: loading model '/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf'
+0.04.509.068 W common_fit_params: failed to fit params to free device memory: n_gpu_layers already set by user to 99, abort
+0.54.858.735 W common_init_result: --spec-draft-vocab without --spec-draft-vocab-file: using specials + lowest token ids
+0.56.015.294 I cmn          init: llama threadpool init, n_threads = 8
+0.56.099.927 I common_speculative_init_result: creating MTP draft context against the target model '/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf'
+0.56.133.838 W load_hparams: Qwen-VL models require at minimum 1024 image tokens to function correctly on grounding tasks
+0.56.133.842 W load_hparams: if you encounter problems with accuracy, try adding --image-min-tokens 1024
+0.56.133.842 W load_hparams: more info: https://github.com/ggml-org/llama.cpp/issues/16842
+
+0.58.525.208 I srv    load_model: loaded multimodal model, '/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/mmproj-F16.gguf'
+0.58.525.230 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 262144, kv_unified = 'false'
+0.58.525.818 I spec common_specu: adaptive draft vocab: subset 98304 rows while <= 3 per 256 recent context tokens fall outside it
+0.58.569.658 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.58.569.706 I srv  llama_server: model loaded
+0.58.569.711 I srv  llama_server: listening on http://127.0.0.1:8097
+1.00.288.583 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+1.00.288.619 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+1.00.585.904 I spec        begin: adaptive draft vocab: cumulative draft steps subset 0 / 0 (0.0000), switches 0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     2      1 100.0  31146.9   5236.9    121.5  24939.6      0.0
+LLAMA_DECODE_TIMING c0     4      1 100.0  18585.8   5404.7     45.9  13084.1  98439.5
+LLAMA_DECODE_TIMING c0     5      9  11.1   6099.0    595.8     28.6   4233.9   1449.8
+LLAMA_DECODE_TIMING c0    38      1 100.0 110191.6   5389.2     36.6  94615.6 1730057.7
+LLAMA_DECODE_TIMING c1     1     36  25.0    282.3     52.2     11.7    202.4   1406.1
+LLAMA_DECODE_TIMING c1     2      1 100.0  29813.7    132.6     83.1   4599.3 2482585.4
+LLAMA_DECODE_TIMING c1     4      1 100.0    771.3    177.9     36.7    523.1  40215.5
+LLAMA_DECODE_TIMING c1     5      9 100.0    493.0    177.5     22.7    266.9  40699.6
+LLAMA_DECODE_TIMING c1    38      1 100.0   3004.9    203.9    175.2   1921.3  25702.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     68      3    100.7 -835888.7 -858377.9    180.3    183.2   0.7   0.0
+VK_STEP_TIMING     69     45     14.6     33.7   -807.4   1022.0   1032.4   8.2  17.8
+VK_STEP_TIMING   4523     12     39.8 -1507207320.8 -1507352777.5  27880.4  27891.6   9.5   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3614.4      1.0     27.7   3562.2   1446.5
+LLAMA_DECODE_TIMING c1     1     40  25.0    245.7     47.7     10.6    172.5   1236.2
+LLAMA_DECODE_TIMING c1     5     10 100.0    444.5    174.1     20.3    225.4  40270.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     13.2     32.4    182.2   1022.5   1033.0   8.4  20.0
+VK_STEP_TIMING   4523     10     28.2    958.1   3561.4  40193.0  40207.8  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3734.5      1.1     32.0   3673.9   1460.9
+LLAMA_DECODE_TIMING c1     1     40  25.0    264.4     52.0     13.4    181.8   1341.2
+LLAMA_DECODE_TIMING c1     5     10 100.0    489.1    184.9     25.9    248.2  40256.5
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     16.7     37.7    194.0   1023.8   1034.3   8.4  20.0
+VK_STEP_TIMING   4523     10     32.6   1018.3   3672.7  40163.1  40180.2  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3678.0      0.9     29.8   3622.7   1443.6
+LLAMA_DECODE_TIMING c1     1     40  25.0    250.0     48.5     11.0    175.4   1290.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    446.1    173.4     20.9    227.4  40247.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     13.6     32.5    184.9   1026.4   1036.7   8.4  20.0
+VK_STEP_TIMING   4523     10     30.3    991.4   3621.8  40177.9  40194.0  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3654.0      1.0     27.1   3601.8   1432.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    248.1     47.6     11.7    173.4   1253.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    461.7    179.5     22.3    234.2  40282.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     14.5     32.9    184.6   1026.2   1036.6   8.4  20.0
+VK_STEP_TIMING   4523     10     27.5    976.8   3601.0  40213.7  40229.6  14.0   0.0
+1.03.632.188 I slot print_timing: id  0 | task 0 | n_gen =    167, tg =  54.52 t/s, tg_3s =  54.85 t/s
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3653.1      0.9     26.9   3601.2   1435.5
+LLAMA_DECODE_TIMING c1     1     40  25.0    246.6     47.7     10.9    172.4   1268.5
+LLAMA_DECODE_TIMING c1     5     10 100.0    443.3    169.5     20.6    229.2  40297.7
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     13.4     32.8    182.9   1028.7   1038.9   8.4  20.0
+VK_STEP_TIMING   4523     10     27.4    984.2   3600.4  40230.9  40246.2  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3658.9      1.0     26.8   3606.5   1446.4
+LLAMA_DECODE_TIMING c1     1     40  25.0    250.4     50.7     11.2    172.8   1308.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    444.8    171.3     20.7    229.0  40295.5
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     13.8     33.1    183.1   1025.0   1035.3   8.4  20.0
+VK_STEP_TIMING   4523     10     27.3    987.8   3605.7  40230.8  40245.8  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4733.9    559.6     30.9   4114.3   1450.8
+LLAMA_DECODE_TIMING c1     1     40  32.5    274.0     64.1     13.0    179.5   1316.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    583.1    200.9     31.7    313.7  39914.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     17.6     40.6   -571.7   1028.1   1039.0   8.3  18.0
+VK_STEP_TIMING   4523     10     31.6   1019.6   2745.7  36313.5  36329.8  12.7   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     3      1 100.0  10572.2   5399.0     29.9   5118.1   1438.2
+LLAMA_DECODE_TIMING c0     5      9   0.0   3790.7      1.1     31.4   3731.4   1436.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    265.3     54.7     12.7    181.0   1278.8
+LLAMA_DECODE_TIMING c1     3      1 100.0    469.5    194.2     29.4    218.9  38569.7
+LLAMA_DECODE_TIMING c1     5      9 100.0    545.8    202.8     30.4    276.8  40286.7
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     17.1     39.5    197.8   1020.2   1030.8   8.4  20.0
+VK_STEP_TIMING   4523     10     31.8   1170.5   3869.0  40027.5  40044.8  14.0   0.0
+1.05.262.980 I slot print_timing: id  0 | task 0 | prompt eval time =     298.75 ms /    42 tokens (    7.11 ms per token,   140.59 tokens per second)
+1.05.262.983 I slot print_timing: id  0 | task 0 |        eval time =    4675.32 ms /   256 tokens (   18.33 ms per token,    54.54 tokens per second)
+1.05.262.984 I slot print_timing: id  0 | task 0 |       total time =    4974.06 ms /   298 tokens
+1.05.262.988 I slot print_timing: id  0 | task 0 |    graphs reused =         86
+1.05.262.992 I slot print_timing: id  0 | task 0 | draft acceptance = 0.46893 (  166 accepted /   354 generated), mean len =  2.87
+1.05.263.034 I slot      release: id  0 | task 0 | stop processing: n_tokens = 297, truncated = 0
+1.05.264.794 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.141
+1.05.443.480 I slot launch_slot_: id  0 | task 92 | processing task, is_child = 0
+1.05.633.198 I spec        begin: adaptive draft vocab: cumulative draft steps subset 356 / 356 (1.0000), switches 1
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     4      1 100.0   9080.5   5562.1     42.3   3429.9 317222.3
+LLAMA_DECODE_TIMING c0     5      9  11.1   4297.9    595.7     27.6   3648.6   1446.9
+LLAMA_DECODE_TIMING c1     1     40  25.0    259.3     52.9     11.9    178.2   1341.1
+LLAMA_DECODE_TIMING c1     4      1 100.0    488.6    199.5     33.0    229.8  44759.1
+LLAMA_DECODE_TIMING c1     5      9 100.0    503.7    192.7     24.8    256.5  40195.3
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     15.4     36.2    192.3   1015.0   1025.8   8.4  20.0
+VK_STEP_TIMING   4523     10     29.8    978.9   3625.6  40573.6  40590.2  14.2   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3778.5      1.1     29.8   3721.1   1441.9
+LLAMA_DECODE_TIMING c1     1     40  25.0    263.9     52.2     12.1    182.6   1250.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    513.8    192.9     26.8    262.6  40242.4
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     15.9     38.1    197.5   1021.3   1032.1   8.4  20.0
+VK_STEP_TIMING   4523     10     30.4   1037.5   3720.0  40156.5  40174.6  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3752.9      1.1     30.5   3694.7   1458.1
+LLAMA_DECODE_TIMING c1     1     40  25.0    267.0     56.3     13.3    180.1   1342.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    526.2    200.2     28.4    264.8  40274.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     17.1     39.3    195.9   1019.0   1029.7   8.4  20.0
+VK_STEP_TIMING   4523     10     31.2   1030.7   3693.6  40190.7  40208.1  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3887.9      1.2     35.9   3820.0   1465.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    275.4     56.2     13.9    187.1   1290.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    590.9    212.7     34.5    301.9  40193.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     19.0     44.0    208.8   1015.8   1026.9   8.4  20.0
+VK_STEP_TIMING   4523     10     36.6   1071.9   3818.6  40090.9  40109.8  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3779.5      1.0     32.3   3719.3   1443.3
+LLAMA_DECODE_TIMING c1     1     40  25.0    268.2     54.7     13.4    182.9   1267.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    557.7    204.2     31.7    284.5  40262.9
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     18.0     41.6    202.0   1020.8   1031.7   8.4  20.0
+VK_STEP_TIMING   4523     10     32.9   1033.5   3718.1  40172.8  40190.7  14.0   0.0
+1.08.668.903 I slot print_timing: id  0 | task 92 | n_gen =    167, tg =  54.70 t/s, tg_3s =  55.02 t/s
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3702.1      1.0     26.8   3649.6   1443.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    253.6     49.5     12.0    176.8   1284.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    461.1    174.2     21.1    239.6  40270.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     14.5     33.9    188.4   1025.3   1036.0   8.4  20.0
+VK_STEP_TIMING   4523     10     27.3    985.0   3648.8  40201.2  40216.9  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3673.5      0.9     27.5   3620.8   1436.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    253.0     49.2     11.4    176.6   1298.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    434.0    172.2     18.3    221.7  40312.9
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     13.4     32.5    184.7   1026.0   1036.8   8.4  20.0
+VK_STEP_TIMING   4523     10     28.0    983.4   3620.0  40250.8  40265.7  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4169.2    541.8     28.2   3572.3   1444.1
+LLAMA_DECODE_TIMING c1     1     40  32.5    260.4     58.7     11.5    174.8   1299.3
+LLAMA_DECODE_TIMING c1     5     10 100.0    443.8    172.1     20.2    226.7  40361.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     13.8     32.6    184.3   1023.8   1034.1   8.4  20.0
+VK_STEP_TIMING   4523     10     28.8    949.4   3571.3  40294.3  40309.5  14.0   0.0
+1.10.292.786 I slot print_timing: id  0 | task 92 | prompt eval time =     190.16 ms /     4 tokens (   47.54 ms per token,    21.04 tokens per second)
+1.10.292.790 I slot print_timing: id  0 | task 92 |        eval time =    4658.87 ms /   256 tokens (   18.27 ms per token,    54.73 tokens per second)
+1.10.292.791 I slot print_timing: id  0 | task 92 |       total time =    4849.03 ms /   260 tokens
+1.10.292.791 I slot print_timing: id  0 | task 92 |    graphs reused =        172
+1.10.292.796 I slot print_timing: id  0 | task 92 | draft acceptance = 0.46893 (  166 accepted /   354 generated), mean len =  2.87
+1.10.292.822 I slot      release: id  0 | task 92 | stop processing: n_tokens = 297, truncated = 0
+1.10.293.815 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.141
+1.10.294.557 I slot launch_slot_: id  0 | task 183 | processing task, is_child = 0
+1.10.482.663 I spec        begin: adaptive draft vocab: cumulative draft steps subset 712 / 712 (1.0000), switches 1
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     3      1 100.0   8713.9   5372.4     27.9   3291.6   1538.7
+LLAMA_DECODE_TIMING c0     4      1 100.0   8757.4   5455.1     43.5   3212.2 136573.7
+LLAMA_DECODE_TIMING c0     5      9   0.0   3674.8      1.0     27.2   3621.9   1485.0
+LLAMA_DECODE_TIMING c1     1     38  26.3    248.6     49.9     10.9    172.3   1248.4
+LLAMA_DECODE_TIMING c1     3      1 100.0    397.5    163.8     17.4    200.0  39027.2
+LLAMA_DECODE_TIMING c1     4      1 100.0    468.8    185.9     35.0    226.8  45292.6
+LLAMA_DECODE_TIMING c1     5      9 100.0    456.6    173.4     21.5    235.0  40378.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     49     14.1     32.4    184.6    995.1   1005.2   8.4  22.4
+VK_STEP_TIMING   4523     11     29.4    968.3   3553.6  40634.3  40649.6  14.1   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4148.5    525.3     27.2   3571.7   1444.4
+LLAMA_DECODE_TIMING c1     1     40  25.0    252.0     51.1     11.6    173.8   1343.3
+LLAMA_DECODE_TIMING c1     5     10 100.0    451.9    173.3     20.8    232.6  40271.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     14.1     33.8    184.6   1022.5   1032.8   8.4  20.0
+VK_STEP_TIMING   4523     10     27.7    960.0   3570.8  40205.9  40221.0  14.1   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3631.2      0.9     26.3   3579.4   1441.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    244.7     47.6     10.9    171.4   1262.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    431.8    169.4     19.0    221.4  40343.4
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     13.1     31.4    180.6   1027.0   1037.3   8.4  20.0
+VK_STEP_TIMING   4523     10     26.8    962.5   3578.6  40280.2  40294.9  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3673.9      1.0     26.7   3621.3   1430.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    253.9     50.0     11.3    177.0   1322.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    434.6    171.8     19.2    221.0  40337.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     13.5     33.2    184.9   1020.7   1031.3   8.4  20.0
+VK_STEP_TIMING   4523     10     27.1    996.0   3620.5  40273.8  40288.9  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3648.5      1.0     27.2   3595.3   1439.4
+LLAMA_DECODE_TIMING c1     1     40  25.0    247.8     48.9     10.9    172.7   1271.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    446.0    173.3     21.0    227.4  40331.5
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     13.5     32.8    182.7   1026.4   1036.6   8.4  20.0
+VK_STEP_TIMING   4523     10     27.8    980.9   3594.4  40264.4  40279.5  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3777.6      1.2     31.4   3716.9   1451.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    264.1     52.8     13.5    180.6   1277.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    542.8    201.1     31.3    274.5  40279.3
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     18.0     41.6    198.2   1026.7   1037.5   8.4  20.0
+VK_STEP_TIMING   4523     10     32.0   1039.9   3715.8  40190.9  40209.4  14.0   0.0
+1.13.510.179 I slot print_timing: id  0 | task 183 | n_gen =    167, tg =  54.84 t/s, tg_3s =  55.17 t/s
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3798.6      1.0     30.9   3739.7   1441.5
+LLAMA_DECODE_TIMING c1     1     40  25.0    266.3     53.5     13.0    182.4   1277.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    535.1    197.9     28.8    274.6  40263.7
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     17.0     39.1    199.6   1022.6   1033.4   8.4  20.0
+VK_STEP_TIMING   4523     10     31.4   1044.6   3738.7  40181.2  40198.1  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   3751.2      1.2     28.4   3693.7   1429.7
+LLAMA_DECODE_TIMING c1     1     40  25.0    261.2     53.3     12.1    179.1   1328.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    518.7    195.1     27.1    264.8  40287.3
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     15.8     37.6    195.2   1021.4   1032.1   8.4  20.0
+VK_STEP_TIMING   4523     10     28.9   1025.9   3692.8  40207.4  40223.9  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4312.9    548.8     32.0   3704.6   1456.1
+LLAMA_DECODE_TIMING c1     1     40  32.5    297.8     72.1     14.6    191.7   1342.5
+LLAMA_DECODE_TIMING c1     5     10 100.0    581.5    214.8     31.2    296.6  40424.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     18.9     45.0    211.4   1021.9   1033.4   8.4  20.0
+VK_STEP_TIMING   4523     10     32.5   1029.0   3703.7  40329.8  40347.6  14.0   0.0
+1.15.146.209 I slot print_timing: id  0 | task 183 | prompt eval time =     188.57 ms /     4 tokens (   47.14 ms per token,    21.21 tokens per second)
+1.15.146.212 I slot print_timing: id  0 | task 183 |        eval time =    4662.79 ms /   256 tokens (   18.29 ms per token,    54.69 tokens per second)
+1.15.146.213 I slot print_timing: id  0 | task 183 |       total time =    4851.37 ms /   260 tokens
+1.15.146.214 I slot print_timing: id  0 | task 183 |    graphs reused =        258
+1.15.146.218 I slot print_timing: id  0 | task 183 | draft acceptance = 0.46893 (  166 accepted /   354 generated), mean len =  2.87
+1.15.146.249 I slot      release: id  0 | task 183 | stop processing: n_tokens = 297, truncated = 0
+1.15.267.803 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18105519533
+1.15.268.784 I slot launch_slot_: id  0 | task 274 | processing task, is_child = 0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     47    177.3     42.9  -7451.7   1149.8   1159.9   8.0  19.1
+VK_STEP_TIMING   4523     13    335.9    984.4 -56629.6  31608.6  31621.6  10.2   0.0
+1.19.455.427 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =   6144, progress = 0.08, t =   3.81 s / 1611.29 tokens per second
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     3      1 100.0   8743.1   5494.1     28.1   3194.9   1426.8
+LLAMA_DECODE_TIMING c0     5      8   0.0   3812.0      1.1     33.4   3748.5   1444.7
+LLAMA_DECODE_TIMING c0  2048      4 100.0 1015832.0  21376.3 836505.5 156449.8  47540.5
+LLAMA_DECODE_TIMING c1     1     34  23.5    262.7     50.3     13.3    181.6   1283.8
+LLAMA_DECODE_TIMING c1     3      1 100.0    424.7    177.1     17.5    213.0  39618.6
+LLAMA_DECODE_TIMING c1     5      8 100.0    545.4    206.1     27.6    276.5  40318.1
+LLAMA_DECODE_TIMING c1  2048      4 100.0  50854.5  15882.6   7944.5  15877.5 317136.0
+1.20.881.335 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =   8192, progress = 0.11, t =   5.23 s / 1566.33 tokens per second
+1.22.334.071 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  10240, progress = 0.14, t =   6.68 s / 1533.99 tokens per second
+1.23.807.173 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  12288, progress = 0.17, t =   8.14 s / 1509.45 tokens per second
+1.25.305.507 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  14336, progress = 0.20, t =   9.63 s / 1488.42 tokens per second
+1.26.828.738 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  16384, progress = 0.23, t =  11.15 s / 1469.86 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     28   2376.4     99.8 -91164.3   3193.7   3197.7   4.0   0.0
+VK_STEP_TIMING   4523     32   1254.1   1045.6 -248277.5  17293.5  17296.9   2.0   0.0
+1.28.366.615 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  18432, progress = 0.25, t =  12.69 s / 1453.03 tokens per second
+1.29.935.238 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  20480, progress = 0.28, t =  14.25 s / 1437.54 tokens per second
+1.31.525.042 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  22528, progress = 0.31, t =  15.83 s / 1423.42 tokens per second
+1.33.138.864 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  24576, progress = 0.34, t =  17.43 s / 1409.65 tokens per second
+1.34.772.960 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  26624, progress = 0.37, t =  19.07 s / 1396.47 tokens per second
+1.36.433.823 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  28672, progress = 0.40, t =  20.72 s / 1383.98 tokens per second
+1.38.116.205 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  30720, progress = 0.42, t =  22.39 s / 1371.79 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     32   2053.5    105.4 -103970.4   3048.6   3053.0   4.0   0.0
+VK_STEP_TIMING   4523     28   1175.5   1142.4 -279864.2  17219.2  17222.6   2.5   0.0
+1.39.853.581 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  32768, progress = 0.45, t =  24.09 s / 1360.06 tokens per second
+1.41.578.533 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  34816, progress = 0.48, t =  25.84 s / 1347.13 tokens per second
+1.43.325.037 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  36864, progress = 0.51, t =  27.58 s / 1336.39 tokens per second
+1.45.096.111 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  38912, progress = 0.54, t =  29.35 s / 1325.86 tokens per second
+1.46.890.850 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  40960, progress = 0.57, t =  31.14 s / 1315.50 tokens per second
+1.48.705.928 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  43008, progress = 0.59, t =  32.95 s / 1305.41 tokens per second
+1.50.542.080 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  45056, progress = 0.62, t =  34.78 s / 1295.59 tokens per second
+1.52.405.649 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  47104, progress = 0.65, t =  36.63 s / 1285.89 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     28   2412.2    101.7 -114987.3   2954.3   2958.6   3.1   0.0
+VK_STEP_TIMING   4523     32   1730.2   1233.0 -310269.6  16977.4  16981.0   3.0   0.0
+1.54.294.642 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  49152, progress = 0.68, t =  38.51 s / 1276.32 tokens per second
+1.56.201.188 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  51200, progress = 0.71, t =  40.41 s / 1266.88 tokens per second
+1.58.142.586 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  53248, progress = 0.73, t =  42.34 s / 1257.64 tokens per second
+2.00.092.763 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  55296, progress = 0.76, t =  44.29 s / 1248.41 tokens per second
+2.02.061.104 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  57344, progress = 0.79, t =  46.26 s / 1239.65 tokens per second
+2.04.052.585 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  59392, progress = 0.82, t =  48.24 s / 1231.22 tokens per second
+2.06.058.869 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  61440, progress = 0.85, t =  50.24 s / 1222.83 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     32   3295.1    108.3 -127165.2   3066.7   3071.1   3.0   0.0
+VK_STEP_TIMING   4523     28   2563.3   1344.0 -339274.6  16986.1  16989.8   3.0   0.0
+2.08.087.420 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  63488, progress = 0.88, t =  52.26 s / 1214.78 tokens per second
+2.10.222.636 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  65536, progress = 0.90, t =  54.31 s / 1206.77 tokens per second
+2.12.287.426 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  67584, progress = 0.93, t =  56.45 s / 1197.14 tokens per second
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0  2048     30 100.0 1296392.8  22013.4 1185346.3  87378.0  12036.7
+LLAMA_DECODE_TIMING c1  2048     30 100.0  65412.9  32848.4  10868.4  13967.6 409359.4
+2.14.378.605 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  69632, progress = 0.96, t =  58.54 s / 1189.56 tokens per second
+2.16.491.617 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  71680, progress = 0.99, t =  60.64 s / 1182.02 tokens per second
+2.16.910.827 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  71973, progress = 0.99, t =  61.25 s / 1175.08 tokens per second
+2.17.636.371 I slot print_timing: id  0 | task 274 | prompt processing, n_tokens =  72485, progress = 1.00, t =  61.87 s / 1171.50 tokens per second
+2.17.895.954 I spec        begin: adaptive draft vocab: cumulative draft steps subset 1068 / 1068 (1.0000), switches 1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     38   1857.6     77.1 -82342.3   2215.4   2223.1   5.4  10.5
+VK_STEP_TIMING   4523     22   2592.3   1372.1 -270166.5  22500.2  22506.5   4.9   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     4      1 100.0   9528.1   5409.8    145.2   3868.6 201804.4
+LLAMA_DECODE_TIMING c0     5      8  12.5   4787.8    676.8     85.5   3992.3   1705.9
+LLAMA_DECODE_TIMING c0   293      1 100.0  26506.8   5373.1   2337.9  18420.4  12309.9
+LLAMA_DECODE_TIMING c0   512      1 100.0  41337.3   5454.1   3665.1  31718.4 192284.1
+LLAMA_DECODE_TIMING c0  2048      1 100.0 1531589.9  21734.7 1420262.1  87947.9  12516.6
+LLAMA_DECODE_TIMING c1     1     36  25.0    268.7     61.5     17.3    171.0   1623.6
+LLAMA_DECODE_TIMING c1     4      1 100.0    549.1    192.2     87.9    171.8  51190.5
+LLAMA_DECODE_TIMING c1     5      8 100.0    570.0    196.8     70.3    269.7  45269.6
+LLAMA_DECODE_TIMING c1   293      1 100.0   6519.1    193.4   2648.2   2712.9 384032.1
+LLAMA_DECODE_TIMING c1   512      1 100.0  11044.7    234.7   4856.6   4117.8 479150.0
+LLAMA_DECODE_TIMING c1  2048      1 100.0  87963.2  47256.0  16900.9  16447.3 481117.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     28.3     41.9    188.0   1237.7   1249.6   8.0  20.0
+VK_STEP_TIMING   4523     10     85.7   1380.7   3999.5  45185.6  45202.0  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4148.7      1.0     89.2   4026.2   1718.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    263.4     56.0     17.8    170.8   1606.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    588.3    199.1     71.9    282.4  45266.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     31.7     47.1    200.5   1240.6   1251.6   8.0  20.0
+VK_STEP_TIMING   4523     10     97.2   1418.2   4081.3  45105.2  45124.1  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4247.7      1.2    103.5   4109.3   1724.9
+LLAMA_DECODE_TIMING c1     1     40  25.0    282.0     61.0     19.4    181.0   1638.5
+LLAMA_DECODE_TIMING c1     5     10 100.0    657.9    217.2     79.7    314.2  45222.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     29.8     46.4    198.0   1237.4   1248.5   8.0  20.0
+VK_STEP_TIMING   4523     10    102.2   1398.7   4062.7  45106.6  45123.8  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4142.8      1.1     91.0   4020.3   1718.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    261.2     55.5     16.6    171.4   1591.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    513.2    181.1     65.2    243.8  45225.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     27.3     40.0    186.9   1240.0   1251.0   8.0  20.0
+VK_STEP_TIMING   4523     10     86.8   1378.4   4027.4  45160.1  45175.8  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4161.8      1.1     87.8   4043.5   1712.1
+LLAMA_DECODE_TIMING c1     1     40  25.0    264.7     56.6     17.5    172.4   1606.3
+LLAMA_DECODE_TIMING c1     5     10 100.0    561.6    193.1     68.5    270.2  45246.0
+2.20.924.683 I slot print_timing: id  0 | task 274 | n_gen =    209, tg =  68.69 t/s, tg_3s =  69.02 t/s
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     31.3     48.0    205.1   1236.8   1247.8   8.0  20.0
+VK_STEP_TIMING   4523     10    100.3   1393.0   4060.2  45191.9  45209.4  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4871.9    600.7    114.5   4123.2   1732.4
+LLAMA_DECODE_TIMING c1     1     40  30.0    295.1     69.5     20.9    183.1   1598.3
+LLAMA_DECODE_TIMING c1     5     10 100.0    690.6    220.9     83.7    340.1  45287.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     35.0     51.6    209.0   1237.5   1248.6   8.0  20.0
+VK_STEP_TIMING   4523     10    116.4   1465.4   4183.4  45045.4  45064.3  14.0   0.0
+2.21.937.134 I slot print_timing: id  0 | task 274 | prompt eval time =   62627.61 ms / 72489 tokens (    0.86 ms per token,  1157.46 tokens per second)
+2.21.937.137 I slot print_timing: id  0 | task 274 |        eval time =    4040.72 ms /   256 tokens (   15.85 ms per token,    63.11 tokens per second)
+2.21.937.138 I slot print_timing: id  0 | task 274 |       total time =   66668.33 ms / 72745 tokens
+2.21.937.139 I slot print_timing: id  0 | task 274 |    graphs reused =        323
+2.21.937.143 I slot print_timing: id  0 | task 274 | draft acceptance = 0.69776 (  187 accepted /   268 generated), mean len =  3.79
+2.21.938.313 I slot      release: id  0 | task 274 | stop processing: n_tokens = 72744, truncated = 0
+2.22.058.822 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.996
+2.22.058.888 I slot launch_slot_: id  0 | task 381 | processing task, is_child = 0
+2.22.438.122 I spec        begin: adaptive draft vocab: cumulative draft steps subset 1336 / 1336 (1.0000), switches 1
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     1      1 100.0  11518.4   5880.9    127.4   5455.8   2516.5
+LLAMA_DECODE_TIMING c0     4      1 100.0  11886.3   7459.8    139.1   4217.1 435235.7
+LLAMA_DECODE_TIMING c0     5     10  10.0   5009.9    601.4    129.1   4235.2   1741.4
+LLAMA_DECODE_TIMING c1     1     37  27.0    311.8     67.7     27.2    191.2   2603.2
+LLAMA_DECODE_TIMING c1     4      1 100.0    970.5    232.4    293.2    394.0  53154.0
+LLAMA_DECODE_TIMING c1     5     10 100.0    693.0    225.3     85.0    333.8  45240.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     48     47.1     61.8    234.8   1148.3   1159.6   8.1  25.0
+VK_STEP_TIMING   4523     12    131.3   1646.2   4556.2  45129.7  45151.8  14.8   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4630.6      1.4    111.1   4474.2   1728.7
+LLAMA_DECODE_TIMING c1     1     40  25.0    312.7     67.1     23.6    196.7   1752.0
+LLAMA_DECODE_TIMING c1     5     10 100.0    712.2    230.1     87.2    343.4  44900.5
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     38.4     56.1    216.0   1231.7   1243.3   8.0  20.0
+VK_STEP_TIMING   4523     10    119.9   1457.3   4187.0  45056.0  45076.5  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4199.9      1.2    113.6   4052.3   1729.3
+LLAMA_DECODE_TIMING c1     1     40  25.0    282.5     60.6     21.1    179.1   1585.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    615.8    208.4     76.4    290.0  45275.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     28.4     42.2    189.1   1244.4   1255.2   8.0  20.0
+VK_STEP_TIMING   4523     10     92.4   1352.7   3975.8  45186.1  45202.0  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4157.3      1.1     86.5   4038.6   1711.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    264.7     56.4     17.4    171.9   1642.7
+LLAMA_DECODE_TIMING c1     5     10 100.0    556.9    191.6     66.5    267.3  45264.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     26.7     39.7    185.1   1241.1   1251.7   8.0  20.0
+VK_STEP_TIMING   4523     10     87.5   1385.5   3993.2  45198.2  45213.7  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4070.3      1.1     87.6   3952.3   1719.4
+LLAMA_DECODE_TIMING c1     1     40  25.0    255.9     54.2     16.6    167.2   1595.0
+LLAMA_DECODE_TIMING c1     5     10 100.0    547.7    188.2     68.5    259.0  45318.5
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     29.5     43.8    191.1   1254.5   1265.2   8.0  20.0
+VK_STEP_TIMING   4523     10     95.9   1385.5   4021.9  45154.3  45170.5  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4183.0      1.1     99.6   4050.9   1714.5
+LLAMA_DECODE_TIMING c1     1     40  25.0    273.7     58.2     18.9    176.5   1607.5
+LLAMA_DECODE_TIMING c1     5     10 100.0    608.7    202.4     77.0    291.3  45244.6
+2.25.477.087 I slot print_timing: id  0 | task 381 | n_gen =    209, tg =  68.46 t/s, tg_3s =  68.79 t/s
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     33.7     49.4    204.1   1235.1   1246.0   8.0  20.0
+VK_STEP_TIMING   4523     10    109.2   1411.1   4072.6  45227.6  45245.8  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4735.8    553.6    102.1   4048.2   1711.6
+LLAMA_DECODE_TIMING c1     1     40  30.0    279.6     65.3     18.8    176.1   1582.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    628.5    207.2     80.0    300.5  45373.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     27.7     40.2    187.8   1240.6   1251.3   8.0  20.0
+VK_STEP_TIMING   4523     10     90.7   1366.4   3990.2  45178.8  45194.7  14.0   0.0
+2.26.478.534 I slot print_timing: id  0 | task 381 | prompt eval time =     379.76 ms /     4 tokens (   94.94 ms per token,    10.53 tokens per second)
+2.26.478.536 I slot print_timing: id  0 | task 381 |        eval time =    4039.87 ms /   256 tokens (   15.84 ms per token,    63.12 tokens per second)
+2.26.478.537 I slot print_timing: id  0 | task 381 |       total time =    4419.63 ms /   260 tokens
+2.26.478.538 I slot print_timing: id  0 | task 381 |    graphs reused =        388
+2.26.478.542 I slot print_timing: id  0 | task 381 | draft acceptance = 0.69776 (  187 accepted /   268 generated), mean len =  3.79
+2.26.479.684 I slot      release: id  0 | task 381 | stop processing: n_tokens = 72744, truncated = 0
+2.26.597.873 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.996
+2.26.597.944 I slot launch_slot_: id  0 | task 451 | processing task, is_child = 0
+2.26.947.503 I spec        begin: adaptive draft vocab: cumulative draft steps subset 1604 / 1604 (1.0000), switches 1
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     1      1 100.0   9044.1   5349.9     50.7   3608.2   1864.2
+LLAMA_DECODE_TIMING c0     4      1 100.0   9338.9   5409.8    119.5   3758.0 409579.6
+LLAMA_DECODE_TIMING c0     5      9  11.1   4664.1    597.4     91.7   3946.1   1715.6
+LLAMA_DECODE_TIMING c1     1     39  28.2    264.3     60.4     17.8    168.0   2545.2
+LLAMA_DECODE_TIMING c1     4      1 100.0    689.2    162.4    231.4    264.6  49630.4
+LLAMA_DECODE_TIMING c1     5      9 100.0    534.1    184.8     67.2    252.8  45254.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     49     33.5     42.8    189.2   1194.8   1205.2   7.9  22.4
+VK_STEP_TIMING   4523     11     92.5   1305.4   3892.4  45182.7  45198.8  14.8   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4100.5      1.1     93.6   3972.3   1713.3
+LLAMA_DECODE_TIMING c1     1     40  25.0    270.1     57.4     18.5    173.7   1668.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    542.2    186.1     67.4    258.6  45233.3
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     28.8     42.8    190.8   1237.6   1248.3   8.0  20.0
+VK_STEP_TIMING   4523     10     89.3   1384.7   4023.7  45135.8  45152.0  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4157.1      1.0     89.7   4036.5   1709.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    268.5     55.4     18.6    175.1   1580.0
+LLAMA_DECODE_TIMING c1     5     10 100.0    571.0    193.0     72.5    273.1  45246.9
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     33.6     48.9    202.7   1234.7   1246.2   8.0  20.0
+VK_STEP_TIMING   4523     10    100.6   1387.3   4032.6  45160.5  45177.4  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4242.3      1.1    106.8   4102.0   1712.7
+LLAMA_DECODE_TIMING c1     1     40  25.0    290.8     61.7     21.8    185.2   1630.2
+LLAMA_DECODE_TIMING c1     5     10 100.0    684.4    223.0     84.9    328.1  45279.5
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     35.1     52.2    215.0   1230.0   1241.5   8.0  20.0
+VK_STEP_TIMING   4523     10    110.2   1459.7   4175.7  45083.3  45103.5  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4376.1      1.2    104.3   4236.5   1780.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    293.5     62.2     20.5    189.6   1620.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    672.3    220.8     83.2    323.3  45282.3
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     35.5     52.6    214.8   1254.4   1265.9   8.0  20.0
+VK_STEP_TIMING   4523     10    109.4   1464.4   4337.1  44890.5  44909.7  14.0   0.0
+2.29.988.479 I slot print_timing: id  0 | task 451 | n_gen =    209, tg =  68.42 t/s, tg_3s =  68.74 t/s
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   5132.1    598.2    120.2   4374.4   1741.9
+LLAMA_DECODE_TIMING c1     1     40  27.5    308.8     71.0     22.7    191.6   1690.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    686.3    229.3     86.0    324.7  45130.3
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     36.5     56.4    218.5   1230.9   1242.5   8.0  20.0
+VK_STEP_TIMING   4523     10    125.7   1512.0   4265.9  45087.4  45107.4  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4376.9      1.3    122.2   4210.1   1751.2
+LLAMA_DECODE_TIMING c1     1     40  27.5    313.5     70.5     22.5    197.5   1604.8
+LLAMA_DECODE_TIMING c1     5     10 100.0    733.7    237.6     89.4    352.6  45197.5
+2.31.003.282 I slot print_timing: id  0 | task 451 | prompt eval time =     350.06 ms /     4 tokens (   87.51 ms per token,    11.43 tokens per second)
+2.31.003.285 I slot print_timing: id  0 | task 451 |        eval time =    4055.26 ms /   256 tokens (   15.90 ms per token,    62.88 tokens per second)
+2.31.003.286 I slot print_timing: id  0 | task 451 |       total time =    4405.32 ms /   260 tokens
+2.31.003.287 I slot print_timing: id  0 | task 451 |    graphs reused =        453
+2.31.003.291 I slot print_timing: id  0 | task 451 | draft acceptance = 0.69776 (  187 accepted /   268 generated), mean len =  3.79
+2.31.004.511 I slot      release: id  0 | task 451 | stop processing: n_tokens = 72744, truncated = 0
+2.31.317.533 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.397 (> 0.100 thold), f_keep = 0.997
+2.31.317.665 I slot launch_slot_: id  0 | task 521 | processing task, is_child = 0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     46    117.0     59.2    234.1   1523.8   1535.2   8.2  21.7
+VK_STEP_TIMING   4523     14    435.6   1410.7  26349.0 100921.3 100951.5  55.1   0.0
+2.35.621.815 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =   6144, progress = 0.03, t =   3.91 s / 1572.80 tokens per second
+2.37.091.459 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =   8192, progress = 0.04, t =   5.35 s / 1530.17 tokens per second
+2.38.575.981 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  10240, progress = 0.06, t =   6.84 s / 1497.52 tokens per second
+2.40.080.800 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  12288, progress = 0.07, t =   8.34 s / 1472.81 tokens per second
+2.41.599.243 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  14336, progress = 0.08, t =   9.85 s / 1454.74 tokens per second
+2.43.133.949 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  16384, progress = 0.09, t =  11.39 s / 1438.99 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   2666.7    123.8    397.4   7126.0   7131.3   8.9  26.7
+VK_STEP_TIMING   4523     30   1414.4   1268.0   4903.6 339638.4 339687.6  17.7   0.0
+2.44.678.459 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  18432, progress = 0.10, t =  12.93 s / 1425.60 tokens per second
+2.46.292.409 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  20480, progress = 0.11, t =  14.51 s / 1411.53 tokens per second
+2.47.940.336 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  22528, progress = 0.12, t =  16.15 s / 1395.22 tokens per second
+2.49.612.784 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  24576, progress = 0.13, t =  17.81 s / 1379.96 tokens per second
+2.51.312.676 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  26624, progress = 0.15, t =  19.50 s / 1365.09 tokens per second
+2.53.033.579 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  28672, progress = 0.16, t =  21.22 s / 1351.43 tokens per second
+2.54.794.047 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  30720, progress = 0.17, t =  22.96 s / 1338.25 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   5232.9    185.5    530.2  10226.8  10234.8   8.4  23.3
+VK_STEP_TIMING   4523     30   3769.1   2318.7   7975.9 374278.3 374372.4  19.6   0.0
+2.56.607.800 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  32768, progress = 0.18, t =  24.74 s / 1324.71 tokens per second
+2.58.374.939 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  34816, progress = 0.19, t =  26.56 s / 1310.93 tokens per second
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     1      1 100.0   9957.4   5680.9    102.3   4119.5   2061.2
+LLAMA_DECODE_TIMING c0     5      4   0.0   4347.5      2.5    122.7   4187.2   1731.3
+LLAMA_DECODE_TIMING c0  2048     18 100.0 1139784.9  32781.7 1061659.8  43103.1  38497.0
+LLAMA_DECODE_TIMING c1     1     15  26.7    301.0     62.9     26.0    189.2   4200.9
+LLAMA_DECODE_TIMING c1     5      4 100.0    692.6    230.5     84.0    329.6  45207.2
+LLAMA_DECODE_TIMING c1  2048     18 100.0  66833.6  36994.2  15803.8   1905.2 373249.1
+3.00.152.931 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  36864, progress = 0.20, t =  28.33 s / 1301.46 tokens per second
+3.01.927.951 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  38912, progress = 0.21, t =  30.12 s / 1291.96 tokens per second
+3.03.722.162 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  40960, progress = 0.22, t =  31.90 s / 1283.89 tokens per second
+3.05.537.049 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  43008, progress = 0.24, t =  33.71 s / 1275.95 tokens per second
+3.07.374.108 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  45056, progress = 0.25, t =  35.54 s / 1267.63 tokens per second
+3.09.224.537 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  47104, progress = 0.26, t =  37.39 s / 1259.78 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   3631.0    139.5    403.7  10149.2  10154.8   7.1  26.7
+VK_STEP_TIMING   4523     30   2704.7   1787.0   6032.7 413114.1 413172.9  21.7   0.0
+3.11.094.901 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  49152, progress = 0.27, t =  39.26 s / 1252.10 tokens per second
+3.12.984.951 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  51200, progress = 0.28, t =  41.14 s / 1244.51 tokens per second
+3.14.894.436 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  53248, progress = 0.29, t =  43.04 s / 1237.05 tokens per second
+3.16.825.853 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  55296, progress = 0.30, t =  44.97 s / 1229.63 tokens per second
+3.18.783.041 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  57344, progress = 0.31, t =  46.92 s / 1222.22 tokens per second
+3.20.764.472 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  59392, progress = 0.32, t =  48.89 s / 1214.77 tokens per second
+3.22.763.288 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  61440, progress = 0.34, t =  50.89 s / 1207.37 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   3043.6    111.9    314.7  12419.9  12424.3   6.7  23.3
+VK_STEP_TIMING   4523     30   2557.3   1423.9   4847.6 452491.4 452532.3  24.3   0.0
+3.24.786.704 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  63488, progress = 0.35, t =  52.90 s / 1200.13 tokens per second
+3.26.923.656 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  65536, progress = 0.36, t =  54.94 s / 1192.79 tokens per second
+3.28.990.481 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  67584, progress = 0.37, t =  57.09 s / 1183.79 tokens per second
+3.31.081.865 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  69632, progress = 0.38, t =  59.18 s / 1176.69 tokens per second
+3.33.197.541 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  71680, progress = 0.39, t =  61.28 s / 1169.63 tokens per second
+3.35.339.178 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  73728, progress = 0.40, t =  63.43 s / 1162.35 tokens per second
+3.37.507.015 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  75776, progress = 0.41, t =  65.59 s / 1155.28 tokens per second
+3.39.697.489 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  77824, progress = 0.43, t =  67.77 s / 1148.28 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   4269.8    116.4 -39385.2  10509.8  10513.9   5.0  16.7
+VK_STEP_TIMING   4523     30   3556.7   1526.7 -147165.6 299154.6 299187.0  17.4   0.0
+3.41.912.357 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  79872, progress = 0.44, t =  69.98 s / 1141.28 tokens per second
+3.44.148.713 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  81920, progress = 0.45, t =  72.21 s / 1134.46 tokens per second
+3.46.407.688 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  83968, progress = 0.46, t =  74.46 s / 1127.63 tokens per second
+3.48.726.235 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  86016, progress = 0.47, t =  76.76 s / 1120.63 tokens per second
+3.51.070.053 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  88064, progress = 0.48, t =  79.10 s / 1113.36 tokens per second
+3.53.437.002 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  90112, progress = 0.49, t =  81.46 s / 1106.22 tokens per second
+3.55.802.723 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  92160, progress = 0.50, t =  83.83 s / 1099.40 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   6128.3    139.1 -161270.9   3751.3   3756.6   3.0   0.0
+VK_STEP_TIMING   4523     30   5033.4   2076.0 -405286.5  17409.1  17414.1   3.0   0.0
+3.58.184.658 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  94208, progress = 0.52, t =  86.21 s / 1092.78 tokens per second
+4.00.602.162 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  96256, progress = 0.53, t =  88.60 s / 1086.37 tokens per second
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0  2048     30 100.0 1509376.5  25317.2 1429745.9  52331.8  13984.1
+LLAMA_DECODE_TIMING c1  2048     30 100.0  86769.6  52111.7  17934.5   7859.4 491664.3
+4.03.205.442 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens =  98304, progress = 0.54, t =  91.06 s / 1079.60 tokens per second
+4.05.688.421 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 100352, progress = 0.55, t =  93.67 s / 1071.29 tokens per second
+4.08.198.610 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 102400, progress = 0.56, t =  96.17 s / 1064.73 tokens per second
+4.10.733.877 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 104448, progress = 0.57, t =  98.70 s / 1058.21 tokens per second
+4.13.291.143 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 106496, progress = 0.58, t = 101.25 s / 1051.81 tokens per second
+4.15.862.889 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 108544, progress = 0.59, t = 103.82 s / 1045.50 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   7722.1    177.3 -162442.0   3867.6   3873.6   3.0   0.0
+VK_STEP_TIMING   4523     30   6413.5   2525.6 -419597.5  18151.4  18157.2   3.0   0.0
+4.18.444.866 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 110592, progress = 0.60, t = 106.41 s / 1039.34 tokens per second
+4.21.025.421 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 112640, progress = 0.62, t = 108.99 s / 1033.51 tokens per second
+4.23.684.705 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 114688, progress = 0.63, t = 111.59 s / 1027.80 tokens per second
+4.26.465.558 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 116736, progress = 0.64, t = 114.30 s / 1021.35 tokens per second
+4.29.247.313 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 118784, progress = 0.65, t = 117.08 s / 1014.54 tokens per second
+4.32.046.187 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 120832, progress = 0.66, t = 119.87 s / 1007.99 tokens per second
+4.34.873.981 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 122880, progress = 0.67, t = 122.69 s / 1001.56 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   7807.1    128.9 -192371.4   3738.0   3742.5   3.0   0.0
+VK_STEP_TIMING   4523     30   7078.6   1815.5 -466337.5  21290.0  21294.6   3.0   0.0
+4.37.732.740 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 124928, progress = 0.68, t = 125.53 s / 995.17 tokens per second
+4.40.604.780 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 126976, progress = 0.69, t = 128.42 s / 988.72 tokens per second
+4.43.497.086 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 129024, progress = 0.71, t = 131.31 s / 982.57 tokens per second
+4.46.597.835 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 131072, progress = 0.72, t = 134.23 s / 976.44 tokens per second
+4.49.545.449 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 133120, progress = 0.73, t = 137.35 s / 969.21 tokens per second
+4.52.509.469 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 135168, progress = 0.74, t = 140.31 s / 963.39 tokens per second
+4.55.502.996 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 137216, progress = 0.75, t = 143.28 s / 957.65 tokens per second
+4.58.521.479 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 139264, progress = 0.76, t = 146.29 s / 951.95 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   8007.2    116.1 -191173.7   3575.9   3579.9   3.0   0.0
+VK_STEP_TIMING   4523     30   7462.4   1632.1 -463376.2  25664.8  25669.0   3.0   0.0
+5.01.566.581 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 141312, progress = 0.77, t = 149.33 s / 946.30 tokens per second
+5.04.626.807 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 143360, progress = 0.78, t = 152.39 s / 940.74 tokens per second
+5.07.714.515 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 145408, progress = 0.80, t = 155.47 s / 935.28 tokens per second
+5.10.828.318 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 147456, progress = 0.81, t = 158.58 s / 929.88 tokens per second
+5.13.960.420 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 149504, progress = 0.82, t = 161.70 s / 924.56 tokens per second
+5.17.128.467 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 151552, progress = 0.83, t = 164.86 s / 919.27 tokens per second
+5.20.321.138 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 153600, progress = 0.84, t = 168.04 s / 914.06 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   8757.3    125.8 -217280.2   3627.2   3631.2   2.3   0.0
+VK_STEP_TIMING   4523     30   8204.3   1621.7 -510033.2  26193.6  26197.6   3.0   0.0
+5.23.544.451 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 155648, progress = 0.85, t = 171.25 s / 908.87 tokens per second
+5.26.786.645 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 157696, progress = 0.86, t = 174.49 s / 903.74 tokens per second
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0  2048     30 100.0 2030461.4  25448.6 1841927.6 160963.5  17007.9
+LLAMA_DECODE_TIMING c1  2048     30 100.0 223958.7 109811.1  33061.5  72181.8 623903.8
+5.30.062.621 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 159744, progress = 0.87, t = 177.76 s / 898.66 tokens per second
+5.33.366.903 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 161792, progress = 0.88, t = 181.05 s / 893.61 tokens per second
+5.36.934.400 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 163840, progress = 0.90, t = 184.40 s / 888.53 tokens per second
+5.40.302.955 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 165888, progress = 0.91, t = 187.98 s / 882.49 tokens per second
+5.43.683.760 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 167936, progress = 0.92, t = 191.35 s / 877.65 tokens per second
+5.47.091.707 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 169984, progress = 0.93, t = 194.75 s / 872.83 tokens per second
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     30   9644.9    127.8 -218031.7   3731.9   3736.1   2.0   0.0
+VK_STEP_TIMING   4523     30   9428.5   1631.6 -518225.8  31095.3  31099.4   3.0   0.0
+5.51.278.679 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 172032, progress = 0.94, t = 198.27 s / 867.68 tokens per second
+5.56.501.311 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 174080, progress = 0.95, t = 203.36 s / 856.01 tokens per second
+6.01.758.972 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 176128, progress = 0.96, t = 208.61 s / 844.31 tokens per second
+6.07.082.309 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 178176, progress = 0.97, t = 213.90 s / 832.98 tokens per second
+6.12.438.002 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 180224, progress = 0.99, t = 219.26 s / 821.98 tokens per second
+6.17.855.904 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 182272, progress = 1.00, t = 224.64 s / 811.40 tokens per second
+6.18.302.086 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 182373, progress = 1.00, t = 226.63 s / 804.73 tokens per second
+6.20.419.413 I slot print_timing: id  0 | task 521 | prompt processing, n_tokens = 182885, progress = 1.00, t = 227.50 s / 803.89 tokens per second
+6.20.834.113 I spec        begin: adaptive draft vocab: cumulative draft steps subset 1872 / 1872 (1.0000), switches 1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     34   7647.0    110.3 -358288.3   3142.6   3148.3   2.7   5.9
+VK_STEP_TIMING   4523     26   9162.8   1592.6 -649986.5  34884.0  34889.0   3.8   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     4      1 100.0   9330.3   5338.8    207.5   3667.9 348631.1
+LLAMA_DECODE_TIMING c0     5      5  20.0   5469.5   1071.0    170.8   4189.5   2095.9
+LLAMA_DECODE_TIMING c0   101      1 100.0  87324.3   5777.5   3187.1  78009.6  15598.5
+LLAMA_DECODE_TIMING c0   512      1 100.0 177148.5   5533.7   9617.3 161459.6 337838.4
+LLAMA_DECODE_TIMING c0  2048     11 100.0 2867558.9  22039.3 2498968.8 344656.2  15877.4
+LLAMA_DECODE_TIMING c1     1     22  27.3    275.9     82.1     26.8    145.6   1932.7
+LLAMA_DECODE_TIMING c1     4      1 100.0    501.0    166.3    171.7    100.3  60181.6
+LLAMA_DECODE_TIMING c1     5      5 100.0    595.7    191.7    142.5    225.1  51734.6
+LLAMA_DECODE_TIMING c1   101      1 100.0  52063.7    189.6   2123.7  49316.1 305738.5
+LLAMA_DECODE_TIMING c1   512      1 100.0  16538.5    231.7  10045.8   4319.1 1582382.2
+LLAMA_DECODE_TIMING c1  2048     11 100.0 298025.8 148733.1  40190.9 101558.1 1163393.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     49.3     45.9    160.5   1545.7   1556.5   5.6  20.0
+VK_STEP_TIMING   4523     10    165.8   1563.1   4212.6  51646.9  51663.4  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4368.5      1.1    161.5   4170.0   2102.4
+LLAMA_DECODE_TIMING c1     1     40  25.0    251.2     58.1     25.5    146.8   1982.7
+LLAMA_DECODE_TIMING c1     5     10 100.0    562.1    189.0    136.9    208.6  51919.7
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     48.4     45.8    158.9   1551.8   1563.2   5.6  20.0
+VK_STEP_TIMING   4523     10    160.4   1578.6   4189.0  51829.5  51845.3  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4384.9      1.1    161.8   4187.3   2104.7
+LLAMA_DECODE_TIMING c1     1     40  25.0    254.1     59.6     24.9    148.0   1951.2
+LLAMA_DECODE_TIMING c1     5     10 100.0    567.8    186.7    138.3    213.8  51907.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     47.0     42.7    154.6   1561.7   1572.5   5.6  20.0
+VK_STEP_TIMING   4523     10    167.5   1566.3   4161.3  51858.3  51873.8  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4361.3      1.1    167.8   4161.8   2114.5
+LLAMA_DECODE_TIMING c1     1     40  25.0    252.6     70.0     23.5    139.9   1832.2
+LLAMA_DECODE_TIMING c1     5     10 100.0    578.5    188.6    137.7    221.3  51952.3
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     48.3     45.5    158.6   1557.0   1567.6   5.6  20.0
+VK_STEP_TIMING   4523     10    166.5   1546.0   4140.2  51913.0  51928.8  14.0   0.0
+6.23.892.926 I slot print_timing: id  0 | task 521 | n_gen =    188, tg =  61.15 t/s, tg_3s =  61.47 t/s
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4870.0    537.5    162.0   4137.3   2111.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    246.7     56.3     25.0    144.9   1957.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    562.8    183.1    137.5    213.4  51996.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     48.8     45.9    160.5   1553.5   1564.4   5.6  20.0
+VK_STEP_TIMING   4523     10    161.8   1569.7   4168.0  51842.1  51857.4  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4373.8      1.2    162.2   4178.0   2096.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    251.6     58.4     25.3    147.4   1937.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    574.8    189.6    139.9    215.1  51933.9
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     49.7     46.3    162.6   1545.5   1556.7   5.6  20.0
+VK_STEP_TIMING   4523     10    167.7   1604.5   4208.3  51858.6  51874.5  14.0   0.0
+6.25.048.475 I slot print_timing: id  0 | task 521 | prompt eval time =  229516.92 ms / 182889 tokens (    1.25 ms per token,   796.84 tokens per second)
+6.25.048.479 I slot print_timing: id  0 | task 521 |        eval time =    4213.61 ms /   256 tokens (   16.52 ms per token,    60.52 tokens per second)
+6.25.048.480 I slot print_timing: id  0 | task 521 |       total time =  233730.53 ms / 183145 tokens
+6.25.048.480 I slot print_timing: id  0 | task 521 |    graphs reused =        512
+6.25.048.484 I slot print_timing: id  0 | task 521 | draft acceptance = 0.78138 (  193 accepted /   247 generated), mean len =  4.11
+6.25.051.402 I slot      release: id  0 | task 521 | stop processing: n_tokens = 183144, truncated = 0
+6.25.351.574 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.999
+6.25.351.700 I slot launch_slot_: id  0 | task 676 | processing task, is_child = 0
+6.25.931.916 I spec        begin: adaptive draft vocab: cumulative draft steps subset 2120 / 2120 (1.0000), switches 1
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     4      2 100.0   9392.8   5402.7    168.6   3777.7 407940.0
+LLAMA_DECODE_TIMING c0     5      9  11.1   4991.4    595.5    172.9   4187.8   2107.2
+LLAMA_DECODE_TIMING c1     1     38  23.7    258.6     66.7     24.7    146.9   1904.4
+LLAMA_DECODE_TIMING c1     4      2 100.0    727.5    173.9    332.9    194.2  55698.9
+LLAMA_DECODE_TIMING c1     5      9 100.0    616.6    202.9    145.2    233.9  51853.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     49     58.8     44.0    157.0   1505.3   1515.6   5.6  22.4
+VK_STEP_TIMING   4523     11    166.5   1500.9   4071.5  52451.4  52467.6  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4352.2      1.1    158.1   4154.8   2110.4
+LLAMA_DECODE_TIMING c1     1     40  25.0    250.1     57.6     25.5    145.7   1984.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    554.6    182.7    134.9    209.3  51939.3
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     48.2     45.1    159.1   1548.6   1559.5   5.6  20.0
+VK_STEP_TIMING   4523     10    158.0   1570.2   4167.4  51842.5  51858.1  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4369.9      1.1    158.6   4173.7   2098.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    249.6     56.9     25.5    146.2   1970.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    559.6    185.1    135.0    212.1  51947.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     47.8     44.2    155.5   1552.7   1563.3   5.6  20.0
+VK_STEP_TIMING   4523     10    163.3   1557.6   4160.9  51880.8  51896.7  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4350.4      1.0    164.3   4155.2   2105.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    251.0     70.0     23.2    139.1   1799.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    566.9    193.1    135.9    210.4  51956.1
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     46.7     42.1    152.8   1559.6   1570.2   5.6  20.0
+VK_STEP_TIMING   4523     10    162.9   1525.0   4112.7  51949.7  51965.6  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4836.8    531.7    161.5   4110.8   2114.6
+LLAMA_DECODE_TIMING c1     1     40  25.0    242.8     55.6     24.8    142.5   1973.4
+LLAMA_DECODE_TIMING c1     5     10 100.0    544.6    178.7    134.7    205.4  52030.2
+6.28.989.040 I slot print_timing: id  0 | task 676 | n_gen =    188, tg =  61.18 t/s, tg_3s =  61.50 t/s
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     48.0     43.5    154.6   1554.3   1565.0   5.6  20.0
+VK_STEP_TIMING   4523     10    161.6   1556.5   4142.9  51867.4  51882.5  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4340.7      1.1    161.4   4142.6   2110.1
+LLAMA_DECODE_TIMING c1     1     40  25.0    246.0     55.6     25.0    144.6   1937.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    552.5    181.5    138.0    206.7  51938.6
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     48.5     45.1    157.5   1551.7   1562.8   5.6  20.0
+VK_STEP_TIMING   4523     10    162.7   1560.2   4142.8  51881.8  51897.2  14.0   0.0
+6.30.142.862 I slot print_timing: id  0 | task 676 | prompt eval time =     580.66 ms /     4 tokens (  145.16 ms per token,     6.89 tokens per second)
+6.30.142.866 I slot print_timing: id  0 | task 676 |        eval time =    4210.23 ms /   256 tokens (   16.51 ms per token,    60.57 tokens per second)
+6.30.142.866 I slot print_timing: id  0 | task 676 |       total time =    4790.89 ms /   260 tokens
+6.30.142.867 I slot print_timing: id  0 | task 676 |    graphs reused =        571
+6.30.142.871 I slot print_timing: id  0 | task 676 | draft acceptance = 0.78138 (  193 accepted /   247 generated), mean len =  4.11
+6.30.145.708 I slot      release: id  0 | task 676 | stop processing: n_tokens = 183144, truncated = 0
+6.30.440.101 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.999
+6.30.440.215 I slot launch_slot_: id  0 | task 740 | processing task, is_child = 0
+6.31.018.873 I spec        begin: adaptive draft vocab: cumulative draft steps subset 2368 / 2368 (1.0000), switches 1
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     4      2 100.0   9364.1   5378.1    163.5   3772.2 404191.2
+LLAMA_DECODE_TIMING c0     5      8   0.0   4335.5      1.1    161.2   4139.7   2103.0
+LLAMA_DECODE_TIMING c1     1     40  25.0    254.9     66.8     24.1    143.9   1888.3
+LLAMA_DECODE_TIMING c1     4      2 100.0    743.4    184.1    318.7    205.0  55624.7
+LLAMA_DECODE_TIMING c1     5      8 100.0    575.5    184.2    137.4    223.6  51998.0
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     54.6     44.2    157.8   1554.6   1565.4   5.5  20.0
+VK_STEP_TIMING   4523     10    163.2   1485.3   4028.4  52572.3  52588.4  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4841.4    538.6    159.6   4105.4   2114.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    247.7     57.2     24.8    144.9   1992.3
+LLAMA_DECODE_TIMING c1     5     10 100.0    554.9    181.5    137.4    209.3  51915.3
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     47.6     45.0    156.6   1558.0   1568.9   5.6  20.0
+VK_STEP_TIMING   4523     10    157.8   1557.1   4157.4  51855.8  51871.2  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4350.2      1.1    156.9   4157.0   2106.8
+LLAMA_DECODE_TIMING c1     1     40  25.0    249.0     57.0     24.9    146.0   1981.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    551.7    184.0    136.4    204.2  51931.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     47.6     43.6    155.9   1556.2   1567.6   5.6  20.0
+VK_STEP_TIMING   4523     10    158.3   1571.3   4162.6  51870.8  51886.8  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4385.0      1.1    166.9   4185.5   2111.6
+LLAMA_DECODE_TIMING c1     1     40  25.0    255.6     66.1     24.7    145.0   1854.6
+LLAMA_DECODE_TIMING c1     5     10 100.0    602.5    194.7    142.8    231.2  51989.8
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     49.6     47.3    162.1   1557.1   1568.0   5.6  20.0
+VK_STEP_TIMING   4523     10    172.5   1562.5   4164.7  51888.6  51905.9  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10  10.0   4847.0    534.4    165.0   4113.1   2112.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    248.5     59.9     24.8    143.5   1928.2
+LLAMA_DECODE_TIMING c1     5     10 100.0    570.0    184.9    138.8    217.0  51991.2
+6.34.077.998 I slot print_timing: id  0 | task 740 | n_gen =    188, tg =  61.14 t/s, tg_3s =  61.46 t/s
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     48.1     43.1    154.9   1549.0   1559.7   5.6  20.0
+VK_STEP_TIMING   4523     10    160.1   1524.7   4100.2  51918.8  51933.8  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4358.6      1.1    158.3   4164.9   2101.3
+LLAMA_DECODE_TIMING c1     1     40  25.0    246.4     56.4     25.1    144.8   1964.9
+LLAMA_DECODE_TIMING c1     5     10 100.0    566.0    184.3    138.3    215.0  52016.2
+VK_STEP_TIMING (60 graphs, us/graph): nodes cnt gap(host before) pre(rec before 1st submit) rec(total) wait(fence) sync(total) nsub late%
+VK_STEP_TIMING     69     50     49.1     47.4    161.2   1553.7   1564.5   5.6  20.0
+VK_STEP_TIMING   4523     10    162.0   1572.8   4167.7  51883.4  51899.3  14.0   0.0
+LLAMA_DECODE_TIMING (60 decodes, us/decode): ctx n_tok cnt built% total build+alloc set_inputs graph_compute outside(before)
+LLAMA_DECODE_TIMING c0     5     10   0.0   4343.4      1.1    162.2   4147.6   2106.2
+LLAMA_DECODE_TIMING c1     1     40  25.0    249.6     59.8     24.6    145.1   1928.1
+LLAMA_DECODE_TIMING c1     5     10 100.0    564.2    184.3    136.8    214.0  51980.4
+6.35.235.906 I slot print_timing: id  0 | task 740 | prompt eval time =     579.10 ms /     4 tokens (  144.77 ms per token,     6.91 tokens per second)
+6.35.235.909 I slot print_timing: id  0 | task 740 |        eval time =    4216.30 ms /   256 tokens (   16.53 ms per token,    60.48 tokens per second)
+6.35.235.910 I slot print_timing: id  0 | task 740 |       total time =    4795.40 ms /   260 tokens
+6.35.235.911 I slot print_timing: id  0 | task 740 |    graphs reused =        630
+6.35.235.914 I slot print_timing: id  0 | task 740 | draft acceptance = 0.78138 (  193 accepted /   247 generated), mean len =  4.11
+6.35.238.766 I slot      release: id  0 | task 740 | stop processing: n_tokens = 183144, truncated = 0
+6.35.258.658 I srv    operator(): operator(): cleaning up before exit...

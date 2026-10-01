@@ -1,0 +1,493 @@
+0.00.000.281 I srv  llama_server: initializing ...
+WARNING: radv is not a conformant Vulkan implementation, testing use only.
+WARNING: radv is not a conformant Vulkan implementation, testing use only.
+0.00.049.639 I cmn  common_param: common_params_print_info: verbosity = 3 (adjust with the `-lv N` CLI arg)
+0.00.049.733 I srv          init: The UI is disabled
+0.00.049.734 I srv          init: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.049.783 W srv  llama_server: security: no API key is set and CORS allows all origins (see https://github.com/ggml-org/llama.cpp/pull/25655)
+0.00.050.966 I srv    load_model: loading model '/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf'
+0.00.989.376 W common_fit_params: failed to fit params to free device memory: n_gpu_layers already set by user to 99, abort
+0.42.646.336 W common_init_result: --spec-draft-vocab without --spec-draft-vocab-file: using specials + lowest token ids
+0.43.802.733 I cmn          init: llama threadpool init, n_threads = 8
+0.43.884.543 I common_speculative_init_result: creating MTP draft context against the target model '/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf'
+0.43.918.768 W load_hparams: Qwen-VL models require at minimum 1024 image tokens to function correctly on grounding tasks
+0.43.918.773 W load_hparams: if you encounter problems with accuracy, try adding --image-min-tokens 1024
+0.43.918.773 W load_hparams: more info: https://github.com/ggml-org/llama.cpp/issues/16842
+
+0.46.331.808 I srv    load_model: loaded multimodal model, '/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/mmproj-F16.gguf'
+0.46.331.828 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 262144, kv_unified = 'false'
+0.46.331.957 I spec common_specu: adaptive draft vocab: subset 98304 rows while <= 3 per 256 recent context tokens fall outside it
+0.46.374.340 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.46.374.374 I srv  llama_server: model loaded
+0.46.374.376 I srv  llama_server: listening on http://127.0.0.1:8097
+0.50.258.136 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.50.258.177 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.54.351.352 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   5906, progress = 0.92, t =   3.81 s / 1550.58 tokens per second
+0.54.804.155 I slot print_timing: id  0 | task 0 | prompt processing, n_tokens =   6418, progress = 1.00, t =   4.23 s / 1517.83 tokens per second
+0.54.960.698 I spec        begin: adaptive draft vocab: cumulative draft steps subset 0 / 0 (0.0000), switches 0
+0.57.961.718 I slot print_timing: id  0 | task 0 | n_gen =    204, tg =  67.66 t/s, tg_3s =  67.99 t/s
+0.58.664.305 I slot print_timing: id  0 | task 0 | prompt eval time =    4702.99 ms /  6422 tokens (    0.73 ms per token,  1365.51 tokens per second)
+0.58.664.309 I slot print_timing: id  0 | task 0 |        eval time =    3702.85 ms /   256 tokens (   14.52 ms per token,    68.87 tokens per second)
+0.58.664.310 I slot print_timing: id  0 | task 0 |       total time =    8405.84 ms /  6678 tokens
+0.58.664.314 I slot print_timing: id  0 | task 0 |    graphs reused =         66
+0.58.664.318 I slot print_timing: id  0 | task 0 | draft acceptance = 0.67883 (  186 accepted /   274 generated), mean len =  3.70
+0.58.664.600 I slot      release: id  0 | task 0 | stop processing: n_tokens = 6677, truncated = 0
+0.58.677.633 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18487759916
+0.59.056.841 I slot launch_slot_: id  0 | task 75 | processing task, is_child = 0
+1.03.235.834 I slot print_timing: id  0 | task 75 | prompt processing, n_tokens =   6144, progress = 0.91, t =   3.79 s / 1621.48 tokens per second
+1.03.363.152 I slot print_timing: id  0 | task 75 | prompt processing, n_tokens =   6247, progress = 0.92, t =   4.19 s / 1490.99 tokens per second
+1.03.822.303 I slot print_timing: id  0 | task 75 | prompt processing, n_tokens =   6759, progress = 1.00, t =   4.44 s / 1521.98 tokens per second
+1.03.978.981 I spec        begin: adaptive draft vocab: cumulative draft steps subset 276 / 276 (1.0000), switches 1
+MTP_TOP2 steps=100 acc_hist=19,15,14,9,43,0,0,0 rej1_rank(2,3,4,miss)=10,2,3,4
+1.07.025.841 I slot print_timing: id  0 | task 75 | n_gen =    186, tg =  60.73 t/s, tg_3s =  61.06 t/s
+1.08.147.526 I slot print_timing: id  0 | task 75 | prompt eval time =    4922.60 ms /  6763 tokens (    0.73 ms per token,  1373.87 tokens per second)
+1.08.147.529 I slot print_timing: id  0 | task 75 |        eval time =    4168.07 ms /   256 tokens (   16.35 ms per token,    61.18 tokens per second)
+1.08.147.530 I slot print_timing: id  0 | task 75 |       total time =    9090.66 ms /  7019 tokens
+1.08.147.530 I slot print_timing: id  0 | task 75 |    graphs reused =        139
+1.08.147.534 I slot print_timing: id  0 | task 75 | draft acceptance = 0.58033 (  177 accepted /   305 generated), mean len =  3.30
+1.08.147.801 I slot      release: id  0 | task 75 | stop processing: n_tokens = 7018, truncated = 0
+1.08.160.446 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18497243117
+1.08.546.441 I slot launch_slot_: id  0 | task 160 | processing task, is_child = 0
+1.12.679.543 I slot print_timing: id  0 | task 160 | prompt processing, n_tokens =   5928, progress = 0.92, t =   3.83 s / 1548.05 tokens per second
+1.13.133.444 I slot print_timing: id  0 | task 160 | prompt processing, n_tokens =   6440, progress = 1.00, t =   4.24 s / 1517.51 tokens per second
+1.13.287.807 I spec        begin: adaptive draft vocab: cumulative draft steps subset 584 / 584 (1.0000), switches 1
+MTP_TOP2 steps=200 acc_hist=21,47,38,20,74,0,0,0 rej1_rank(2,3,4,miss)=10,4,3,4
+1.16.316.232 I slot print_timing: id  0 | task 160 | n_gen =    180, tg =  59.12 t/s, tg_3s =  59.45 t/s
+1.17.540.674 I slot print_timing: id  0 | task 160 | prompt eval time =    4741.84 ms /  6444 tokens (    0.74 ms per token,  1358.97 tokens per second)
+1.17.540.677 I slot print_timing: id  0 | task 160 |        eval time =    4252.38 ms /   256 tokens (   16.68 ms per token,    59.97 tokens per second)
+1.17.540.678 I slot print_timing: id  0 | task 160 |       total time =    8994.21 ms /  6700 tokens
+1.17.540.678 I slot print_timing: id  0 | task 160 |    graphs reused =        215
+1.17.540.682 I slot print_timing: id  0 | task 160 | draft acceptance = 0.55732 (  175 accepted /   314 generated), mean len =  3.22
+1.17.540.919 I slot      release: id  0 | task 160 | stop processing: n_tokens = 6699, truncated = 0
+1.17.554.532 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18506636235
+1.17.930.791 I slot launch_slot_: id  0 | task 246 | processing task, is_child = 0
+1.22.159.054 I slot print_timing: id  0 | task 246 | prompt processing, n_tokens =   6105, progress = 0.92, t =   3.83 s / 1592.48 tokens per second
+1.22.616.120 I slot print_timing: id  0 | task 246 | prompt processing, n_tokens =   6617, progress = 1.00, t =   4.34 s / 1524.46 tokens per second
+1.22.770.910 I spec        begin: adaptive draft vocab: cumulative draft steps subset 900 / 900 (1.0000), switches 1
+1.25.779.640 I slot print_timing: id  0 | task 246 | n_gen =    248, tg =  82.12 t/s, tg_3s =  82.44 t/s
+1.25.890.788 I slot print_timing: id  0 | task 246 | prompt eval time =    4840.60 ms /  6621 tokens (    0.73 ms per token,  1367.81 tokens per second)
+1.25.890.791 I slot print_timing: id  0 | task 246 |        eval time =    3119.11 ms /   256 tokens (   12.23 ms per token,    81.75 tokens per second)
+1.25.890.792 I slot print_timing: id  0 | task 246 |       total time =    7959.71 ms /  6877 tokens
+1.25.890.793 I slot print_timing: id  0 | task 246 |    graphs reused =        270
+1.25.890.796 I slot print_timing: id  0 | task 246 | draft acceptance = 0.85652 (  197 accepted /   230 generated), mean len =  4.40
+1.25.891.050 I slot      release: id  0 | task 246 | stop processing: n_tokens = 6876, truncated = 0
+1.25.903.860 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18514986367
+1.26.286.674 I slot launch_slot_: id  0 | task 310 | processing task, is_child = 0
+1.30.493.640 I slot print_timing: id  0 | task 310 | prompt processing, n_tokens =   6144, progress = 0.86, t =   3.82 s / 1608.93 tokens per second
+1.30.849.590 I slot print_timing: id  0 | task 310 | prompt processing, n_tokens =   6616, progress = 0.93, t =   4.22 s / 1568.20 tokens per second
+1.31.308.331 I slot print_timing: id  0 | task 310 | prompt processing, n_tokens =   7128, progress = 1.00, t =   4.70 s / 1517.67 tokens per second
+1.31.466.498 I spec        begin: adaptive draft vocab: cumulative draft steps subset 1132 / 1132 (1.0000), switches 1
+MTP_TOP2 steps=300 acc_hist=23,63,56,30,128,0,0,0 rej1_rank(2,3,4,miss)=11,5,3,4
+1.34.473.723 I slot print_timing: id  0 | task 310 | n_gen =    217, tg =  71.84 t/s, tg_3s =  72.17 t/s
+1.34.958.625 I slot print_timing: id  0 | task 310 | prompt eval time =    5180.27 ms /  7132 tokens (    0.73 ms per token,  1376.76 tokens per second)
+1.34.958.629 I slot print_timing: id  0 | task 310 |        eval time =    3491.40 ms /   256 tokens (   13.69 ms per token,    73.04 tokens per second)
+1.34.958.630 I slot print_timing: id  0 | task 310 |       total time =    8671.67 ms /  7388 tokens
+1.34.958.630 I slot print_timing: id  0 | task 310 |    graphs reused =        332
+1.34.958.633 I slot print_timing: id  0 | task 310 | draft acceptance = 0.73643 (  190 accepted /   258 generated), mean len =  3.92
+1.34.958.920 I slot      release: id  0 | task 310 | stop processing: n_tokens = 7387, truncated = 0
+1.34.972.222 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18524054235
+1.35.373.851 I slot launch_slot_: id  0 | task 382 | processing task, is_child = 0
+1.38.771.618 I slot print_timing: id  0 | task 382 | prompt processing, n_tokens =   4883, progress = 0.90, t =   3.13 s / 1559.13 tokens per second
+1.39.226.721 I slot print_timing: id  0 | task 382 | prompt processing, n_tokens =   5395, progress = 1.00, t =   3.51 s / 1536.57 tokens per second
+1.39.380.788 I spec        begin: adaptive draft vocab: cumulative draft steps subset 1392 / 1392 (1.0000), switches 1
+MTP_TOP2 steps=400 acc_hist=29,85,76,42,168,0,0,0 rej1_rank(2,3,4,miss)=15,5,4,5
+1.42.409.703 I slot print_timing: id  0 | task 382 | n_gen =    178, tg =  58.45 t/s, tg_3s =  58.78 t/s
+1.43.696.319 I slot print_timing: id  0 | task 382 | prompt eval time =    4007.42 ms /  5399 tokens (    0.74 ms per token,  1347.25 tokens per second)
+1.43.696.322 I slot print_timing: id  0 | task 382 |        eval time =    4314.77 ms /   256 tokens (   16.92 ms per token,    59.10 tokens per second)
+1.43.696.323 I slot print_timing: id  0 | task 382 |       total time =    8322.19 ms /  5655 tokens
+1.43.696.323 I slot print_timing: id  0 | task 382 |    graphs reused =        410
+1.43.696.334 I slot print_timing: id  0 | task 382 | draft acceptance = 0.54037 (  174 accepted /   322 generated), mean len =  3.15
+1.43.696.588 I slot      release: id  0 | task 382 | stop processing: n_tokens = 5654, truncated = 0
+1.43.708.878 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18532791903
+1.44.066.512 I slot launch_slot_: id  0 | task 469 | processing task, is_child = 0
+1.48.245.249 I slot print_timing: id  0 | task 469 | prompt processing, n_tokens =   6144, progress = 0.80, t =   3.79 s / 1621.05 tokens per second
+1.48.956.028 I slot print_timing: id  0 | task 469 | prompt processing, n_tokens =   7135, progress = 0.93, t =   4.53 s / 1575.09 tokens per second
+1.49.416.852 I slot print_timing: id  0 | task 469 | prompt processing, n_tokens =   7647, progress = 1.00, t =   5.02 s / 1521.91 tokens per second
+1.49.576.392 I spec        begin: adaptive draft vocab: cumulative draft steps subset 1716 / 1716 (1.0000), switches 1
+1.52.626.854 I slot print_timing: id  0 | task 469 | n_gen =    168, tg =  54.76 t/s, tg_3s =  55.08 t/s
+MTP_TOP2 steps=500 acc_hist=41,112,103,54,190,0,0,0 rej1_rank(2,3,4,miss)=18,6,7,10
+1.54.127.977 I slot print_timing: id  0 | task 469 | prompt eval time =    5510.35 ms /  7651 tokens (    0.72 ms per token,  1388.48 tokens per second)
+1.54.127.981 I slot print_timing: id  0 | task 469 |        eval time =    4550.84 ms /   256 tokens (   17.85 ms per token,    56.03 tokens per second)
+1.54.127.981 I slot print_timing: id  0 | task 469 |       total time =   10061.20 ms /  7907 tokens
+1.54.127.982 I slot print_timing: id  0 | task 469 |    graphs reused =        491
+1.54.127.986 I slot print_timing: id  0 | task 469 | draft acceptance = 0.50595 (  170 accepted /   336 generated), mean len =  3.00
+1.54.128.242 I slot      release: id  0 | task 469 | stop processing: n_tokens = 7906, truncated = 0
+1.54.141.404 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18543223558
+1.54.558.942 I slot launch_slot_: id  0 | task 561 | processing task, is_child = 0
+1.58.512.144 I slot print_timing: id  0 | task 561 | prompt processing, n_tokens =   5754, progress = 0.92, t =   3.79 s / 1518.84 tokens per second
+1.58.965.902 I slot print_timing: id  0 | task 561 | prompt processing, n_tokens =   6266, progress = 1.00, t =   4.06 s / 1541.97 tokens per second
+1.59.121.576 I spec        begin: adaptive draft vocab: cumulative draft steps subset 2056 / 2056 (1.0000), switches 1
+2.02.174.561 I slot print_timing: id  0 | task 561 | n_gen =    223, tg =  72.73 t/s, tg_3s =  73.06 t/s
+2.02.550.465 I slot print_timing: id  0 | task 561 | prompt eval time =    4563.11 ms /  6270 tokens (    0.73 ms per token,  1374.06 tokens per second)
+2.02.550.469 I slot print_timing: id  0 | task 561 |        eval time =    3428.14 ms /   256 tokens (   13.44 ms per token,    74.38 tokens per second)
+2.02.550.469 I slot print_timing: id  0 | task 561 |       total time =    7991.25 ms /  6526 tokens
+2.02.550.470 I slot print_timing: id  0 | task 561 |    graphs reused =        553
+2.02.550.473 I slot print_timing: id  0 | task 561 | draft acceptance = 0.74609 (  191 accepted /   256 generated), mean len =  3.98
+2.02.550.748 I slot      release: id  0 | task 561 | stop processing: n_tokens = 6525, truncated = 0
+2.02.562.534 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18551646063
+2.02.929.440 I slot launch_slot_: id  0 | task 631 | processing task, is_child = 0
+2.06.946.695 I slot print_timing: id  0 | task 631 | prompt processing, n_tokens =   5824, progress = 0.92, t =   3.79 s / 1534.74 tokens per second
+2.07.398.693 I slot print_timing: id  0 | task 631 | prompt processing, n_tokens =   6336, progress = 1.00, t =   4.13 s / 1535.36 tokens per second
+2.07.554.073 I spec        begin: adaptive draft vocab: cumulative draft steps subset 2312 / 2312 (1.0000), switches 1
+MTP_TOP2 steps=600 acc_hist=50,131,112,65,242,0,0,0 rej1_rank(2,3,4,miss)=22,8,7,13
+2.10.562.985 I slot print_timing: id  0 | task 631 | n_gen =    224, tg =  74.13 t/s, tg_3s =  74.46 t/s
+2.10.996.292 I slot print_timing: id  0 | task 631 | prompt eval time =    4625.09 ms /  6340 tokens (    0.73 ms per token,  1370.78 tokens per second)
+2.10.996.296 I slot print_timing: id  0 | task 631 |        eval time =    3441.47 ms /   256 tokens (   13.50 ms per token,    74.10 tokens per second)
+2.10.996.296 I slot print_timing: id  0 | task 631 |       total time =    8066.57 ms /  6596 tokens
+2.10.996.297 I slot print_timing: id  0 | task 631 |    graphs reused =        614
+2.10.996.301 I slot print_timing: id  0 | task 631 | draft acceptance = 0.74902 (  191 accepted /   255 generated), mean len =  3.98
+2.10.996.504 I slot      release: id  0 | task 631 | stop processing: n_tokens = 6595, truncated = 0
+2.11.007.929 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18560091819
+2.11.379.911 I slot launch_slot_: id  0 | task 701 | processing task, is_child = 0
+2.15.270.800 I slot print_timing: id  0 | task 701 | prompt processing, n_tokens =   5634, progress = 0.92, t =   3.80 s / 1481.28 tokens per second
+2.15.726.402 I slot print_timing: id  0 | task 701 | prompt processing, n_tokens =   6146, progress = 1.00, t =   4.31 s / 1425.76 tokens per second
+2.15.881.650 I spec        begin: adaptive draft vocab: cumulative draft steps subset 2568 / 2568 (1.0000), switches 1
+2.15.882.150 I slot print_timing: id  0 | task 701 | prompt eval time =    4502.22 ms /  6150 tokens (    0.73 ms per token,  1365.99 tokens per second)
+2.15.882.152 I slot print_timing: id  0 | task 701 |        eval time =       0.00 ms /     1 tokens (    0.00 ms per token,     0.00 tokens per second)
+2.15.882.152 I slot print_timing: id  0 | task 701 |       total time =    4502.22 ms /  6151 tokens
+2.15.882.153 I slot print_timing: id  0 | task 701 |    graphs reused =        614
+2.15.882.334 I slot      release: id  0 | task 701 | stop processing: n_tokens = 6150, truncated = 0
+2.15.894.145 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18564977649
+2.16.258.594 I slot launch_slot_: id  0 | task 707 | processing task, is_child = 0
+2.20.266.804 I slot print_timing: id  0 | task 707 | prompt processing, n_tokens =   5783, progress = 0.92, t =   3.79 s / 1524.53 tokens per second
+2.20.724.600 I slot print_timing: id  0 | task 707 | prompt processing, n_tokens =   6295, progress = 1.00, t =   4.12 s / 1527.27 tokens per second
+2.20.879.729 I spec        begin: adaptive draft vocab: cumulative draft steps subset 2568 / 2568 (1.0000), switches 1
+2.23.933.077 I slot print_timing: id  0 | task 707 | n_gen =    242, tg =  78.95 t/s, tg_3s =  79.27 t/s
+MTP_TOP2 steps=700 acc_hist=57,137,123,76,307,0,0,0 rej1_rank(2,3,4,miss)=25,10,7,15
+2.24.097.842 I slot print_timing: id  0 | task 707 | prompt eval time =    4621.59 ms /  6299 tokens (    0.73 ms per token,  1362.95 tokens per second)
+2.24.097.845 I slot print_timing: id  0 | task 707 |        eval time =    3217.36 ms /   256 tokens (   12.62 ms per token,    79.26 tokens per second)
+2.24.097.846 I slot print_timing: id  0 | task 707 |       total time =    7838.95 ms /  6555 tokens
+2.24.097.846 I slot print_timing: id  0 | task 707 |    graphs reused =        671
+2.24.097.850 I slot print_timing: id  0 | task 707 | draft acceptance = 0.81590 (  195 accepted /   239 generated), mean len =  4.25
+2.24.098.054 I slot      release: id  0 | task 707 | stop processing: n_tokens = 6554, truncated = 0
+2.24.110.948 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18573193369
+2.24.512.637 I slot launch_slot_: id  0 | task 773 | processing task, is_child = 0
+2.28.452.230 I slot print_timing: id  0 | task 773 | prompt processing, n_tokens =   5643, progress = 0.92, t =   3.80 s / 1486.81 tokens per second
+2.28.905.127 I slot print_timing: id  0 | task 773 | prompt processing, n_tokens =   6155, progress = 1.00, t =   4.35 s / 1416.41 tokens per second
+2.29.065.151 I spec        begin: adaptive draft vocab: cumulative draft steps subset 2808 / 2808 (1.0000), switches 1
+2.32.094.054 I slot print_timing: id  0 | task 773 | n_gen =    168, tg =  55.15 t/s, tg_3s =  55.47 t/s
+2.33.486.274 I slot print_timing: id  0 | task 773 | prompt eval time =    4552.96 ms /  6159 tokens (    0.74 ms per token,  1352.75 tokens per second)
+2.33.486.278 I slot print_timing: id  0 | task 773 |        eval time =    4420.40 ms /   256 tokens (   17.33 ms per token,    57.69 tokens per second)
+2.33.486.279 I slot print_timing: id  0 | task 773 |       total time =    8973.36 ms /  6415 tokens
+2.33.486.279 I slot print_timing: id  0 | task 773 |    graphs reused =        751
+2.33.486.283 I slot print_timing: id  0 | task 773 | draft acceptance = 0.51964 (  172 accepted /   331 generated), mean len =  3.07
+2.33.486.521 I slot      release: id  0 | task 773 | stop processing: n_tokens = 6414, truncated = 0
+2.33.499.503 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18582581836
+2.33.500.632 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 710.595 MiB)
+2.33.922.936 I slot launch_slot_: id  0 | task 862 | processing task, is_child = 0
+2.37.871.928 I slot print_timing: id  0 | task 862 | prompt processing, n_tokens =   5754, progress = 0.92, t =   3.79 s / 1519.96 tokens per second
+2.38.325.289 I slot print_timing: id  0 | task 862 | prompt processing, n_tokens =   6266, progress = 1.00, t =   4.06 s / 1543.40 tokens per second
+2.38.488.787 I spec        begin: adaptive draft vocab: cumulative draft steps subset 3140 / 3140 (1.0000), switches 1
+MTP_TOP2 steps=800 acc_hist=84,152,135,89,340,0,0,0 rej1_rank(2,3,4,miss)=34,16,12,22
+2.41.538.904 I slot print_timing: id  0 | task 862 | n_gen =    193, tg =  62.96 t/s, tg_3s =  63.29 t/s
+2.42.345.061 I slot print_timing: id  0 | task 862 | prompt eval time =    4566.30 ms /  6270 tokens (    0.73 ms per token,  1373.10 tokens per second)
+2.42.345.065 I slot print_timing: id  0 | task 862 |        eval time =    3855.54 ms /   256 tokens (   15.12 ms per token,    66.14 tokens per second)
+2.42.345.065 I slot print_timing: id  0 | task 862 |       total time =    8421.84 ms /  6526 tokens
+2.42.345.066 I slot print_timing: id  0 | task 862 |    graphs reused =        820
+2.42.345.069 I slot print_timing: id  0 | task 862 | draft acceptance = 0.63763 (  183 accepted /   287 generated), mean len =  3.54
+2.42.345.344 I slot      release: id  0 | task 862 | stop processing: n_tokens = 6525, truncated = 0
+2.42.358.131 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18591440659
+2.42.359.256 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 724.071 MiB)
+2.42.781.643 I slot launch_slot_: id  0 | task 940 | processing task, is_child = 0
+2.46.799.963 I slot print_timing: id  0 | task 940 | prompt processing, n_tokens =   5886, progress = 0.92, t =   3.78 s / 1555.12 tokens per second
+2.47.251.925 I slot print_timing: id  0 | task 940 | prompt processing, n_tokens =   6398, progress = 1.00, t =   4.13 s / 1549.85 tokens per second
+2.47.415.223 I spec        begin: adaptive draft vocab: cumulative draft steps subset 3428 / 3428 (1.0000), switches 1
+MTP_TOP2 steps=900 acc_hist=101,173,144,107,375,0,0,0 rej1_rank(2,3,4,miss)=47,18,13,23
+2.50.455.965 I slot print_timing: id  0 | task 940 | n_gen =    181, tg =  59.21 t/s, tg_3s =  59.53 t/s
+2.51.410.769 I slot print_timing: id  0 | task 940 | prompt eval time =    4634.06 ms /  6402 tokens (    0.72 ms per token,  1381.51 tokens per second)
+2.51.410.772 I slot print_timing: id  0 | task 940 |        eval time =    3995.04 ms /   256 tokens (   15.67 ms per token,    63.83 tokens per second)
+2.51.410.773 I slot print_timing: id  0 | task 940 |       total time =    8629.10 ms /  6658 tokens
+2.51.410.773 I slot print_timing: id  0 | task 940 |    graphs reused =        893
+2.51.410.777 I slot print_timing: id  0 | task 940 | draft acceptance = 0.60811 (  180 accepted /   296 generated), mean len =  3.43
+2.51.411.014 I slot      release: id  0 | task 940 | stop processing: n_tokens = 6657, truncated = 0
+2.51.421.569 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18600506329
+2.51.422.612 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 711.464 MiB)
+2.51.842.682 I slot launch_slot_: id  0 | task 1021 | processing task, is_child = 0
+2.56.017.165 I slot print_timing: id  0 | task 1021 | prompt processing, n_tokens =   6144, progress = 0.67, t =   3.79 s / 1622.55 tokens per second
+2.57.448.135 I slot print_timing: id  0 | task 1021 | prompt processing, n_tokens =   8192, progress = 0.89, t =   5.22 s / 1568.64 tokens per second
+2.57.874.322 I slot print_timing: id  0 | task 1021 | prompt processing, n_tokens =   8708, progress = 0.94, t =   5.98 s / 1457.40 tokens per second
+2.58.341.679 I slot print_timing: id  0 | task 1021 | prompt processing, n_tokens =   9220, progress = 1.00, t =   6.46 s / 1427.52 tokens per second
+2.58.510.798 I spec        begin: adaptive draft vocab: cumulative draft steps subset 3724 / 3724 (1.0000), switches 1
+3.01.514.329 I slot print_timing: id  0 | task 1021 | n_gen =    198, tg =  65.61 t/s, tg_3s =  65.93 t/s
+MTP_TOP2 steps=1000 acc_hist=123,183,151,113,430,0,0,0 rej1_rank(2,3,4,miss)=54,22,14,33
+3.02.589.723 I slot print_timing: id  0 | task 1021 | prompt eval time =    6668.55 ms /  9224 tokens (    0.72 ms per token,  1383.21 tokens per second)
+3.02.589.726 I slot print_timing: id  0 | task 1021 |        eval time =    4078.20 ms /   256 tokens (   15.99 ms per token,    62.53 tokens per second)
+3.02.589.727 I slot print_timing: id  0 | task 1021 |       total time =   10746.75 ms /  9480 tokens
+3.02.589.727 I slot print_timing: id  0 | task 1021 |    graphs reused =        966
+3.02.589.730 I slot print_timing: id  0 | task 1021 | draft acceptance = 0.59272 (  179 accepted /   302 generated), mean len =  3.36
+3.02.589.999 I slot      release: id  0 | task 1021 | stop processing: n_tokens = 9479, truncated = 0
+3.02.602.614 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18611685314
+3.02.603.837 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 718.459 MiB)
+3.03.089.506 I slot launch_slot_: id  0 | task 1105 | processing task, is_child = 0
+3.06.917.829 I slot print_timing: id  0 | task 1105 | prompt processing, n_tokens =   5600, progress = 0.92, t =   3.46 s / 1619.30 tokens per second
+3.07.369.460 I slot print_timing: id  0 | task 1105 | prompt processing, n_tokens =   6112, progress = 1.00, t =   3.94 s / 1552.22 tokens per second
+3.07.530.184 I spec        begin: adaptive draft vocab: cumulative draft steps subset 4028 / 4028 (1.0000), switches 1
+3.10.577.801 I slot print_timing: id  0 | task 1105 | n_gen =    205, tg =  66.95 t/s, tg_3s =  67.28 t/s
+3.11.169.923 I slot print_timing: id  0 | task 1105 | prompt eval time =    4441.12 ms /  6116 tokens (    0.73 ms per token,  1377.13 tokens per second)
+3.11.169.927 I slot print_timing: id  0 | task 1105 |        eval time =    3639.26 ms /   256 tokens (   14.27 ms per token,    70.07 tokens per second)
+3.11.169.928 I slot print_timing: id  0 | task 1105 |       total time =    8080.39 ms /  6372 tokens
+3.11.169.928 I slot print_timing: id  0 | task 1105 |    graphs reused =       1031
+3.11.169.932 I slot print_timing: id  0 | task 1105 | draft acceptance = 0.69776 (  187 accepted /   268 generated), mean len =  3.79
+3.11.170.201 I slot      release: id  0 | task 1105 | stop processing: n_tokens = 6371, truncated = 0
+3.11.173.186 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18620265518
+3.11.175.089 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 738.654 MiB)
+3.11.627.431 I slot launch_slot_: id  0 | task 1179 | processing task, is_child = 0
+3.11.941.574 I spec        begin: adaptive draft vocab: cumulative draft steps subset 4296 / 4296 (1.0000), switches 1
+MTP_TOP2 steps=1100 acc_hist=143,202,163,120,472,0,0,0 rej1_rank(2,3,4,miss)=65,25,16,37
+3.14.977.980 I slot print_timing: id  0 | task 1179 | n_gen =    129, tg =  42.17 t/s, tg_3s =  42.49 t/s
+3.17.810.014 I slot print_timing: id  0 | task 1179 | prompt eval time =     314.64 ms /    37 tokens (    8.50 ms per token,   117.60 tokens per second)
+3.17.810.018 I slot print_timing: id  0 | task 1179 |        eval time =    5867.68 ms /   256 tokens (   23.01 ms per token,    43.46 tokens per second)
+3.17.810.018 I slot print_timing: id  0 | task 1179 |       total time =    6182.31 ms /   293 tokens
+3.17.810.019 I slot print_timing: id  0 | task 1179 |    graphs reused =       1138
+3.17.810.022 I slot print_timing: id  0 | task 1179 | draft acceptance = 0.32353 (  143 accepted /   442 generated), mean len =  2.28
+3.17.810.050 I slot      release: id  0 | task 1179 | stop processing: n_tokens = 292, truncated = 0
+3.17.812.060 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.103 (> 0.100 thold), f_keep = 0.010
+3.17.997.644 I slot launch_slot_: id  0 | task 1294 | processing task, is_child = 0
+3.18.287.207 I spec        begin: adaptive draft vocab: cumulative draft steps subset 4744 / 4744 (1.0000), switches 1
+MTP_TOP2 steps=1200 acc_hist=172,230,182,130,486,0,0,0 rej1_rank(2,3,4,miss)=78,29,19,46
+3.21.324.354 I slot print_timing: id  0 | task 1294 | n_gen =    170, tg =  55.66 t/s, tg_3s =  55.98 t/s
+3.23.151.541 I slot print_timing: id  0 | task 1294 | prompt eval time =     290.04 ms /    29 tokens (   10.00 ms per token,    99.99 tokens per second)
+3.23.151.544 I slot print_timing: id  0 | task 1294 |        eval time =    4863.83 ms /   256 tokens (   19.07 ms per token,    52.43 tokens per second)
+3.23.151.545 I slot print_timing: id  0 | task 1294 |       total time =    5153.87 ms /   285 tokens
+3.23.151.546 I slot print_timing: id  0 | task 1294 |    graphs reused =       1228
+3.23.151.549 I slot print_timing: id  0 | task 1294 | draft acceptance = 0.44022 (  162 accepted /   368 generated), mean len =  2.76
+3.23.151.574 I slot      release: id  0 | task 1294 | stop processing: n_tokens = 284, truncated = 0
+3.23.153.766 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18632246889
+3.23.154.547 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 670.165 MiB)
+3.23.385.315 I slot launch_slot_: id  0 | task 1390 | processing task, is_child = 0
+3.23.678.403 I spec        begin: adaptive draft vocab: cumulative draft steps subset 5112 / 5112 (1.0000), switches 1
+MTP_TOP2 steps=1300 acc_hist=201,254,200,147,498,0,0,0 rej1_rank(2,3,4,miss)=90,33,22,55
+3.26.722.719 I slot print_timing: id  0 | task 1390 | n_gen =    160, tg =  52.24 t/s, tg_3s =  52.57 t/s
+3.28.245.796 I slot print_timing: id  0 | task 1390 | prompt eval time =     293.58 ms /    30 tokens (    9.79 ms per token,   102.19 tokens per second)
+3.28.245.799 I slot print_timing: id  0 | task 1390 |        eval time =    4566.88 ms /   256 tokens (   17.91 ms per token,    55.84 tokens per second)
+3.28.245.800 I slot print_timing: id  0 | task 1390 |       total time =    4860.46 ms /   286 tokens
+3.28.245.801 I slot print_timing: id  0 | task 1390 |    graphs reused =       1311
+3.28.245.805 I slot print_timing: id  0 | task 1390 | draft acceptance = 0.49706 (  169 accepted /   340 generated), mean len =  2.99
+3.28.245.830 I slot      release: id  0 | task 1390 | stop processing: n_tokens = 285, truncated = 0
+3.28.247.849 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18637341144
+3.28.427.378 I slot launch_slot_: id  0 | task 1479 | processing task, is_child = 0
+3.28.717.485 I spec        begin: adaptive draft vocab: cumulative draft steps subset 5396 / 5452 (0.9897), switches 3
+MTP_TOP2 steps=1400 acc_hist=217,284,213,165,521,0,0,0 rej1_rank(2,3,4,miss)=99,35,26,57
+3.31.759.621 I slot print_timing: id  0 | task 1479 | n_gen =    178, tg =  58.20 t/s, tg_3s =  58.52 t/s
+3.33.279.667 I slot print_timing: id  0 | task 1479 | prompt eval time =     290.57 ms /    31 tokens (    9.37 ms per token,   106.69 tokens per second)
+3.33.279.670 I slot print_timing: id  0 | task 1479 |        eval time =    4561.70 ms /   256 tokens (   17.89 ms per token,    55.90 tokens per second)
+3.33.279.670 I slot print_timing: id  0 | task 1479 |       total time =    4852.27 ms /   287 tokens
+3.33.279.671 I slot print_timing: id  0 | task 1479 |    graphs reused =       1395
+3.33.279.675 I slot print_timing: id  0 | task 1479 | draft acceptance = 0.48837 (  168 accepted /   344 generated), mean len =  2.95
+3.33.279.710 I slot      release: id  0 | task 1479 | stop processing: n_tokens = 286, truncated = 0
+3.33.281.990 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.103 (> 0.100 thold), f_keep = 0.010
+3.33.282.951 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 759.165 MiB)
+3.33.519.947 I slot launch_slot_: id  0 | task 1569 | processing task, is_child = 0
+3.33.805.155 I spec        begin: adaptive draft vocab: cumulative draft steps subset 5740 / 5796 (0.9903), switches 3
+MTP_TOP2 steps=1500 acc_hist=239,307,231,180,543,0,0,0 rej1_rank(2,3,4,miss)=109,40,28,62
+3.36.847.710 I slot print_timing: id  0 | task 1569 | n_gen =    153, tg =  49.97 t/s, tg_3s =  50.29 t/s
+3.39.150.924 I slot print_timing: id  0 | task 1569 | prompt eval time =     285.67 ms /    29 tokens (    9.85 ms per token,   101.52 tokens per second)
+3.39.150.927 I slot print_timing: id  0 | task 1569 |        eval time =    5345.02 ms /   256 tokens (   20.96 ms per token,    47.71 tokens per second)
+3.39.150.928 I slot print_timing: id  0 | task 1569 |       total time =    5630.69 ms /   285 tokens
+3.39.150.929 I slot print_timing: id  0 | task 1569 |    graphs reused =       1495
+3.39.150.932 I slot print_timing: id  0 | task 1569 | draft acceptance = 0.37500 (  153 accepted /   408 generated), mean len =  2.50
+3.39.150.960 I slot      release: id  0 | task 1569 | stop processing: n_tokens = 284, truncated = 0
+3.39.153.108 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.125 (> 0.100 thold), f_keep = 0.011
+3.39.325.716 I slot launch_slot_: id  0 | task 1674 | processing task, is_child = 0
+3.39.614.498 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6148 / 6204 (0.9910), switches 3
+MTP_TOP2 steps=1600 acc_hist=267,335,250,191,557,0,0,0 rej1_rank(2,3,4,miss)=125,44,30,67
+3.42.659.243 I slot print_timing: id  0 | task 1674 | n_gen =    155, tg =  50.59 t/s, tg_3s =  50.92 t/s
+3.44.682.710 I slot print_timing: id  0 | task 1674 | prompt eval time =     289.25 ms /    24 tokens (   12.05 ms per token,    82.97 tokens per second)
+3.44.682.712 I slot print_timing: id  0 | task 1674 |        eval time =    5067.71 ms /   256 tokens (   19.87 ms per token,    50.32 tokens per second)
+3.44.682.713 I slot print_timing: id  0 | task 1674 |       total time =    5356.95 ms /   280 tokens
+3.44.682.714 I slot print_timing: id  0 | task 1674 |    graphs reused =       1582
+3.44.682.717 I slot print_timing: id  0 | task 1674 | draft acceptance = 0.46348 (  165 accepted /   356 generated), mean len =  2.85
+3.44.682.741 I slot      release: id  0 | task 1674 | stop processing: n_tokens = 279, truncated = 0
+3.44.684.931 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.103 (> 0.100 thold), f_keep = 0.011
+3.44.685.711 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 704.588 MiB)
+3.44.911.038 I slot launch_slot_: id  0 | task 1767 | processing task, is_child = 0
+3.45.198.597 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6148 / 6560 (0.9372), switches 4
+3.48.236.816 I slot print_timing: id  0 | task 1767 | n_gen =    137, tg =  44.77 t/s, tg_3s =  45.10 t/s
+MTP_TOP2 steps=1700 acc_hist=291,364,272,201,572,0,0,0 rej1_rank(2,3,4,miss)=137,45,33,76
+3.50.548.779 I slot print_timing: id  0 | task 1767 | prompt eval time =     288.04 ms /    29 tokens (    9.93 ms per token,   100.68 tokens per second)
+3.50.548.782 I slot print_timing: id  0 | task 1767 |        eval time =    5349.68 ms /   256 tokens (   20.98 ms per token,    47.67 tokens per second)
+3.50.548.782 I slot print_timing: id  0 | task 1767 |       total time =    5637.72 ms /   285 tokens
+3.50.548.783 I slot print_timing: id  0 | task 1767 |    graphs reused =       1673
+3.50.548.786 I slot print_timing: id  0 | task 1767 | draft acceptance = 0.42667 (  160 accepted /   375 generated), mean len =  2.70
+3.50.548.811 I slot      release: id  0 | task 1767 | stop processing: n_tokens = 284, truncated = 0
+3.50.550.772 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.103 (> 0.100 thold), f_keep = 0.011
+3.50.725.337 I slot launch_slot_: id  0 | task 1865 | processing task, is_child = 0
+3.51.014.952 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6148 / 6936 (0.8864), switches 4
+3.54.059.031 I slot print_timing: id  0 | task 1865 | n_gen =    156, tg =  50.93 t/s, tg_3s =  51.26 t/s
+MTP_TOP2 steps=1800 acc_hist=307,393,295,211,594,0,0,0 rej1_rank(2,3,4,miss)=146,47,34,80
+3.55.989.613 I slot print_timing: id  0 | task 1865 | prompt eval time =     290.08 ms /    29 tokens (   10.00 ms per token,    99.97 tokens per second)
+3.55.989.617 I slot print_timing: id  0 | task 1865 |        eval time =    4973.93 ms /   256 tokens (   19.51 ms per token,    51.27 tokens per second)
+3.55.989.617 I slot print_timing: id  0 | task 1865 |       total time =    5264.01 ms /   285 tokens
+3.55.989.618 I slot print_timing: id  0 | task 1865 |    graphs reused =       1757
+3.55.989.621 I slot print_timing: id  0 | task 1865 | draft acceptance = 0.47851 (  167 accepted /   349 generated), mean len =  2.90
+3.55.989.650 I slot      release: id  0 | task 1865 | stop processing: n_tokens = 284, truncated = 0
+3.55.991.810 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.115 (> 0.100 thold), f_keep = 0.011
+3.55.992.579 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 707.354 MiB)
+3.56.229.037 I slot launch_slot_: id  0 | task 1956 | processing task, is_child = 0
+3.56.520.950 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6148 / 7288 (0.8436), switches 4
+3.59.552.035 I slot print_timing: id  0 | task 1956 | n_gen =    122, tg =  39.93 t/s, tg_3s =  40.26 t/s
+MTP_TOP2 steps=1900 acc_hist=343,419,305,224,609,0,0,0 rej1_rank(2,3,4,miss)=162,52,38,90
+4.02.487.029 I slot print_timing: id  0 | task 1956 | prompt eval time =     292.37 ms /    26 tokens (   11.25 ms per token,    88.93 tokens per second)
+4.02.487.033 I slot print_timing: id  0 | task 1956 |        eval time =    5965.35 ms /   256 tokens (   23.39 ms per token,    42.75 tokens per second)
+4.02.487.033 I slot print_timing: id  0 | task 1956 |       total time =    6257.72 ms /   282 tokens
+4.02.487.034 I slot print_timing: id  0 | task 1956 |    graphs reused =       1860
+4.02.487.038 I slot print_timing: id  0 | task 1956 | draft acceptance = 0.35225 (  149 accepted /   423 generated), mean len =  2.41
+4.02.487.069 I slot      release: id  0 | task 1956 | stop processing: n_tokens = 281, truncated = 0
+4.02.489.122 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18671582384
+4.02.664.759 I slot launch_slot_: id  0 | task 2065 | processing task, is_child = 0
+4.02.951.310 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6148 / 7712 (0.7972), switches 4
+4.05.996.055 I slot print_timing: id  0 | task 2065 | n_gen =    145, tg =  47.31 t/s, tg_3s =  47.63 t/s
+MTP_TOP2 steps=2000 acc_hist=364,446,323,238,629,0,0,0 rej1_rank(2,3,4,miss)=174,56,39,94
+4.07.131.747 I slot print_timing: id  0 | task 2065 | prompt eval time =     287.03 ms /    32 tokens (    8.97 ms per token,   111.49 tokens per second)
+4.07.131.750 I slot print_timing: id  0 | task 2065 |        eval time =    4179.68 ms /   221 tokens (   19.00 ms per token,    52.64 tokens per second)
+4.07.131.751 I slot print_timing: id  0 | task 2065 |       total time =    4466.70 ms /   253 tokens
+4.07.131.752 I slot print_timing: id  0 | task 2065 |    graphs reused =       1933
+4.07.131.755 I slot print_timing: id  0 | task 2065 | draft acceptance = 0.49662 (  147 accepted /   296 generated), mean len =  2.99
+4.07.131.785 I slot      release: id  0 | task 2065 | stop processing: n_tokens = 253, truncated = 0
+4.07.133.774 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18676227099
+4.07.307.964 I slot launch_slot_: id  0 | task 2142 | processing task, is_child = 0
+4.07.600.971 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6148 / 8008 (0.7677), switches 4
+4.10.617.666 I slot print_timing: id  0 | task 2142 | n_gen =    240, tg =  79.25 t/s, tg_3s =  79.57 t/s
+4.10.831.173 I slot print_timing: id  0 | task 2142 | prompt eval time =     293.48 ms /    48 tokens (    6.11 ms per token,   163.55 tokens per second)
+4.10.831.176 I slot print_timing: id  0 | task 2142 |        eval time =    3229.46 ms /   256 tokens (   12.66 ms per token,    78.96 tokens per second)
+4.10.831.177 I slot print_timing: id  0 | task 2142 |       total time =    3522.94 ms /   304 tokens
+4.10.831.177 I slot print_timing: id  0 | task 2142 |    graphs reused =       1991
+4.10.831.181 I slot print_timing: id  0 | task 2142 | draft acceptance = 0.80498 (  194 accepted /   241 generated), mean len =  4.18
+4.10.831.209 I slot      release: id  0 | task 2142 | stop processing: n_tokens = 303, truncated = 0
+4.10.833.238 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.107 (> 0.100 thold), f_keep = 0.010
+4.10.834.198 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 690.838 MiB)
+4.11.068.615 I slot launch_slot_: id  0 | task 2206 | processing task, is_child = 0
+4.11.352.887 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6392 / 8252 (0.7746), switches 5
+MTP_TOP2 steps=2100 acc_hist=376,461,336,249,678,0,0,0 rej1_rank(2,3,4,miss)=183,57,39,96
+4.14.366.293 I slot print_timing: id  0 | task 2206 | n_gen =    148, tg =  48.79 t/s, tg_3s =  49.12 t/s
+4.16.572.769 I slot print_timing: id  0 | task 2206 | prompt eval time =     284.73 ms /    28 tokens (   10.17 ms per token,    98.34 tokens per second)
+4.16.572.772 I slot print_timing: id  0 | task 2206 |        eval time =    5219.14 ms /   256 tokens (   20.47 ms per token,    48.86 tokens per second)
+4.16.572.773 I slot print_timing: id  0 | task 2206 |       total time =    5503.87 ms /   284 tokens
+4.16.572.774 I slot print_timing: id  0 | task 2206 |    graphs reused =       2081
+4.16.572.777 I slot print_timing: id  0 | task 2206 | draft acceptance = 0.43666 (  162 accepted /   371 generated), mean len =  2.74
+4.16.572.805 I slot      release: id  0 | task 2206 | stop processing: n_tokens = 283, truncated = 0
+4.16.848.157 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18685668119
+4.17.024.544 I slot launch_slot_: id  0 | task 2302 | processing task, is_child = 0
+4.24.726.506 W find_slot: non-consecutive token position 10 after 9 for sequence 0 with 512 new tokens
+4.24.726.513 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.24.726.513 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.24.726.514 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.24.728.983 W find_slot: non-consecutive token position 10 after 9 for sequence 0 with 512 new tokens
+4.25.040.837 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.25.090.713 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.25.425.684 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.25.771.941 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.25.771.945 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.25.771.946 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.25.771.946 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 496 new tokens
+4.25.772.919 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.26.109.345 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.26.459.859 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 512 new tokens
+4.26.812.961 W find_slot: non-consecutive token position 10 after 10 for sequence 0 with 496 new tokens
+4.27.168.486 W find_slot: non-consecutive token position 100 after 10 for sequence 0 with 6 new tokens
+4.27.168.514 W find_slot: non-consecutive token position 100 after 10 for sequence 0 with 6 new tokens
+4.27.558.546 I slot print_timing: id  0 | task 2302 | prompt processing, n_tokens =   4096, progress = 1.00, t =  10.49 s / 390.46 tokens per second
+4.27.717.384 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6424 / 8624 (0.7449), switches 8
+MTP_TOP2 steps=2200 acc_hist=400,488,354,265,693,0,0,0 rej1_rank(2,3,4,miss)=197,61,39,103
+4.30.764.907 I slot print_timing: id  0 | task 2302 | n_gen =    154, tg =  50.22 t/s, tg_3s =  50.54 t/s
+4.32.894.605 I slot print_timing: id  0 | task 2302 | prompt eval time =   10693.41 ms /  4100 tokens (    2.61 ms per token,   383.41 tokens per second)
+4.32.894.608 I slot print_timing: id  0 | task 2302 |        eval time =    5176.20 ms /   256 tokens (   20.30 ms per token,    49.26 tokens per second)
+4.32.894.611 I slot print_timing: id  0 | task 2302 |       total time =   15869.62 ms /  4356 tokens
+4.32.894.611 I slot print_timing: id  0 | task 2302 |    graphs reused =       2174
+4.32.894.615 I slot print_timing: id  0 | task 2302 | draft acceptance = 0.41146 (  158 accepted /   384 generated), mean len =  2.63
+4.32.895.193 I slot      release: id  0 | task 2302 | stop processing: n_tokens = 4355, truncated = 0
+4.32.939.824 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18701990510
+4.32.940.872 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 705.734 MiB)
+4.33.277.547 I slot launch_slot_: id  0 | task 2403 | processing task, is_child = 0
+4.33.576.434 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6812 / 9012 (0.7559), switches 9
+MTP_TOP2 steps=2300 acc_hist=426,524,369,277,704,0,0,0 rej1_rank(2,3,4,miss)=208,64,42,112
+4.36.590.667 I slot print_timing: id  0 | task 2403 | n_gen =    121, tg =  39.83 t/s, tg_3s =  40.15 t/s
+4.39.600.760 I slot print_timing: id  0 | task 2403 | n_gen =    238, tg =  39.35 t/s, tg_3s =  38.87 t/s
+4.40.101.733 I slot print_timing: id  0 | task 2403 | prompt eval time =     299.37 ms /    31 tokens (    9.66 ms per token,   103.55 tokens per second)
+4.40.101.736 I slot print_timing: id  0 | task 2403 |        eval time =    6524.79 ms /   256 tokens (   25.59 ms per token,    39.08 tokens per second)
+4.40.101.737 I slot print_timing: id  0 | task 2403 |       total time =    6824.16 ms /   287 tokens
+4.40.101.737 I slot print_timing: id  0 | task 2403 |    graphs reused =       2285
+4.40.101.741 I slot print_timing: id  0 | task 2403 | draft acceptance = 0.30905 (  140 accepted /   453 generated), mean len =  2.23
+4.40.102.516 I slot      release: id  0 | task 2403 | stop processing: n_tokens = 286, truncated = 0
+4.40.129.752 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18709197832
+4.40.328.470 I slot launch_slot_: id  0 | task 2521 | processing task, is_child = 0
+4.40.634.858 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6812 / 9468 (0.7195), switches 10
+MTP_TOP2 steps=2400 acc_hist=459,550,388,285,718,0,0,0 rej1_rank(2,3,4,miss)=228,65,44,121
+4.43.658.032 I slot print_timing: id  0 | task 2521 | n_gen =    159, tg =  52.28 t/s, tg_3s =  52.60 t/s
+4.45.416.551 I slot print_timing: id  0 | task 2521 | prompt eval time =     306.84 ms /    35 tokens (    8.77 ms per token,   114.07 tokens per second)
+4.45.416.554 I slot print_timing: id  0 | task 2521 |        eval time =    4781.10 ms /   256 tokens (   18.75 ms per token,    53.33 tokens per second)
+4.45.416.555 I slot print_timing: id  0 | task 2521 |       total time =    5087.94 ms /   291 tokens
+4.45.416.555 I slot print_timing: id  0 | task 2521 |    graphs reused =       2365
+4.45.416.559 I slot print_timing: id  0 | task 2521 | draft acceptance = 0.51818 (  171 accepted /   330 generated), mean len =  3.06
+4.45.417.515 I slot      release: id  0 | task 2521 | stop processing: n_tokens = 290, truncated = 0
+4.45.434.035 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18714512830
+4.45.434.808 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 700.201 MiB)
+4.45.676.556 I slot launch_slot_: id  0 | task 2608 | processing task, is_child = 0
+4.45.976.062 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6812 / 9800 (0.6951), switches 10
+MTP_TOP2 steps=2500 acc_hist=478,581,410,294,737,0,0,0 rej1_rank(2,3,4,miss)=237,69,46,126
+4.48.982.804 I slot print_timing: id  0 | task 2608 | n_gen =    137, tg =  45.25 t/s, tg_3s =  45.57 t/s
+4.51.776.544 I slot print_timing: id  0 | task 2608 | prompt eval time =     300.03 ms /    33 tokens (    9.09 ms per token,   109.99 tokens per second)
+4.51.776.547 I slot print_timing: id  0 | task 2608 |        eval time =    5799.68 ms /   256 tokens (   22.74 ms per token,    43.97 tokens per second)
+4.51.776.548 I slot print_timing: id  0 | task 2608 |       total time =    6099.70 ms /   289 tokens
+4.51.776.549 I slot print_timing: id  0 | task 2608 |    graphs reused =       2463
+4.51.776.552 I slot print_timing: id  0 | task 2608 | draft acceptance = 0.37871 (  153 accepted /   404 generated), mean len =  2.50
+4.51.777.563 I slot      release: id  0 | task 2608 | stop processing: n_tokens = 288, truncated = 0
+4.51.792.666 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18720872880
+4.51.969.297 I slot launch_slot_: id  0 | task 2713 | processing task, is_child = 0
+4.52.260.215 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6812 / 10208 (0.6673), switches 10
+MTP_TOP2 steps=2600 acc_hist=498,611,429,313,749,0,0,0 rej1_rank(2,3,4,miss)=243,71,46,138
+4.55.266.965 I slot print_timing: id  0 | task 2713 | n_gen =    156, tg =  51.57 t/s, tg_3s =  51.89 t/s
+4.57.481.381 I slot print_timing: id  0 | task 2713 | prompt eval time =     291.37 ms /    31 tokens (    9.40 ms per token,   106.39 tokens per second)
+4.57.481.384 I slot print_timing: id  0 | task 2713 |        eval time =    5220.43 ms /   256 tokens (   20.47 ms per token,    48.85 tokens per second)
+4.57.481.384 I slot print_timing: id  0 | task 2713 |       total time =    5511.80 ms /   287 tokens
+4.57.481.385 I slot print_timing: id  0 | task 2713 |    graphs reused =       2551
+4.57.481.388 I slot print_timing: id  0 | task 2713 | draft acceptance = 0.44780 (  163 accepted /   364 generated), mean len =  2.77
+4.57.481.578 I slot      release: id  0 | task 2713 | stop processing: n_tokens = 286, truncated = 0
+4.57.496.855 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18726576893
+4.57.497.642 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 704.588 MiB)
+4.57.727.487 I slot launch_slot_: id  0 | task 2808 | processing task, is_child = 0
+4.58.019.093 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6812 / 10576 (0.6441), switches 10
+5.01.032.647 I slot print_timing: id  0 | task 2808 | n_gen =    154, tg =  50.78 t/s, tg_3s =  51.11 t/s
+MTP_TOP2 steps=2700 acc_hist=519,643,447,324,767,0,0,0 rej1_rank(2,3,4,miss)=252,76,47,144
+5.02.963.527 I slot print_timing: id  0 | task 2808 | prompt eval time =     292.08 ms /    32 tokens (    9.13 ms per token,   109.56 tokens per second)
+5.02.963.530 I slot print_timing: id  0 | task 2808 |        eval time =    4943.68 ms /   256 tokens (   19.39 ms per token,    51.58 tokens per second)
+5.02.963.531 I slot print_timing: id  0 | task 2808 |       total time =    5235.76 ms /   288 tokens
+5.02.963.531 I slot print_timing: id  0 | task 2808 |    graphs reused =       2635
+5.02.963.535 I slot print_timing: id  0 | task 2808 | draft acceptance = 0.48555 (  168 accepted /   346 generated), mean len =  2.93
+5.02.963.749 I slot      release: id  0 | task 2808 | stop processing: n_tokens = 287, truncated = 0
+5.02.980.328 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18732059064
+5.03.160.369 I slot launch_slot_: id  0 | task 2898 | processing task, is_child = 0
+5.03.457.033 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6812 / 10924 (0.6236), switches 10
+5.06.458.622 I slot print_timing: id  0 | task 2898 | n_gen =    128, tg =  42.33 t/s, tg_3s =  42.65 t/s
+MTP_TOP2 steps=2800 acc_hist=542,674,465,340,779,0,0,0 rej1_rank(2,3,4,miss)=263,80,49,150
+5.09.349.306 I slot print_timing: id  0 | task 2898 | prompt eval time =     297.21 ms /    31 tokens (    9.59 ms per token,   104.30 tokens per second)
+5.09.349.310 I slot print_timing: id  0 | task 2898 |        eval time =    5891.25 ms /   256 tokens (   23.10 ms per token,    43.28 tokens per second)
+5.09.349.310 I slot print_timing: id  0 | task 2898 |       total time =    6188.46 ms /   287 tokens
+5.09.349.311 I slot print_timing: id  0 | task 2898 |    graphs reused =       2736
+5.09.349.315 I slot print_timing: id  0 | task 2898 | draft acceptance = 0.36473 (  151 accepted /   414 generated), mean len =  2.45
+5.09.349.661 I slot      release: id  0 | task 2898 | stop processing: n_tokens = 286, truncated = 0
+5.09.373.039 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18738444978
+5.09.373.927 W srv         alloc:  - making room for prompt cache entry, removing oldest entry (size = 709.804 MiB)
+5.09.602.315 I slot launch_slot_: id  0 | task 3005 | processing task, is_child = 0
+5.09.894.981 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6812 / 11340 (0.6007), switches 10
+5.12.900.745 I slot print_timing: id  0 | task 3005 | n_gen =    187, tg =  61.90 t/s, tg_3s =  62.22 t/s
+MTP_TOP2 steps=2900 acc_hist=566,695,477,359,803,0,0,0 rej1_rank(2,3,4,miss)=275,85,50,155
+5.14.148.402 I slot print_timing: id  0 | task 3005 | prompt eval time =     293.12 ms /    41 tokens (    7.15 ms per token,   139.87 tokens per second)
+5.14.148.405 I slot print_timing: id  0 | task 3005 |        eval time =    4252.55 ms /   256 tokens (   16.68 ms per token,    59.96 tokens per second)
+5.14.148.480 I slot print_timing: id  0 | task 3005 |       total time =    4545.67 ms /   297 tokens
+5.14.148.482 I slot print_timing: id  0 | task 3005 |    graphs reused =       2809
+5.14.148.485 I slot print_timing: id  0 | task 3005 | draft acceptance = 0.60000 (  180 accepted /   300 generated), mean len =  3.40
+5.14.149.467 I slot      release: id  0 | task 3005 | stop processing: n_tokens = 296, truncated = 0
+5.14.167.625 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 18743244782
+5.14.342.839 I slot launch_slot_: id  0 | task 3083 | processing task, is_child = 0
+5.14.637.930 I spec        begin: adaptive draft vocab: cumulative draft steps subset 6812 / 11640 (0.5852), switches 10
+5.17.680.644 I slot print_timing: id  0 | task 3083 | n_gen =    136, tg =  44.38 t/s, tg_3s =  44.70 t/s
+MTP_TOP2 steps=3000 acc_hist=596,720,491,366,827,0,0,0 rej1_rank(2,3,4,miss)=285,94,50,166
+5.20.228.078 I slot print_timing: id  0 | task 3083 | prompt eval time =     295.55 ms /    52 tokens (    5.68 ms per token,   175.94 tokens per second)
+5.20.228.082 I slot print_timing: id  0 | task 3083 |        eval time =    5589.42 ms /   256 tokens (   21.92 ms per token,    45.62 tokens per second)
+5.20.228.082 I slot print_timing: id  0 | task 3083 |       total time =    5884.97 ms /   308 tokens
+5.20.228.083 I slot print_timing: id  0 | task 3083 |    graphs reused =       2905
+5.20.228.087 I slot print_timing: id  0 | task 3083 | draft acceptance = 0.39594 (  156 accepted /   394 generated), mean len =  2.58
+5.20.228.424 I slot      release: id  0 | task 3083 | stop processing: n_tokens = 307, truncated = 0
+5.20.243.105 I srv    operator(): operator(): cleaning up before exit...
+5.20.254.347 W ~llama_context:    Vulkan0 compute buffer size of 142.0000 MiB, does not match expectation of 132.0000 MiB

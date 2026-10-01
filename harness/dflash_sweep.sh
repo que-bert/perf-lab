@@ -24,7 +24,7 @@ PORT="${PERFLAB_PORT:-8921}"
 CTX="${PERFLAB_CTX:-262144}"
 REPS="${PERFLAB_REPS:-4}"
 NPRED="${PERFLAB_NPRED:-256}"
-export PERFLAB_BIN="${PERFLAB_BIN:-$HOME/llama.cpp/b10902-adaptive-mtp}"
+export PERFLAB_BIN="${PERFLAB_BIN:-$HOME/git/perf-lab/bin/upstream-vulkan/b10902-adaptive-mtp}"
 
 # The R9700 is card0 here and the 16 GB RX 9060 XT is card1 -- the DRM order is
 # the reverse of rocm-smi's GPU[0]/GPU[1]. Resolve by size rather than index.

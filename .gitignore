@@ -6,3 +6,14 @@ __pycache__/
 # Session handoffs are narrative and judgment, not re-derivable fact, and this
 # repo is public. They stay on disk for /unwrap; they are never published.
 docs/handoffs/
+
+# Local-only artifacts: prebuilt binaries per setup, small local models, the
+# Bonsai fork source (not a git repo), the integration-head worktree of the
+# llama.cpp submodule, KLD reference logits (~240 MB each), compiled probes.
+bin/
+models/
+runners/llama.cpp/bonsai-prism/
+runners/llama.cpp/qwen3.8-r9700-next/
+*.dkld
+harness/wmma_peak/wmma_peak
+.opencode/

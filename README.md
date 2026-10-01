@@ -37,29 +37,41 @@ Requires `PERF_LAB_MODEL`, `PERF_LAB_BIN` and `PERF_LAB_GPU_UID`. The GPU is sel
 by unique ID; if it is absent the run aborts rather than silently measuring a different
 card and stamping the row with a fingerprint that lies.
 
-### Current known-good config
+### Setups
 
-Fork branch `r9700-qwen` @ 901abb2a8 (= `r9700-integrate11`: integrate8 + host GET_ROWS for
-token_embd with an input sync + lazy mmproj GPU residency + 64 MiB FA-scratch growth step; previous serving builds tagged
-`r9700-qwen-integrate10`, `r9700-qwen-integrate8`, `r9700-qwen-integrate7` and `r9700-qwen-integrate2`). Qwen3.8-27B Q6_K,
-262,144 context, `-fa on`, `--parallel 1`, `-ctk q8_0 -ctv q8_0`, `--spec-type draft-mtp
---spec-draft-n-max 4 -ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive`,
-`--mmproj mmproj-F16.gguf`, **`-lm none`**, environment **`MTMD_LAZY_GPU=1 GGML_VK_HOST_GET_ROWS=1`**.
-`GGML_VK_HOST_GET_ROWS=1` without `-lm none` corrupts decode (GATES10): set both or neither.
-Decode 63.5 t/s at ~70k and 60.5 at ~176k; pooled 55.7 t/s (37 prompts, quiet window);
-server prefill 1,160 t/s at ~70k; at ~176k ~706 (680–803 depending on VRAM state) (past ~120k the card is full and pages oscillate to GTT, row VIMG). The mmproj leaves VRAM when idle
-(~1.1 GB), so an image request costs ~2 s more. See `autoresearch/results.tsv` (VB, HGR10, GATES10, SERVE10).
+Each setup is one model + runner + card combination, with its own README, results and at most
+two binaries (the one serving and the one being tested next).
+
+| setup | what | README |
+|---|---|---|
+| Qwen3.8-27B on R9700 | tuned llama.cpp fork (Vulkan, RDNA4 kernels, MTP speculative decoding) | [setups/qwen3.8-27b-r9700](setups/qwen3.8-27b-r9700/README.md) |
+| Small models | Bonsai (PrismML fork), Gemma 4, MiniCPM, Ornith, Qwen3.5-9B evals and speed sweeps | [setups/small-models](setups/small-models/README.md) |
+| Upstream llama.cpp | pinned upstream builds the canaries and baselines run on | `bin/upstream-vulkan`, `bin/upstream-rocm` |
 
 ## Layout
 
 ```
-results/ledger.jsonl   append-only, one row per measurement
-results/schema.json    the contract; CI-validated
-harness/               probe, bench, check, alert, run_set, install
-configs/canary.yaml    canary configurations and their bands
-systemd/               timer units (installed into the user instance)
-apt/99-perf-lab        upgrade hook; queues a run, never runs one
+setups/<setup>/            README, results, plans and loop state for one model/runner/card
+runners/llama.cpp/
+  qwen3.8-r9700/           submodule: github.com/que-bert/llama.cpp, branch r9700-qwen (serving)
+  qwen3.8-r9700-next/      worktree of the same repo at the integration head (local only)
+  bonsai-prism/            PrismML fork source for Bonsai (local only, not a git repo)
+bin/                       prebuilt binaries per setup, at most two each (local only)
+  upstream-vulkan/         b10472-vulkan (canary pin), b10902-adaptive-mtp (has draft-dflash)
+  upstream-rocm/           b10082-rocm
+  bonsai-prism/            prism-b10685-vulkan, prism-b10685-rocm
+models/                    small local models (local only)
+results/ledger.jsonl       append-only, one row per canary measurement
+results/schema.json        the contract; CI-validated
+results/depth/             harness/depth.sh default output
+harness/                   probe, bench, check, alert, run_set, install, shared measurement tools
+configs/canary.yaml        canary configurations and their bands
+systemd/                   timer units (installed into the user instance)
+apt/99-perf-lab            upgrade hook; queues a run, never runs one
+FINDINGS.md                lab-wide findings log (dated entries; paths in older entries predate this layout)
 ```
+
+Clone with `git clone --recurse-submodules`, or run `git submodule update --init` afterwards.
 
 ## Beyond the canaries
 

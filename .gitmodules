@@ -1,0 +1,4 @@
+[submodule "runners/llama.cpp/qwen3.8-r9700"]
+	path = runners/llama.cpp/qwen3.8-r9700
+	url = https://github.com/que-bert/llama.cpp.git
+	branch = r9700-qwen

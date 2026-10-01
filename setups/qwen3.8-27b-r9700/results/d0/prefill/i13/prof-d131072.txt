@@ -1,0 +1,39 @@
+op                                                                      count    us/call        ms   share  TFLOPS
+FLASH_ATTN_EXT dst(256,24,512,1),  q(256,512,24,1),  k(256,131584,4,1)     16    17258.5    276.14   44.7%    95.9
+Q6K_MUL_MAT_MUL_MAT_SWIGLU MUL_MAT q6_K m=17408 n=512 k=5120               54     1906.8    102.97   16.7%    47.9
+MUL_MAT q6_K m=5120 n=512 k=17408                                          64     1050.7     67.24   10.9%    86.9
+MUL_MAT q6_K m=10240 n=512 k=5120                                          48      604.7     29.03    4.7%    88.8
+FA_DEQUANT_KV kv=131584                                                    16     1424.2     22.79    3.7%        
+MUL_MAT q6_K m=17408 n=512 k=5120                                          20      957.5     19.15    3.1%    95.3
+MUL_MAT q8_0 m=5120 n=512 k=6144                                           48      385.6     18.51    3.0%    83.5
+MUL_MAT q6_K m=6144 n=512 k=5120                                           48      353.7     16.98    2.7%    91.1
+GATED_DELTA_NET                                                            48      318.6     15.29    2.5%        
+MUL_MAT q6_K m=12288 n=512 k=5120                                          16      700.3     11.20    1.8%    92.0
+MUL_MAT q6_K m=5120 n=512 k=6144                                           16      373.3      5.97    1.0%    86.3
+ADD                                                                       176       33.3      5.86    0.9%        
+MUL_MAT f32 m=48 n=512 k=5120                                              96       33.2      3.19    0.5%     7.6
+RMS_NORM_MUL RMS_NORM(5120,512,1,1)                                       129       20.4      2.64    0.4%        
+MUL_MAT q6_K m=1024 n=512 k=5120                                           32       81.4      2.61    0.4%    65.9
+SSM_CONV_SILU SSM_CONV                                                     48       51.2      2.46    0.4%        
+RMS_NORM_MUL_SILU_MUL RMS_NORM(128,48,512,1)                               48       48.3      2.32    0.4%        
+CONCAT                                                                     48       40.7      1.95    0.3%        
+MUL_MAT_VEC q6_K m=248320 n=1 k=5120                                        1     1682.8      1.68    0.3%     1.5
+GLU                                                                        10      165.3      1.65    0.3%        
+RMS_NORM_SCALE RMS_NORM(128,16,512,1)                                      96       12.9      1.24    0.2%        
+RMS_NORM_MUL RMS_NORM(256,24,512,1)                                        16       76.9      1.23    0.2%        
+GET_ROWS                                                                   97        9.1      0.88    0.1%        
+ROPE                                                                       32       26.6      0.85    0.1%        
+CONT                                                                       16       49.4      0.79    0.1%        
+CPY                                                                        96        7.9      0.76    0.1%        
+SIGMOID_MUL SIGMOID                                                        16       47.4      0.76    0.1%        
+MUL_MAT f32 m=64 n=49152 k=64                                              16       30.9      0.49    0.1%    12.9
+MUL_MAT f32 m=256 n=12288 k=256                                            16       21.2      0.34    0.1%    75.9
+SOFTPLUS_MUL SOFTPLUS                                                      48        6.6      0.32    0.1%        
+RMS_NORM_MUL RMS_NORM(256,4,512,1)                                         16       17.0      0.27    0.0%        
+SET_ROWS                                                                   32        5.5      0.18    0.0%        
+MUL_MAT f32 m=64 n=8192 k=64                                               16        9.2      0.15    0.0%     7.2
+MUL_MAT f32 m=256 n=2048 k=256                                             16        6.5      0.10    0.0%    40.9
+SIGMOID                                                                    48        2.1      0.10    0.0%        
+TOTAL (logged GPU time, last block)                                                         618.08  100.0%
+llama-bench: pp512 @ d131072  794.97 ± 0.00 t/s  (perf logger on: syncs per node, so t/s is below unlogged)
+raw log: results/d0/prefill/i13/prefill_profile-d131072-ub512-20261001T155630Z.log
