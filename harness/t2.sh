@@ -19,7 +19,8 @@ arms=""; for i in $(seq 1 $K); do arms="$arms base cand"; done
 [[ $PH == *" depth "* ]] && A=$A B=$B T=t2-$T PHASES=depth DEPTH_ARMS="$arms" MAXLOAD=4 $S/autoresearch/ab_bin.sh > $O/depth.log 2>&1
 [[ $PH == *" pool "* ]] && A=$A B=$B T=t2-$T PHASES=pool MAXLOAD=4 $S/autoresearch/ab_bin.sh > $O/pool.log 2>&1
 if [[ $PH == *" prompt "* ]]; then
-  for i in $(seq 1 $K); do $S/results/d0/scripts/mtp_prompt_ab.sh $A base; $S/results/d0/scripts/mtp_prompt_ab.sh $B cand; done > $O/prompt.log 2>&1
+  # the lock is taken outside so mtp_prompt_ab.sh's 900 s timeout does not count queue time
+  for i in $(seq 1 $K); do harness/gpu_lock.sh $S/results/d0/scripts/mtp_prompt_ab.sh $A base; harness/gpu_lock.sh $S/results/d0/scripts/mtp_prompt_ab.sh $B cand; done > $O/prompt.log 2>&1
 fi
 if [[ $PH == *" flagless "* ]]; then
   # only what the operator must set by hand: mmproj, and -lm none + HOST_GET_ROWS (must be set together, never by preset)
