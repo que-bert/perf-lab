@@ -16,7 +16,9 @@ OUT=$P/results/phase2/smoke; mkdir -p "$OUT"
 PORT=${PORT:-8099}; fail=0
 for n in "${NAMES[@]}"; do
   mp=$(zoo_path "$n")
-  r=$("$H/gpu_lock.sh" bash -c "PERFLAB_BIN=$B PERFLAB_ENV='${SMOKE_ENV:-}' PERFLAB_CTK=f16 PERFLAB_CTV=f16 $H/serve_unit.sh '$mp' $PORT 4096 --parallel 1 ${SMOKE_ARGS:-} >/dev/null || { echo LOADFAIL; exit 0; }
+  # plain decoding on both sides: fork builds with GGUF presets would otherwise turn MTP / n-gram drafting on
+  np=""; "$B/llama-server" --help 2>&1 | grep -q -- --no-preset && np=--no-preset
+  r=$("$H/gpu_lock.sh" bash -c "PERFLAB_BIN=$B PERFLAB_ENV='${SMOKE_ENV:-}' PERFLAB_CTK=f16 PERFLAB_CTV=f16 $H/serve_unit.sh '$mp' $PORT 4096 --parallel 1 $np ${SMOKE_ARGS:-} >/dev/null || { echo LOADFAIL; exit 0; }
     python3 - $PORT <<'PY'
 import json, sys, urllib.request
 port = int(sys.argv[1])
