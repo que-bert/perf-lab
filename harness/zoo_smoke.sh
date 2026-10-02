@@ -13,6 +13,7 @@ MODE=$1; B=$2; shift 2
 LB=ref; [ "$MODE" = test ] && { LB=$1; shift; }
 NAMES=("$@"); [ ${#NAMES[@]} = 0 ] && mapfile -t NAMES < <(zoo_names)
 OUT=$P/results/phase2/smoke; mkdir -p "$OUT"
+CS=$([ "${PERFLAB_CARD:-r9700}" = 9060 ] && echo -9060)   # upstream tokens are recorded per card
 PORT=${PORT:-$(zoo_port 8099)}; fail=0
 for n in "${NAMES[@]}"; do
   mp=$(zoo_path "$n")
@@ -32,9 +33,9 @@ print(json.dumps(out))
 PY
     systemctl --user stop perflab-srv-$PORT")
   if [ "$r" = LOADFAIL ] || [ -z "$r" ]; then echo "== SMOKE $n $LB FAIL load"; fail=1; continue; fi
-  if [ "$MODE" = ref ]; then echo "$r" > "$OUT/$n.ref.json"; echo "== SMOKE $n ref recorded"; continue; fi
+  if [ "$MODE" = ref ]; then echo "$r" > "$OUT/$n.ref$CS.json"; echo "== SMOKE $n ref recorded"; continue; fi
   echo "$r" > "$OUT/$n.$LB.json"
-  python3 - "$OUT/$n.ref.json" "$OUT/$n.$LB.json" "$n" "$LB" <<'PY' || fail=1
+  python3 - "$OUT/$n.ref$CS.json" "$OUT/$n.$LB.json" "$n" "$LB" <<'PY' || fail=1
 import json, sys
 ref, got = json.load(open(sys.argv[1])), json.load(open(sys.argv[2]))
 bad = []

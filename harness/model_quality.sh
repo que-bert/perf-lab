@@ -14,7 +14,8 @@ set -u
 H=$(dirname "$(readlink -f "$0")"); P=$(dirname "$H"); . "$H/zoo.sh"
 MODE=$1; B=$2; N=$3; LB=${4:-ref}; shift 3; [ $# -gt 0 ] && shift
 MP=$(zoo_path "$N"); [ -f "$MP" ] || { echo "model_quality: no zoo model $N" >&2; exit 2; }
-REF=${KLD_REF_DIR:-$ZOO_M/perflab-kld-ref}/$N.kld; mkdir -p "$(dirname "$REF")"
+# references are per card: the 9060 XT gives different (valid) logits than the R9700 (minicpm PPL 3.899 vs 3.889)
+REF=${KLD_REF_DIR:-$ZOO_M/perflab-kld-ref$([ "${PERFLAB_CARD:-r9700}" = 9060 ] && echo -9060)}/$N.kld; mkdir -p "$(dirname "$REF")"
 C=$P/harness/corpus/decode_kld.txt
 OUT=$P/results/phase2/quality/$N; mkdir -p "$OUT"
 PPLA=(-m "$MP" -f "$C" -c 1024 --chunks "${CHUNKS:-8}" -fa on -ngl 99 -dev "$(zoo_vkdev)")

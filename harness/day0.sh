@@ -16,7 +16,7 @@ O=$P/results/phase2/day0; mkdir -p $O; R=$O/$N.md
 GP=$P/runners/llama.cpp/upstream-ce8caa6/gguf-py
 if python3 harness/ollama_gguf_convert.py --inspect "$M" >/dev/null 2>&1; then
   C=$ZOO_M/converted/$N.gguf; mkdir -p "$(dirname "$C")"
-  python3 harness/ollama_gguf_convert.py "$M" "$C" --keep-mtp && M=$C
+  python3 harness/ollama_gguf_convert.py "$M" "$C" && M=$C   # MTP head dropped: the ollama qwen3.5-9b head kept with --keep-mtp gave acceptance 0.004
 fi
 mtp=$(PYTHONPATH=$GP python3 -c "
 import gguf, sys
