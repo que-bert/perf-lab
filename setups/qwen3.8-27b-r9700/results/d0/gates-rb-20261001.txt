@@ -1,0 +1,32 @@
+== git e67b52de8 decode-kld: port to upstream common_batch + llama_process (RB)
+== test MUL_MAT:   1161/1161 tests passed 
+== test MUL_MAT_VEC_FUSION:   1271/1271 tests passed 
+== test RMS_NORM:   51/51 tests passed 
+== test RMS_NORM_MUL_ADD:   36/36 tests passed 
+== test SCALE:   4/4 tests passed 
+== test RMS_NORM_SCALE:   16/16 tests passed 
+== test CPY:   252/252 tests passed 
+== test CONCAT:   201/201 tests passed 
+== test GET_ROWS:   244/244 tests passed 
+== test ADD:   103/103 tests passed 
+== test MUL:   93/93 tests passed 
+== test GATED_DELTA_NET:   37/37 tests passed 
+== test GATED_DELTA_NET_CACHE_FUSION:   5/5 tests passed 
+== test GDN_RECURRENT_CACHE:   13/13 tests passed 
+== test RMS_NORM_MUL_SILU_MUL:   5/5 tests passed 
+== test SSM_CONV:   45/45 tests passed 
+== test SIGMOID:   8/8 tests passed 
+== test SOFTPLUS:   8/8 tests passed 
+== test SILU:   8/8 tests passed 
+== test L2_NORM:   30/30 tests passed 
+== test FA:   183/183 tests passed 
+== PPL: PPL = 2.2877 +/- 0.03233
+== KLD d70000 b4: mean_kld 0.000741 top1_flip 0.3906% (2 / 512) 
+== KLD d70000 b1: mean_kld 0.000588 top1_flip 0.3906% (2 / 512) 
+== KLD d176000 b4: mean_kld 0.000278 top1_flip 0.0000% (0 / 512) 
+== KLD d176000 b1: mean_kld 0.000199 top1_flip 0.1953% (1 / 512) 
+Running as unit: perflab-srv-8097.service; invocation ID: 7faa232bd12d4624b2acd8c3565188db
+== ACC rb-corpus load=0.71 1.01 2.32 POOLED 2597 3652 0.7111
+Running as unit: perflab-srv-8097.service; invocation ID: e0524e7ef72147878e626e76a377fc17
+== ACC rb-chat load=0.89 0.98 2.06 POOLED 2013 3776 0.5331
+== GATES DONE Thu Oct  1 06:54:03 PM PDT 2026

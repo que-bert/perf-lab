@@ -4,7 +4,7 @@
 set -u
 S=/home/bbuckham/git/perf-lab/setups/qwen3.8-27b-r9700/results/d0/scripts
 P=/home/bbuckham/git/perf-lab; W=$1; LB=$2; B=$W/build/bin
-M=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf
+M=${QMODEL:-/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf}
 L=$P/harness/gpu_lock.sh
 echo "== git $(git -C $W log --oneline -1)"
 for op in MUL_MAT MUL_MAT_VEC_FUSION RMS_NORM RMS_NORM_MUL_ADD SCALE RMS_NORM_SCALE CPY CONCAT GET_ROWS ADD MUL GATED_DELTA_NET GATED_DELTA_NET_CACHE_FUSION GDN_RECURRENT_CACHE RMS_NORM_MUL_SILU_MUL SSM_CONV SIGMOID SOFTPLUS SILU L2_NORM; do

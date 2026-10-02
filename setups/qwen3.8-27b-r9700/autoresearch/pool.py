@@ -12,7 +12,7 @@ chat = setups/qwen3.8-27b-r9700/results/d0/scripts/chat_acc.py prompts + image; 
 """
 import argparse, base64, importlib.util, json, os, sys, urllib.request
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../.."))  # repo root (setups/<setup>/autoresearch/)
 
 
 def load(name, path):
