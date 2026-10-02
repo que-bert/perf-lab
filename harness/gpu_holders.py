@@ -19,6 +19,15 @@ FOREIGN_VRAM_MIB = float(os.environ.get("PERFLAB_FOREIGN_VRAM_MIB", "256"))
 FOREIGN_BUSY_PCT = float(os.environ.get("PERFLAB_FOREIGN_BUSY_PCT", "2"))
 MAX_LOAD = float(os.environ.get("PERFLAB_MAXLOAD", "4"))  # 1-min loadavg; launch-bound models feel a build
 OURS = ("llama-", "test-backend-o")
+IDLE_VRAM_MIB = float(os.environ.get("PERFLAB_IDLE_VRAM_MIB", "1024"))
+
+
+def card_mem(kind):
+    """Card-wide bytes in use: kind = vram | gtt."""
+    try:
+        return int(open(f"/sys/bus/pci/devices/{PCI}/mem_info_{kind}_used").read())
+    except OSError:
+        return 0
 
 
 def render_node():
@@ -112,6 +121,12 @@ def main():
         load = float(open("/proc/loadavg").read().split()[0])
         if load >= MAX_LOAD:
             bad.append(f"loadavg={load}")
+        # nothing of ours runs between locked runs, so the card must have drained: a just-exited model's
+        # VRAM still being freed makes the next run start in GTT (fork prefill then ramps 680 -> 1600 t/s)
+        if not any(ours(k[0], v["comm"], allow) for k, v in clients().items()):
+            used = card_mem("vram") / 2**20
+            if used > IDLE_VRAM_MIB:
+                bad.append(f"card vram {used:.0f}MiB not drained")
         if bad:
             print("busy: " + "; ".join(bad))
             sys.exit(1)
@@ -134,16 +149,18 @@ def main():
                     busy = 100.0 * (v["engine_ns"] - prev.get(k, v)["engine_ns"]) / (iv * 1e9)
                     f.write(json.dumps({"t": round(time.time(), 1), "pid": k[0], "comm": v["comm"],
                                         "vram_mib": round(v["vram_kib"] / 1024, 1), "busy_pct": round(busy, 2)}) + "\n")
-                f.write(json.dumps({"t": round(time.time(), 1), "load": float(open("/proc/loadavg").read().split()[0])}) + "\n")
+                f.write(json.dumps({"t": round(time.time(), 1), "load": float(open("/proc/loadavg").read().split()[0]),
+                                    "vram_gib": round(card_mem("vram") / 2**30, 2), "gtt_gib": round(card_mem("gtt") / 2**30, 2)}) + "\n")
                 f.flush()
                 prev = cur
     elif cmd == "verdict":
-        bad, loadmax = {}, 0.0
+        bad, loadmax, vmax, gmax = {}, 0.0, 0.0, 0.0
         try:
             for line in open(args[0]):
                 r = json.loads(line)
                 if "load" in r:
                     loadmax = max(loadmax, r["load"])
+                    vmax, gmax = max(vmax, r.get("vram_gib", 0)), max(gmax, r.get("gtt_gib", 0))
                     continue
                 if r["vram_mib"] > FOREIGN_VRAM_MIB or r["busy_pct"] > FOREIGN_BUSY_PCT:
                     b = bad.setdefault(f"{r['comm']}[{r['pid']}]", [0, 0.0, 0.0])
@@ -158,7 +175,7 @@ def main():
         if msg:
             print("VOID " + msg)
             sys.exit(1)
-        print(f"CLEAN maxload={loadmax}")
+        print(f"CLEAN maxload={loadmax} vram<={vmax}GiB gtt<={gmax}GiB")
     else:
         sys.exit(__doc__)
 
