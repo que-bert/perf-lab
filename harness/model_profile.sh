@@ -17,7 +17,7 @@ NAME=$(basename "$M" .gguf)
 OUT=${PROFILE_DIR:-$P/results/phase2/profile}/$NAME; mkdir -p "$OUT"
 J=$OUT/$LB.jsonl
 # sh -c so a VOID re-run inside gpu_lock.sh truncates the output instead of appending to it
-"$H/gpu_lock.sh" sh -c 'o=$1; shift; exec "$@" > "$o"' _ "$J.tmp" "$B/llama-bench" -m "$MP" -dev "${PERFLAB_VKDEV:-Vulkan1}" -ngl 99 -fa 1 \
+"$H/gpu_lock.sh" sh -c 'o=$1; shift; exec "$@" > "$o"' _ "$J.tmp" "$B/llama-bench" -m "$MP" -dev "$(zoo_vkdev)" -ngl 99 -fa 1 \
   -p "${PP:-512}" -n "${TG:-128}" -d "${DEPTHS:-0,8192}" -r "${REPS:-5}" -o jsonl "$@" 2> "$OUT/$LB.log"
 rc=$?
 grep -h 'gpu_lock:' "$OUT/$LB.log" >&2

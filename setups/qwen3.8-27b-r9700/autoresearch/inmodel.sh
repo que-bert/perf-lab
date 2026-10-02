@@ -3,7 +3,7 @@
 set -u
 cd /home/bbuckham/git/perf-lab
 B=$1; LB=$2; EV=$3; NM=${4:-3}
-M=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf
+M=${PERFLAB_MODEL_DIR:-/home/bbuckham/models}/Qwen3.8-27B-Q6_K.gguf
 O=setups/qwen3.8-27b-r9700/results/d0/inmodel; mkdir -p $O
 harness/gpu_lock.sh bash -c "PERFLAB_BIN=$B PERFLAB_CTK=q8_0 PERFLAB_CTV=q8_0 PERFLAB_LOG=$PWD/$O/$LB.stderr PERFLAB_ENV='GGML_VK_PERF_LOGGER=1;GGML_VK_PERF_LOGGER_FREQUENCY=1${EV:+;$EV}' harness/serve_unit.sh $M 8103 16384 --parallel 1 --spec-type draft-mtp --spec-draft-n-max $NM -ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive >/dev/null
   curl -s localhost:8103/completion -d '{\"prompt\":\"Write a long essay about the history of computing.\",\"n_predict\":160,\"temperature\":0}' >/dev/null

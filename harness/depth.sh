@@ -17,7 +17,7 @@
 # keeping the fixed serving config (ctx 262144, -fa on, --parallel 1, MTP).
 set -u
 BIN=$1; LABEL=$2; PORT=$3; shift 3
-MNT="${PERFLAB_MODEL_DIR:-/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth}"
+MNT="${PERFLAB_MODEL_DIR:-/home/bbuckham/models}"
 MODEL="${PERFLAB_MODEL:-$MNT/Qwen3.8-27B-Q6_K.gguf}"
 MMPROJ="${PERFLAB_MMPROJ:-$MNT/mmproj-F16.gguf}"
 DEPTHS="${DEPTHS:-1,1600,4000}"

@@ -4,7 +4,7 @@
 # Both arms get the serving env (MTMD_LAZY_GPU=1;GGML_VK_HOST_GET_ROWS=1) plus EXTRA_ENV. Quiet window: loadavg < ${MAXLOAD:-2}.
 set -u
 P=/home/bbuckham/git/perf-lab; cd $P
-MNT=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth; M=$MNT/Qwen3.8-27B-Q6_K.gguf
+MNT=${PERFLAB_MODEL_DIR:-/home/bbuckham/models}; M=$MNT/Qwen3.8-27B-Q6_K.gguf
 A=${A:-/home/bbuckham/git/perf-lab/runners/llama.cpp/qwen3.8-r9700/build/bin}; B=${B:?candidate bindir}; T=${T:?label}
 L=$P/harness/gpu_lock.sh
 E="MTMD_LAZY_GPU=1;GGML_VK_HOST_GET_ROWS=1${EXTRA_ENV:+;$EXTRA_ENV}"

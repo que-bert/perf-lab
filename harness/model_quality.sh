@@ -17,7 +17,7 @@ MP=$(zoo_path "$N"); [ -f "$MP" ] || { echo "model_quality: no zoo model $N" >&2
 REF=${KLD_REF_DIR:-$ZOO_M/perflab-kld-ref}/$N.kld; mkdir -p "$(dirname "$REF")"
 C=$P/harness/corpus/decode_kld.txt
 OUT=$P/results/phase2/quality/$N; mkdir -p "$OUT"
-PPLA=(-m "$MP" -f "$C" -c 1024 --chunks "${CHUNKS:-8}" -fa on -ngl 99 -dev "${PERFLAB_VKDEV:-Vulkan1}")
+PPLA=(-m "$MP" -f "$C" -c 1024 --chunks "${CHUNKS:-8}" -fa on -ngl 99 -dev "$(zoo_vkdev)")
 if [ "$MODE" = ref ]; then
   "$H/gpu_lock.sh" "$B/llama-perplexity" "${PPLA[@]}" --kl-divergence-base "$REF" > "$OUT/ref.log" 2>&1 || {
     echo "model_quality: ref failed for $N" >&2; tail -5 "$OUT/ref.log" >&2; exit 1; }
@@ -33,7 +33,7 @@ kld=$(grep -E '^Mean +KLD:' "$L" | grep -oE '[0-9]+\.[0-9]+' | head -1)
 top=$(grep -E '^Same top p:' "$L" | grep -oE '[0-9]+\.[0-9]+' | head -1)
 acc=""
 if [ "$(zoo_mtp "$N")" = 1 ] && [ "${ACC:-1}" != 0 ]; then
-  PORT=${PORT:-8098}
+  PORT=${PORT:-$(zoo_port 8098)}
   a=$("$H/gpu_lock.sh" bash -c "PERFLAB_BIN=$B PERFLAB_CTK=q8_0 PERFLAB_CTV=q8_0 $H/serve_unit.sh $MP $PORT 32768 --parallel 1 --spec-type draft-mtp --spec-draft-n-max 3 ${ACC_ARGS:-} >/dev/null &&
     python3 $P/setups/qwen3.8-27b-r9700/results/d0/scripts/multi.py $PORT $OUT/acc-$LB.json | grep POOLED; systemctl --user stop perflab-srv-$PORT")
   acc=" ACC=$(echo "$a" | awk '{print $4}')"

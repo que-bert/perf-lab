@@ -3,7 +3,7 @@
 # Fills ~176k of context first (depth worst case), then sends imgtest-style image requests while sampling every 0.2 s.
 set -u
 cd /home/bbuckham/git/perf-lab
-B=${1:?bindir}; XENV=${2:-}; LBL=${3:-fac}; MNT=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth
+B=${1:?bindir}; XENV=${2:-}; LBL=${3:-fac}; MNT=${PERFLAB_MODEL_DIR:-/home/bbuckham/models}
 D=/sys/class/drm/card0/device; O=setups/qwen3.8-27b-r9700/results/d0/e2e/vram-img-peak-$LBL.samples; : > $O
 harness/gpu_guard.sh 900 || exit 1
 PERFLAB_BIN=$B PERFLAB_ENV="MTMD_LAZY_GPU=1;GGML_VK_HOST_GET_ROWS=1${XENV:+;$XENV}" PERFLAB_CTK=q8_0 PERFLAB_CTV=q8_0 harness/serve_unit.sh $MNT/Qwen3.8-27B-Q6_K.gguf 8097 262144 \

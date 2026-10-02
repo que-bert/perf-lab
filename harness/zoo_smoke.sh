@@ -13,7 +13,7 @@ MODE=$1; B=$2; shift 2
 LB=ref; [ "$MODE" = test ] && { LB=$1; shift; }
 NAMES=("$@"); [ ${#NAMES[@]} = 0 ] && mapfile -t NAMES < <(zoo_names)
 OUT=$P/results/phase2/smoke; mkdir -p "$OUT"
-PORT=${PORT:-8099}; fail=0
+PORT=${PORT:-$(zoo_port 8099)}; fail=0
 for n in "${NAMES[@]}"; do
   mp=$(zoo_path "$n")
   # plain decoding on both sides: fork builds with GGUF presets would otherwise turn MTP / n-gram drafting on

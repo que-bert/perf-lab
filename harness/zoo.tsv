@@ -1,10 +1,11 @@
 # phase-2 target models (docs/2026-10-01-phase2-plan.md "Targets"). name, role, mtp(0/1), path
-# Read by model_profile.sh / model_quality.sh / zoo_smoke.sh. M = /mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models
-qwen27-q6k	primary	1	M/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf
-qwen27-q4km	primary	1	M/qwen3.8:27b/unsloth/Qwen3.8-27B-Q4_K_M.gguf
+# Paths: M/ = ZOO_M (SATA), N/ = ZOO_N (NVMe, $PERFLAB_MODEL_DIR). Read by model_profile.sh / model_quality.sh / zoo_smoke.sh. M = /mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models
+qwen27-q6k	primary	1	N/Qwen3.8-27B-Q6_K.gguf
+qwen27-q4km	primary	1	N/Qwen3.8-27B-Q4_K_M.gguf
 minicpm-q4km	primary	0	M/minicpm5-2b/openbmb/MiniCPM5-2B-Q4_K_M.gguf
 minicpm-q8	primary	0	M/minicpm5-2b/openbmb/MiniCPM5-2B-Q8_0.gguf
 gemma4-e4b	secondary	0	/home/bbuckham/.lmstudio/models/lmstudio-community/gemma-4-E4B-it-GGUF/gemma-4-E4B-it-Q4_K_M.gguf
 ornith-q4km	secondary	1	M/ornith1.5:9b/Ornith-1.5-9B-Q4_K_M.gguf
 ornith-q6k	secondary	1	M/ornith1.5:9b/Ornith-1.5-9B-Q6_K.gguf
-qwen36-a3b	secondary	1	M/qwen3.6:35b-a3b/unsloth/Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf
+qwen36-a3b	secondary	1	N/Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf
+qwen35-9b-ollama	secondary	1	/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/converted/qwen35-9b-ollama.gguf

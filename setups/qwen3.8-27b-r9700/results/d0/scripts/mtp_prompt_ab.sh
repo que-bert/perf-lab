@@ -6,7 +6,7 @@
 set -u
 cd /home/bbuckham/git/perf-lab
 B=$1; LB=$2; EV=${3:-}; MODE=${4:-spec}
-M=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth
+M=${PERFLAB_MODEL_DIR:-/home/bbuckham/models}
 P=$PWD/setups/qwen3.8-27b-r9700/results/d0/i8/mtpp_prompt.json
 SPEC="--spec-type draft-mtp --spec-draft-n-max 4 -ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive"
 [ "$MODE" = nospec ] && SPEC=""

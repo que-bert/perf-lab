@@ -4,7 +4,7 @@
 set -u
 P=/home/bbuckham/git/perf-lab; cd $P
 BIN=$1; LB=$2; shift 2
-MNT=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth; M=${QMODEL:-$MNT/Qwen3.8-27B-Q6_K.gguf}
+MNT=${PERFLAB_MODEL_DIR:-/home/bbuckham/models}; M=${QMODEL:-$MNT/Qwen3.8-27B-Q6_K.gguf}
 CARD=$(for c in /sys/class/drm/card[0-9]*/device; do [ "$(cat $c/mem_info_vram_total 2>/dev/null)" -gt 30000000000 ] 2>/dev/null && echo $c && break; done)
 OUT=setups/qwen3.8-27b-r9700/results/d0/vram-$LB-$(date +%Y%m%dT%H%M%S).log
 harness/gpu_lock.sh bash -c "

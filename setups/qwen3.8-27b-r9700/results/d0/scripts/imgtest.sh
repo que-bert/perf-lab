@@ -6,7 +6,7 @@
 set -u
 BIN=$1; LB=$2; shift 2
 cd /home/bbuckham/git/perf-lab
-MNT="/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth"
+MNT="${PERFLAB_MODEL_DIR:-/home/bbuckham/models}"
 PORT=8097; D=/sys/class/drm/card0/device
 mib() { echo $(( $(cat $D/mem_info_vram_used)/1048576 )) gtt $(( $(cat $D/mem_info_gtt_used)/1048576 )); }
 echo "== $LB bin=$BIN env=${PERFLAB_ENV:-} args=$*"

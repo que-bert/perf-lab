@@ -4,7 +4,7 @@
 # ABAB depth.sh (70k/176k, 3 reps), then pooled t/s for each arm. Quiet window: loadavg < ${MAXLOAD:-2}.
 set -u
 P=/home/bbuckham/git/perf-lab; cd $P
-MNT=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth; M=$MNT/Qwen3.8-27B-Q6_K.gguf
+MNT=${PERFLAB_MODEL_DIR:-/home/bbuckham/models}; M=$MNT/Qwen3.8-27B-Q6_K.gguf
 B=${B:-/home/bbuckham/git/llama.cpp-r9700-ar-hgr/build/bin}; T=${T:-hgr}
 L=$P/harness/gpu_lock.sh
 F="-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive -lm none"

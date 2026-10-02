@@ -10,7 +10,7 @@
 #   MODEL=...  override the model;  KEEP_LOG=dir  where to keep the raw stderr.
 set -euo pipefail
 BIN="${1:?bin-dir}"; DEPTH="${2:?depth}"; UB="${3:?ubatch}"
-MODEL="${MODEL:-/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q6_K.gguf}"
+MODEL="${MODEL:-${PERFLAB_MODEL_DIR:-/home/bbuckham/models}/Qwen3.8-27B-Q6_K.gguf}"
 LOGDIR="${KEEP_LOG:-${TMPDIR:-/tmp}}"
 LOG="$LOGDIR/prefill_profile-d${DEPTH}-ub${UB}-$(date -u +%Y%m%dT%H%M%SZ).log"
 OUT="$LOG.stdout"

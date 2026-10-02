@@ -6,7 +6,7 @@ set -u
 P=/home/bbuckham/git/perf-lab; cd $P
 Q=$1; T=$2; B=${3:-$P/runners/llama.cpp/qwen3.8-r9700/build/bin}
 D=setups/qwen3.8-27b-r9700; L=$P/harness/gpu_lock.sh
-MNT=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth
+MNT=${PERFLAB_MODEL_DIR:-/home/bbuckham/models}
 E="MTMD_LAZY_GPU=1;GGML_VK_HOST_GET_ROWS=1"
 F="-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive -lm none"
 quiet() { until awk -v m="${MAXLOAD:-2}" '{exit !($1 < m)}' /proc/loadavg; do sleep 30; done; }

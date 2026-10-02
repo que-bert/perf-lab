@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Who is using the R9700, from /proc/<pid>/fdinfo (DRM client stats).
+"""Who is using the card (PERFLAB_GPU_PCI, default the R9700), from /proc/<pid>/fdinfo (DRM client stats).
 
   gpu_holders.py list                       one line per DRM client on the card
   gpu_holders.py busy [--allow PID...]      exit 1 if a foreign client holds the card
@@ -20,6 +20,15 @@ FOREIGN_BUSY_PCT = float(os.environ.get("PERFLAB_FOREIGN_BUSY_PCT", "2"))
 MAX_LOAD = float(os.environ.get("PERFLAB_MAXLOAD", "4"))  # 1-min loadavg; launch-bound models feel a build
 OURS = ("llama-", "test-backend-o")
 IDLE_VRAM_MIB = float(os.environ.get("PERFLAB_IDLE_VRAM_MIB", "1024"))
+# Lane kind (gpu_lock.sh exports it): "timing" voids on any foreign activity (the R9700 default);
+# "correctness" never voids and never waits on desktop baseline clients, it only logs foreign activity.
+# Baseline = the desktop's own DRM clients (comm prefixes; comm is truncated to 15 chars by the kernel).
+LANE_KIND = os.environ.get("PERFLAB_LANE_KIND", "timing")
+BASELINE = tuple(x for x in os.environ.get(
+    "PERFLAB_BASELINE_COMMS",
+    "Xwayland,Xorg,gnome-shell,gnome-remote-d,mutter,ghostty,steam,steamwebhelper,firefox,Discord,discord,"
+    "gjs,xdg-desktop-por,plasmashell,kwin,chrome,Isolated Web,WebExtensions,Web Content,RDD Process,"
+    "gnome-software,nautilus,code,electron,Hyprland,sway,pipewire,wireplumber").split(",") if x)
 
 
 def card_mem(kind):
@@ -95,6 +104,10 @@ def ours(pid, comm, allow):
     return comm.startswith(OURS) or pid in allow
 
 
+def baseline(comm):
+    return comm.startswith(BASELINE)
+
+
 def foreign_now(allow, iv=1.0):
     a = clients()
     time.sleep(iv)
@@ -119,6 +132,14 @@ def main():
         allow = {int(x) for x in args if x.isdigit()}
         bad = foreign_now(allow)
         load = float(open("/proc/loadavg").read().split()[0])
+        if LANE_KIND == "correctness":
+            # only a non-desktop foreign client (a game, a sibling's server) makes a correctness run wait
+            bad = [b for b in bad if not baseline(b.split("[")[0])]
+            if bad:
+                print("busy: " + "; ".join(bad))
+                sys.exit(1)
+            print("free")
+            return
         if load >= MAX_LOAD:
             bad.append(f"loadavg={load}")
         # nothing of ours runs between locked runs, so the card must have drained: a just-exited model's
@@ -172,6 +193,9 @@ def main():
         except FileNotFoundError:
             pass
         msg = "; ".join(f"{k} n={v[0]} vram<={v[1]:.0f}MiB busy<={v[2]:.1f}%" for k, v in bad.items())
+        if LANE_KIND == "correctness":
+            print(f"CLEAN(correctness lane) maxload={loadmax} vram<={vmax}GiB gtt<={gmax}GiB" + (f" foreign-logged: {msg}" if msg else ""))
+            return
         if loadmax >= 1.5 * MAX_LOAD:
             msg = (msg + "; " if msg else "") + f"loadavg<={loadmax}"
         if msg:

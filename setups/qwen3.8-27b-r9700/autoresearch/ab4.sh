@@ -5,7 +5,7 @@ S=/tmp/claude-1000/-home-bbuckham-git-perf-lab/b29d0a53-3607-41fd-86df-7e270e1c4
 P=/home/bbuckham/git/perf-lab; cd $P
 I2=/home/bbuckham/git/llama.cpp-r9700-integrate2/build/bin
 I4=/home/bbuckham/git/llama.cpp-r9700-integrate4/build/bin
-MNT=/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth; M=$MNT/Qwen3.8-27B-Q6_K.gguf
+MNT=${PERFLAB_MODEL_DIR:-/home/bbuckham/models}; M=$MNT/Qwen3.8-27B-Q6_K.gguf
 L=$P/harness/gpu_lock.sh
 F4="-ctkd q8_0 -ctvd q8_0 --spec-draft-vocab 98304 --spec-draft-vocab-adaptive"
 ( while sleep 20; do echo "$(date +%T) vram=$(( $(cat /sys/bus/pci/devices/0000:0c:00.0/mem_info_vram_used)/1048576 ))MiB load=$(cut -d' ' -f1 /proc/loadavg)"; done ) > $S/main/vram-ab4.log &
