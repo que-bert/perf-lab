@@ -19,3 +19,5 @@ runners/llama.cpp/qwen3.8-r9700-rb/
 *.dkld
 harness/wmma_peak/wmma_peak
 .opencode/
+runners/llama.cpp/upstream-*/
+runners/llama.cpp/qwen3.8-r9700-*/
