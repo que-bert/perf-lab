@@ -17,7 +17,7 @@ Plan: `docs/2026-10-01-phase2-plan.md` (rev 3). Every number below is in `setups
 | W4 presets | done | GGUF identity presets (27B, MiniCPM), per-arch presets (gemma4, qwen35, qwen35moe), MTP auto-on with parallel 1, explicit flags win, `--print-preset`, `--no-preset`; flagless 27B pooled = explicit (56.39 vs 56.43, same tok/step) |
 | W4 converter | done | `harness/ollama_gguf_convert.py` (gemma4 E4B/E2B, qwen35 incl. MTP head); loader prints a hint naming it; no loader divergence |
 | W4 validated-only | done | int8 cm1 MMQ on RDNA4 limited to Q8_0/Q6_K; FA staging and fork cm1 shader limited to quantised KV; small-BAR host-visible rule limited to small models |
-| W4 KV reuse with MTP | see T2/W4 reuse log | `results/phase2/w4_reuse.log` |
+| W4 KV reuse with MTP | done | repeated 32.5k prompt: 4 tokens reprocessed, identical text and acceptance; shared prefix reused (13 tokens) |
 | W5 Gemma4 | done | fork FA crash at hsk 512 (ACO SIGFPE, fork staging) fixed; second bug (sparse-mask row) fixed; f16-KV FA back to upstream speed (hsk256 pp 93 -> 66 us); pp +12-19 % over upstream; tg d0 -3 % remains (not FA) |
 | W6 tuning | done | runtime sweep (ubatch x KV) for 6 non-27B files -> presets; kernel tuning folded into W5/W7 (MoE q6_K down GEMV -20 %) |
 | W7 MoE | done | KLD "bug" was the Vulkan reference (upstream Vulkan vs CPU 0.049, fork 0.046); fork tg 2.7x upstream, MTP n=3 serving 153 vs 95 t/s (corpus); expert q6_K down GEMV 18.3 -> 14.5 us |
@@ -28,9 +28,23 @@ Plan: `docs/2026-10-01-phase2-plan.md` (rev 3). Every number below is in `setups
 
 ## Integration
 
-- `r9700-integrate17` = integrate16 + W2 small-BAR fix + W4 presets/hint. T2 vs the integrate16 anchor: see `results/phase2/t2/i17/`.
-- `r9700-integrate18` = integrate17 + loader populate + W5 FA + W6 presets + W7 MoE GEMV + validated-only MMQ guard. T2: `results/phase2/t2/i18/`.
-- Serving (`r9700-qwen`) is not changed by this phase; promotion is the operator's call.
+- `r9700-integrate17` (tag `r9700-integrate17-t2`) = integrate16 + W2 small-BAR fix + W4 presets/hint. Passed T2 (row I17).
+- `r9700-integrate18` (tag `r9700-integrate18-t2`) = integrate17 + loader populate + W5 FA + W6 presets + W7 MoE GEMV +
+  validated-only MMQ guard + small-BAR 12 GiB + MoE preset fix. Passed T2 (row I18): every I1 axis NOISE vs the anchor
+  (largest |mean| 0.15 %), gates identical to GATES16, zoo KLD/PPL identical, I2 MiniCPM decode +8 %.
+- All phase-2 branches and both tags are pushed to que-bert/llama.cpp. Serving (`r9700-qwen` = integrate16) is unchanged:
+  promotion to integrate18 is the operator's call.
+- MoE note: ubatch 1024 gives +19 % pp2048 on the 35B-A3B but lowers MTP acceptance 0.7009 -> 0.6824, so it is not in the
+  MoE preset.
+
+## Gate harness (after phase 2)
+
+- Two lanes: `PERFLAB_CARD=r9700` (timing) and `PERFLAB_CARD=9060` (correctness, desktop clients tolerated); a shared CPU
+  lock keeps launch-bound timing runs alone. KLD/smoke references are per card (`perflab-kld-ref-9060`).
+- `gate_plan.py` picks T2 phases from the fork diff; `ab_stat.py decide` stops ABAB rounds early; `arm_session.sh` loads
+  the 27B once per arm (validated: same numbers as the separate scripts); `gates5.sh` one op-test process + one
+  acceptance load; models on NVMe (`PERFLAB_MODEL_DIR`); `build.sh` keeps builds out of timing runs.
+- Measured on NVMe: T2 timing phases ~61 min (was ~232 min on SATA); old-flow T2 took 8.4 h wall with queueing.
 
 ## Open
 
