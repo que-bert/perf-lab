@@ -13,7 +13,7 @@
 #   gates    gates5.sh: op tests (planned ops, one process), PPL, decode KLD, acceptance (one server load)
 #   zoo      quality (PPL/KLD/acc) + smoke. Models <= ZOO_SMALL_GB (default 12) run on the 9060 lane (correctness kind,
 #            concurrently, cpu lock shared) when ZOO_LANES=1; the big ones (27B, 35B-A3B) on the R9700 after the
-#            timing phases. ZOO_LANES=1 (opt-in) sends them to the 9060; default 0 because the 9060 is not bit-identical to the R9700 references (see FINDINGS in commit).
+#            timing phases. Default on (ZOO_LANES=0 disables) for models that have 9060 references (perflab-kld-ref-9060, smoke/<name>.ref-9060.json): the 9060 gives different valid logits, so it is judged against its own refs.
 # Every GPU step takes gpu_lock.sh. Output: results/phase2/t2/<label>/*.log; arm numbers in <label>/arm/*.arm.json.
 # Env: K (3) KMIN (2) TOL_PCT (0.5) SEQ (1) FULL (0) PHASES A BASE_REF GATES_PARTS OPS ZOO_PARTS ZOO_ACC.
 set -u
@@ -75,7 +75,7 @@ zoo_split() {  # prints "small|big" name lists by file size
   local n big="" small="" gb=${ZOO_SMALL_GB:-12}
   for n in $(zoo_names); do
     local f; f=$(zoo_path $n); local sz=$(( $(stat -c %s "$f" 2>/dev/null || echo 999999999999) / 1000000000 ))
-    if [ "${ZOO_LANES:-0}" = 1 ] && [ $sz -le $gb ]; then small="$small $n"; else big="$big $n"; fi
+    if [ "${ZOO_LANES:-1}" = 1 ] && [ $sz -le $gb ] && [ -f "$ZOO_M/perflab-kld-ref-9060/$n.kld" ] && [ -f "$P/results/phase2/smoke/$n.ref-9060.json" ]; then small="$small $n"; else big="$big $n"; fi
   done
   echo "${small# }|${big# }"
 }
