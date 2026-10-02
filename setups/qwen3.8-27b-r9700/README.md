@@ -7,8 +7,8 @@ PRO R9700 (RDNA4, 32 GB) through Vulkan, with MTP speculative decoding.
 
 | role | branch (github.com/que-bert/llama.cpp) | local build |
 |---|---|---|
-| serving | `r9700-qwen` @ 02ea7fe9f (= integrate16, promoted 2026-10-01) | `runners/llama.cpp/qwen3.8-r9700/build/bin` (submodule) |
-| next (integration head) | `r9700-integrate16` @ 02ea7fe9f (next experiments branch from here) | `runners/llama.cpp/qwen3.8-r9700-next/build/bin` (worktree) |
+| serving | `r9700-qwen` @ 3a37b0c1d (= integrate18, promoted 2026-10-02; rollback tag `r9700-qwen-integrate16`) | `runners/llama.cpp/qwen3.8-r9700/build/bin` (submodule) |
+| next (integration head) | `r9700-integrate18` @ 3a37b0c1d (next experiments branch from here) | `runners/llama.cpp/qwen3.8-r9700-i18/build/bin` (worktree) |
 
 Every experiment is a branch on the fork: `r9700-ar-<id>` for autoresearch experiments,
 `r9700-integrate<N>` for integration heads, `r9700-{p,r,d}<n>-*` for the earlier plan phases.
