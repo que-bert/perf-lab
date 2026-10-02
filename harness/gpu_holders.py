@@ -141,6 +141,8 @@ def main():
         with open(out, "a") as f:
             while True:
                 time.sleep(iv)
+                if tree and not os.path.exists(f"/proc/{tree}"):
+                    return  # the gpu_lock.sh that started us is gone (killed): do not hold the lock fd forever
                 cur = clients()
                 allow = descendants(tree) if tree else set()
                 for k, v in cur.items():
