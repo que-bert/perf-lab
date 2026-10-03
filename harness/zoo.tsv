@@ -8,4 +8,4 @@ gemma4-e4b	secondary	0	/home/bbuckham/.lmstudio/models/lmstudio-community/gemma-
 ornith-q4km	secondary	1	M/ornith1.5:9b/Ornith-1.5-9B-Q4_K_M.gguf
 ornith-q6k	secondary	1	M/ornith1.5:9b/Ornith-1.5-9B-Q6_K.gguf
 qwen36-a3b	secondary	1	N/Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf
-qwen35-9b-ollama	secondary	1	/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/converted/qwen35-9b-ollama.gguf
+qwen35-9b-ollama	secondary	0	/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/converted/qwen35-9b-ollama.gguf
