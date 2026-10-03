@@ -1,0 +1,164 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 195.281,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 4096,
+   "ms_step": 5.121
+  },
+  "pooled": {
+   "tps": 195.281,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 4096,
+   "ms_step": 5.121
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 1311.713,
+   "dn": 0,
+   "da": 0,
+   "text": " older ones.\n\n## Build GUI binding using Gradle\n\nThe `llama.android` directory contains a Gradle build script that can be used to build the project.\n\n```sh\n# Build the project\n./gradlew build\n\n# Run the project\n./gradlew run\n```\n\n## Build GUI binding using CMake\n\nThe `llama.android` directory contains a CMake build script that can be used to build the project.\n\n```sh\n# Build the project\ncmake -B build -G \"Unix Makefiles\"\ncmake --build build\n\n# Run the project\n./build/llama.android\n```\n\n## Build GUI binding using Make\n\nThe `llama.android` directory contains a Makefile that can be used to build the project.\n\n```sh\n# Build the project\nmake\n\n# Run the project\n./llama.android\n```\n\n## Build GUI binding using Docker\n\nThe `llama.android` directory contains a Dockerfile that can be used to build the project.\n\n```sh\n# Build the project\ndocker build -t llama.android .\n\n# Run the project\ndocker run -p 8080:8080 llama.android\n```\n\n## Build GUI binding using Docker\n\nThe `ll"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 1311.479,
+   "dn": 0,
+   "da": 0,
+   "text": "owngments or Other Non-Obvious\n   Comments\", add a paragraph under the section stating that these\n   comments have been added as offered by you in the original version,\n   subject to the following conditions.\nL. Preserve the section Entitled \"Copyright\" (including its Title (but not\n   any other body paragraphs in the Text !)) if this License extends\n   the version of the Document whose copyright page you have used.\nM. Insert an appropriate copyright notice for your modifications in the\n   located below this License, also adding to it (top) your modified\n   versions of the documents used in creating the Modified Version,\n   along with the intended publisher's name and title.\n\nYou may add any other copyright notices, statements, or modifications\ngenerally accepted by the public in inclusion in other public\nlicense versions of the Document, provided that you do so in the\nsame way you got the original Copyright notice.  If you modify the Cover Texts\nor the Title Page,, make any such modifications to the covered documents\nonly in the way set out in the previous sections.\n\nYou may make filename changes and/or toolchain changes solely in\naddition to copyleft modifications you may make.\n\nAll Invariant Sections and required Cover Texts"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 1309.964,
+   "dn": 0,
+   "da": 0,
+   "text": " Copyright (C) 2001 Free Software Foundation, Inc.\n            <http://fsf.org/>\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License as\n            by the Free Software Foundation, either version 2 of the\n            License, or (at your option) any later version.\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License\n            as defined by the Free Software Foundation.\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License\n            as defined by the Free Software Foundation.\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License\n            as defined by the Free Software Foundation.\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License\n            as defined by the Free Software Foundation.\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License\n            as defined"
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 256,
+   "ms": 1319.509,
+   "dn": 0,
+   "da": 0,
+   "text": "Qwen2.5-Coder-7B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/qwen2.5-32b-instruct-q4_k_m](https://huggingface.co/Qwen/qwen2.5-32B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/qwen2.5-72b-instruct-q4_k_m](https://huggingface.co/Qwen/qwen2.5-72B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/qwen2.5-8b-instruct-q4_k_m](https://huggingface.co/Qwen/qwen2.5-8B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/qwen2.5-32b-instruct"
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 1330.659,
+   "dn": 0,
+   "da": 0,
+   "text": " the latest version, refer to [oneAPI supported GPU](https://www.intel.com/content/www/us/en/developer/articles/system-requirements/intel-oneapi-base-toolkit-system-requirements.html#inpage-nav-1-1).\n\n3. **Install other development tools**\n\n- **For Intel GPU**\n\n  - **Ubuntu 24.04**\n\n    ```sh\n    sudo apt install build-essential git cmake libomp-dev libgomp-dev libclang-dev libclang-dev-tools\n    ```\n\n  - **Fedora Silverblue 39**\n\n    ```sh\n    sudo dnf install gcc gcc-c++ gcc-g++ gcc-cc gcc-cc++ gcc-ccx gcc-ccxx gcc-ccxx-mk gcc-ccxx-mk-mk gcc-ccxx-mk-mk-mk gcc-ccxx-mk-mk-mk-mk gcc-ccxx-mk-mk-mk-mk-mk gcc-ccxx-mk-mk-mk-mk-mk-mk gcc-ccxx-mk-mk-mk-mk-mk-mk-mk gcc-"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 1279.927,
+   "dn": 0,
+   "da": 0,
+   "text": " means and with any other\nconditions; but the author/donor on this change may not effective\nexcuse you within this section to refuse to do so.\n\n  12. If you do not receive all of the information needed for these\nterms to be satisfied, you must comply with the terms of this License\nwith respect to the overriding requirement.  If some part of the\noverriding requirement needs to be new information, you may\nsatisfare it with the knowledge the developer gave you.\n\n  13. Field files for the Library are kept with them or are modified or\nenhanced to add compatible information between the content of fields\nand the content of the Library.  These field files are not modified\nby execution of this License.\n\n  14. You may not use this License to exercise any other right or claim\n    of ownership over the Library except what it gives you.  This License\n    is not a license to impute ownership to the Library or your hardware\n    counterparts.\n\n  15. If you convey a copy of the Library with a copy of a\n    corresponding machine-readable list of the source code for the\n    Library, the recipient also receives the right to copy and distribute\n    a copy of the source"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 256,
+   "ms": 1346.813,
+   "dn": 0,
+   "da": 0,
+   "text": ".g. a license under a different license or a license for a\n    different work.\n\n1.13. \"Special Terms\"\n    means terms that other than the License have effect with the License.\n\n1.14. \"System\"\n    means all computer or other electronic devices.\n\n2. Grant of Copyright License\n-----------------------------\n\n2.1. License Grant\n    Subject to the terms and conditions of this License, each Contributor\n    hereby grants to You a perpetual, worldwide, non-exclusive, no-charge,\n    no-trademark, non-conditional, limited to the extent set forth in this\n    License, the Right to Use, to do either, and distribute, copies of the\n    Contributor Version, or any portions of it, in Source Code Form\n    and Contributor Version; and, at our option, to include, but not require,\n    any Code of Conduct or similar.\n\n2.2. Grant of Patent License\n    Subject to the terms and conditions of this License, each Contributor\n    hereby grants to You a perpetual, worldwide, non-exclusive, no-charge,\n    no-trademark, non-conditional, limited to the extent set forth in this\n    License, the Right to"
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 1301.5,
+   "dn": 0,
+   "da": 0,
+   "text": " while frame is not None and _is_internal_frame(frame):\n        frame = frame.f_back\n    return frame\n\n\ndef _is_warning_ignored(message, category, filename, lineno, module, line):\n    \"\"\"Check if a warning is ignored by the current filter configuration.\"\"\"\n    if not message:\n        return True\n    if not category:\n        return True\n    if not module:\n        return True\n    if not filename:\n        return True\n    if not lineno:\n        return True\n    if not line:\n        return True\n    import re\n    if not re.search(message, str(message)):\n        return True\n    if not re.search(module, str(module)):\n        return True\n    if not re.search(filename, str(filename)):\n        return True\n    if not re.search(str(lineno), str(lineno)):\n        return True\n    if not re.search(line, str(line)):\n        return True\n    return False\n\n\ndef _is_warning_shown(message, category, filename, lineno, module, line):\n    \"\"\"Check if a warning has been shown by the current filter configuration.\"\"\"\n    if not message:\n        return True\n    if not category:\n        return True\n    if not module:\n"
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 1301.63,
+   "dn": 0,
+   "da": 0,
+   "text": ":\n                myoffset = timedelta(0)\n\n        # Convert to the desired timezone\n        tz = self.__class__(self.year, self.month, self.day,\n                             self.hour, self.minute, self.second,\n                             self.microsecond, tz, self.fold)\n        if tz is not None and mytz is not None:\n            tzoffset = tz.utcoffset(self)\n            if tzoffset is None:\n                raise ValueError(\"tzinfo is None and utcoffset() returned None\")\n            if myoffset is None:\n                myoffset = tzoffset\n            elif myoffset != tzoffset:\n                raise ValueError(\"utcoffset() mismatch\")\n        return tz\n\n    def utcoffset(self):\n        \"\"\"Return the timezone offset in seconds, positive east of UTC.\"\"\"\n        if self._tzinfo is None:\n            return None\n        return self._tzinfo.utcoffset(None)\n\n    def tzname(self):\n        \"\"\"Return the timezone name.\"\"\"\n        if self._tzinfo is None:\n            return None\n        return self._tzinfo.tzname(None)\n\n    def dst(self):\n        \"\"\"Return the timezone"
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 256,
+   "ms": 1294.804,
+   "dn": 0,
+   "da": 0,
+   "text": "\t    if _all_zeros(self._int, prec):\n            return 0\n        elif self._int[prec-1] == '5':\n            return 1\n        else:\n            return -1\n\n    def _round_half_down(self, prec):\n        \"\"\"Rounds 5 down (towards 0)\"\"\"\n        if _all_zeros(self._int, prec):\n            return 0\n        elif self._int[prec-1] == '5':\n            return -1\n        else:\n            return 1\n\n    def _round_half_even(self, prec):\n        \"\"\"Rounds 5 to even (banker's rounding)\"\"\"\n        if _all_zeros(self._int, prec):\n            return 0\n        elif self._int[prec-1] == '5':\n            return 1 if self._int[:prec] != '0' else -1\n        else:\n            return -1\n\n    def _round_nearest(self, prec):\n        \"\"\"Round to the nearest digit, with ties to even.\"\"\"\n        if _all_zeros(self._int, prec):\n            return 0\n        elif self._int[prec-1] == '5':\n            return 1 if"
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 1297.686,
+   "dn": 0,
+   "da": 0,
+   "text": "  # 1.0\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.000'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1."
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 1298.056,
+   "dn": 0,
+   "da": 0,
+   "text": " \"\"\"\n\n    __slots__ = ()\n\n    @abc.abstractmethod\n    def __enter__(self):\n        return self\n\n    @abc.abstractmethod\n    def __exit__(self, exc_type, exc_value, traceback):\n        pass\n\n    @abc.abstractmethod\n    def close(self):\n        \"\"\"Close the file.  This method must clear the file descriptor.\n        Can be ignored if the file doesn't support this operation.\n\n        \"\"\"\n\n    @property\n    @abc.abstractmethod\n    def closed(self):\n        \"\"\"True if the file is closed.\n\n        \"\"\"\n\n    @property\n    @abc.abstractmethod\n    def mode(self):\n        \"\"\"The file mode.  This may be a string or character.\n\n        \"\"\"\n\n    @property\n    @abc.abstractmethod\n    def newlines(self):\n        \"\"\"The number of newline characters found on the file.\n\n        \"\"\"\n\n    @property\n    @abc.abstractmethod\n    def name(self):\n        \"\"\"The name of the file, if available.\n\n        \"\"\"\n\n    @property\n    @abc.abstractmethod\n    def softspace(self):\n        \"\"\"The amount of additional space returned by write() calls"
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 1292.376,
+   "dn": 0,
+   "da": 0,
+   "text": "ally equivalent\n    # number with a smaller number of digits, then converts that to\n    # Decimal.\n    #\n    # The algorithm is described in the paper \"Fast conversion of\n    # decimal to binary floating-point and vice versa\" by David Gay.\n    # https://www.codecogs.com/articles/fast_conversion_of_decimal_to_binary_floating_point_and_vice_versa.pdf\n    # https://www.codecogs.com/articles/fast_conversion_of_decimal_to_binary_floating_point_and_vice_versa.pdf\n    # https://www.codecogs.com/articles/fast_conversion_of_decimal_to_binary_floating_point_and_vice_versa.pdf\n    # https://www.codecogs.com/articles/fast_conversion_of_decimal_to_binary_floating_point_and_vice_versa.pdf\n    # https://www.codecogs.com/articles/fast_conversion_of_decimal_to_binary_floating_point_and_vice_versa.pdf\n    # https://www.codecogs.com/articles/fast_conversion_of_decimal_to_binary_floating_point_and_vice_versa.pdf\n    # https://www.codecogs.com/articles/fast_conversion_of_decimal_to_binary_floating_point_and"
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 1306.236,
+   "dn": 0,
+   "da": 0,
+   "text": "-with-cuda-toolkit/) to make llama.cpp work on a GPU that is not a NVIDIA GPU.\n\n## MUSA\n\nMUSA is a cross-platform GPU computing framework that is based on the CUDA architecture.\n\n## HIP\n\nHIP is a cross-platform GPU computing framework that is based on the CUDA architecture.\n\n## Vulkan\n\nVulkan is a cross-platform GPU computing framework that is based on the CUDA architecture.\n\n## CANN\n\nCANN is a cross-platform GPU computing framework that is based on the CUDA architecture.\n\n## ZenDNN\n\nZenDNN is a cross-platform GPU computing framework that is based on the CUDA architecture.\n\n## Arm® KleidiAI™\n\nArm® KleidiAI™ is a cross-platform GPU computing framework that is based on the CUDA architecture.\n\n## OpenCL\n\nOpenCL is a cross-platform GPU computing framework that is based on the CUDA architecture.\n\n## Android\n\nllama.cpp can be built for Android using the [Android NDK](https://developer.android.com/ndk) and the [llama.cpp Android build script](./backend/android.sh).\n\n## OpenVINO\n\nOpenVINO is a cross-platform GPU computing framework that is"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 1365.514,
+   "dn": 0,
+   "da": 0,
+   "text": "ROM_WINDOWS': 0,\n    'HAVE_COPY_FROM_WINDOWS_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 1307.06,
+   "dn": 0,
+   "da": 0,
+   "text": "okens-per-second N`) flag to limit the number of tokens generated per second. If you see the following lines in the output:\n```shell\nllama_model_load_internal: [cublas] offloading 60 layers to GPU\nllama_model_load_internal: [cublas] offloading output layer to GPU\nllama_model_load_internal: [cublas] total VRAM used: 17223 MB\nllama_model_load_internal: [cublas] offloading 60 layers to GPU\nllama_model_load_internal: [cublas] offloading output layer to GPU\nllama_model_load_internal: [cublas] total VRAM used: 17223 MB\n...\n```\nthen the CPU is oversaturated. The CPU is not able to keep up with the GPU, and the CPU is being used to offload work to the GPU. The CPU is not able to keep up with the GPU, and the CPU is being used to offload work to the GPU. The CPU is not able to keep up with the GPU, and the CPU is being used to offload work to the GPU. The CPU is not able to keep up with the GPU, and the CPU is being used"
+  }
+ ]
+}

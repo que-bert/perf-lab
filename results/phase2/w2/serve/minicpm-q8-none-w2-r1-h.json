@@ -1,0 +1,92 @@
+{
+ "summary": {
+  "heldout": {
+   "tps": 181.978,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 1943,
+   "ms_step": 5.495
+  },
+  "pooled": {
+   "tps": 181.978,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 1943,
+   "ms_step": 5.495
+  }
+ },
+ "rows": [
+  {
+   "set": "heldout",
+   "i": 0,
+   "n": 256,
+   "ms": 1405.608,
+   "dn": 0,
+   "da": 0,
+   "text": "한국의 전통 음식인 **김치**는 단순한 간식이나 조미료가 아니라, 한국의 역사와 문화, 그리고 한인계의 정체성을 담고 있는 중요한 음식입니다. 김치의 역사, 종류, 그리고 만드는 방법에 대해 자세히 알아보겠습니다.\n\n---\n\n### 1. 김치의 역사\n\n김치는 **한반도**에서 오랜 기간 사랑받아 온 음식입니다. 가장 오래된 기록은 **1000 년 전**의 **'김치'**라는 이름이 등장한 것으로 알려져 있습니다. 그러나 그보다 더 오래된 전통은 **'김'**(김나무)과 **'치'**(치마)라는 단어의 조합에서 비롯된 것으로 추정됩니다.\n\n- **고대 시대**: 김치는 **한반도의 식생활**과 밀접하게 연결되어 있습니다. 특히 **고대 한반도**의 **'김'**(김나무)와 **'치'**(치마)라는 단어의 조합에서 비롯된 것으로 추정됩니다.\n- **한인계의 정체성**: 김치는 **한인계**의 정체성을 나타내는 음식으로, **"
+  },
+  {
+   "set": "heldout",
+   "i": 1,
+   "n": 256,
+   "ms": 1407.698,
+   "dn": 0,
+   "da": 0,
+   "text": "Солнечная система — это наше космическое пространство, в котором все объекты находятся в постоянном движении. Солнце — центральный объект, а планеты — вращаются вокруг него. Однако, если рассматривать это в более широком контексте, то можно увидеть, что наша система не является единственной. Важно понимать, что все планеты, включая Землю, находятся в гравитационном поле Солнца, которое является основой для нашей жизни.\n\nПланеты, входящие в Солнечную систему, можно разделить на несколько групп. Это внутренние планеты, такие как Меркурий, Венера, Земля и Марс, которые находятся ближе к Солнцу. Затем есть Газовые гиганты, такие как Юпитер, Сатурн, Уран и Нептун, которые находятся на большем расстоянии от Солнца. Также стоит упомянуть Плутона, который теперь классифицируется как карликовая планета.\n\nВажно помнить, что наше понимание Солнечной системы постоянно развивается"
+  },
+  {
+   "set": "heldout",
+   "i": 2,
+   "n": 256,
+   "ms": 1408.438,
+   "dn": 0,
+   "da": 0,
+   "text": "Ecco una guida semplice per scoprire Roma in tre giorni:\n\n**Giorno 1: Il Cuore Storico**\nInizia da **Castel Sant'Angelo** e poi cammina lungo il **Ponte di Sforza**. Dedica del tempo a passeggiare nel **Piazza Navona** e ammira i fontane. Per pranzo, prova una pizza al forno a base di pizza napoletana in un piccolo locale vicino al Pantheon.\n\n**Giorno 2: Arte e Relax**\nDedica la mattina al **Vaticano**: visita la **Basilica di San Pietro** e il **Sacro Cuore**. Nel pomeriggio, rilassati nel **Parco del Largo di Trastevere**. Per cena, esplora i vicoli di Trastevere per trovare una trattoria tipica.\n\n**Giorno 3: Panorami e Cultura**\nSali sul **Monti** per una vista sulla città. Nel pomeriggio, visita il **Pincio** o il **Villa Borghese** per un"
+  },
+  {
+   "set": "heldout",
+   "i": 3,
+   "n": 256,
+   "ms": 1409.412,
+   "dn": 0,
+   "da": 0,
+   "text": "O sistema de saúde pública no Brasil é uma das mais complexas e importantes do mundo, mas também enfrenta desafios significativos. Abaixo, explico detalhadamente como funciona esse sistema e os problemas que ele enfrenta.\n\n---\n\n### **Como Funciona o Sistema de Saúde Pública no Brasil?**\n\n1. **Estrutura Geral:**\n   - O sistema é composto por **Fundos de Saúde Pública (FSP)**, que são os fundos que financiam a saúde pública.\n   - Existem também **Fundos de Saúde Privada (FSP)**, que são financiados por empresas privadas, mas são complementares ao sistema público.\n\n2. **Gestão do Sistema:**\n   - A gestão é feita pelo **Ministério da Saúde**, que é o órgão responsável pela política e gestão da saúde.\n   - As **Secretarias de Saúde** são as unidades de gestão que atuam em diferentes regiões do país.\n\n3. **Financiamento:**\n   - A saúde pública é financiada principalmente pelo **Fundo de Saúde Pública (FSP)**, que é um fundo público.\n   - Além disso, há **financiamento complementar"
+  },
+  {
+   "set": "heldout",
+   "i": 4,
+   "n": 256,
+   "ms": 1405.301,
+   "dn": 0,
+   "da": 0,
+   "text": "Tết Nguyên Đán là một dịp lễ hội quan trọng, mang đến niềm vui và sự gắn kết cho toàn bộ dân tộc Việt Nam. Dưới đây là giải thích chi tiết về lịch sử và ý nghĩa của Tết Nguyên Đán.\n\n### 1. Lịch sử của Tết Nguyên Đán\n- **Nguồn gốc:** Tết Nguyên Đán có nguồn gốc từ thời Lạng Sơn (trước thời nhà Nguyễn). Trong lịch sử, Tết là dịp để tập hợp nhân dân, tôn vinh thiên nhiên và tôn vinh nhân lo"
+  },
+  {
+   "set": "heldout",
+   "i": 5,
+   "n": 256,
+   "ms": 1405.685,
+   "dn": 0,
+   "da": 0,
+   "text": "على الرغم من أن الإنترنت يبدو سهلاً، إلا أنه يعتمد على مئات الخطوات التي تتحكم بها عملية الوصول إلى الصفحات. فيما يلي التفاصيل التفصيلية لعملية الإنترنت من حيث الطلب حتى وصول الصفحة إلى المتصفح.\n\n### 1. فهم الإنترنت\nالإنترنت ليس مجرد شبكة عالمية، بل هو نظام متصفحات وخدمات مت"
+  },
+  {
+   "set": "heldout",
+   "i": 6,
+   "n": 256,
+   "ms": 1406.514,
+   "dn": 0,
+   "da": 0,
+   "text": "下面是一个使用 Python 实现的 LRU（最近最少使用）缓存类。它使用 **哈希表（字典）** 配合 **双向链表** 来保证 `get` 和 `put` 操作的时间复杂度均为 **O(1)**。\n\n---\n\n### 代码实现\n\n```python\nclass Node:\n    \"\"\"\n    双向链表节点类，用于存储缓存键值对。\n    每个节点包含：\n        - key: 缓存键\n        - value: 缓存值\n        - prev: 前一个节点\n        - next: 后一个节点\n    \"\"\"\n    def __init__(self, key, value):\n        self.key = key\n        self.value = value\n        self.prev = None\n        self.next = None\n\n\nclass LRUCache:\n    \"\"\"\n    LRU 缓存类，支持 get 和 put 操作。\n    核心思想：\n        1. 使用字典（hash map）实现 O(1) 的键查找。\n        2. 使用双向链表维护访问顺序，最近访问的节点移到链表头部，\n           最久未访问的节点移到链表尾部。\n    \"\"\"\n    def __init__(self, capacity: int):\n        \"\"\"\n        初始化 LRU 缓存。\n"
+  },
+  {
+   "set": "heldout",
+   "i": 7,
+   "n": 151,
+   "ms": 828.483,
+   "dn": 0,
+   "da": 0,
+   "text": "\"委员会将决定推迟，直到更多田间试验数据可用，并因长期安全性和成本问题而提出。\"\n\n**词义选择说明：**\n- **\"committee\"** 译为“委员会”，指代负责决策的机构。\n- **\"postponed\"** 译为“推迟”，强调时间上的延后。\n- **\"field trials\"** 译为“田间试验”，特指在真实环境中的测试。\n- **\"cited\"** 译为“提出”，体现原因的陈述方式。\n- **\"long-term safety\"** 译为“长期安全性”，突出时间维度与安全性的关联。\n- **\"cost\"** 译为“成本”，保持原意简洁。"
+  }
+ ]
+}

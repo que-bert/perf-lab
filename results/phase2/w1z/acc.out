@@ -1,0 +1,4 @@
+Running as unit: perflab-srv-8097.service; invocation ID: 3964f6cfa48b48c59a47e01baf89f575
+== ACC w1z-corpus load=0.72 0.81 0.83 POOLED 2597 3652 0.7111
+gpu_lock: CLEAN maxload=0.78 vram<=30.5GiB gtt<=2.58GiB
+VERIFY_DONE

@@ -1,0 +1,98 @@
+[
+  {
+    "label": "~70k",
+    "reps_requested": 1600,
+    "prompt_n": 4,
+    "decode_mean": 62.905,
+    "decode_steady_mean": 63.056,
+    "decode_steady_min": 63.02,
+    "decode_steady_max": 63.092,
+    "decode_spread_pct": 0.11,
+    "prefill": 1249.24699904724,
+    "accept_frac": 0.6703,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 62.603556716735596,
+        "prefill": 1249.24699904724,
+        "prompt_n": 72489,
+        "accepted": 185,
+        "drafted": 276,
+        "wall": 62.24221396446228,
+        "content": "\nRequest 1600. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1601. Write a short technical description of how a write-ahead log keeps a database\n\n<think>\nThe user has sent 1602 identical requests (Request 0 through Request 1601), all asking for the same thing: a short technical description of how a write-ahead log keeps a database consistent across a crash, covering the log record, the checkpoint, and recovery. They want it to be specific and not use lists.\n\nSince all requests are identical, I'll write one comprehensive response that addresses all of them. I'll write a single, well-structured paragraph (or a few paragraphs) that covers:\n\n1. The log record - what it contains, how it's written before the data page is modified\n2. The checkpoint - what it is, how it marks a consistent state\n3. Recovery - how the database uses the log after a crash to restore consistency\n\nLet me write this as flowing prose without any lists, being specific about the mechanics.\n</think>\n\nA write"
+      },
+      {
+        "rep": 1,
+        "decode": 63.09202900253976,
+        "prefill": 11.371195624363923,
+        "prompt_n": 4,
+        "accepted": 185,
+        "drafted": 276,
+        "wall": 4.516260385513306,
+        "content": "\nRequest 1600. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1601. Write a short technical description of how a write-ahead log keeps a database\n\n<think>\nThe user has sent 1602 identical requests (Request 0 through Request 1601), all asking for the same thing: a short technical description of how a write-ahead log keeps a database consistent across a crash, covering the log record, the checkpoint, and recovery. They want it to be specific and not use lists.\n\nSince all requests are identical, I'll write one comprehensive response that addresses all of them. I'll write a single, well-structured paragraph (or a few paragraphs) that covers:\n\n1. The log record - what it contains, how it's written before the data page is modified\n2. The checkpoint - what it is, how it marks a consistent state\n3. Recovery - how the database uses the log after a crash to restore consistency\n\nLet me write this as flowing prose without any lists, being specific about the mechanics.\n</think>\n\nA write"
+      },
+      {
+        "rep": 2,
+        "decode": 63.01972739890153,
+        "prefill": 11.410672972965264,
+        "prompt_n": 4,
+        "accepted": 185,
+        "drafted": 276,
+        "wall": 4.515936374664307,
+        "content": "\nRequest 1600. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 1601. Write a short technical description of how a write-ahead log keeps a database\n\n<think>\nThe user has sent 1602 identical requests (Request 0 through Request 1601), all asking for the same thing: a short technical description of how a write-ahead log keeps a database consistent across a crash, covering the log record, the checkpoint, and recovery. They want it to be specific and not use lists.\n\nSince all requests are identical, I'll write one comprehensive response that addresses all of them. I'll write a single, well-structured paragraph (or a few paragraphs) that covers:\n\n1. The log record - what it contains, how it's written before the data page is modified\n2. The checkpoint - what it is, how it marks a consistent state\n3. Recovery - how the database uses the log after a crash to restore consistency\n\nLet me write this as flowing prose without any lists, being specific about the mechanics.\n</think>\n\nA write"
+      }
+    ],
+    "prefill_mean": 424.0,
+    "prefill_min": 11.4,
+    "prefill_max": 1249.2,
+    "prefill_spread_pct": 291.95
+  },
+  {
+    "label": "~176k",
+    "reps_requested": 4000,
+    "prompt_n": 4,
+    "decode_mean": 60.076,
+    "decode_steady_mean": 59.819,
+    "decode_steady_min": 59.697,
+    "decode_steady_max": 59.94,
+    "decode_spread_pct": 0.41,
+    "prefill": 852.1039938950834,
+    "accept_frac": 0.761,
+    "rows": [
+      {
+        "rep": 0,
+        "decode": 60.59222124192192,
+        "prefill": 852.1039938950834,
+        "prompt_n": 182889,
+        "accepted": 192,
+        "drafted": 251,
+        "wall": 219.14158248901367,
+        "content": "\nRequest 4000. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4001. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4002. Write a short technical description of how a write-ahead log keeps a database consistent across a can you give me the answer to all of these\n\n<think>\nThe user has provided 4003 identical requests (Request 0 through Request 4002), all asking for the same thing: a short technical description of how a write-ahead log (WAL) keeps a database consistent across a crash, covering the log record, the checkpoint, and recovery. They want it to be specific and not use lists.\n\nSince all requests are identical, I just need to provide one answer that satisfies all of them. Let me write a clear, specific, paragraph-based technical description covering:\n\n1. The log record - what it contains, how it's written before the data"
+      },
+      {
+        "rep": 1,
+        "decode": 59.696600805318845,
+        "prefill": 6.894697288315557,
+        "prompt_n": 4,
+        "accepted": 191,
+        "drafted": 251,
+        "wall": 5.15351414680481,
+        "content": "\nRequest 4000. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4001. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4002. Write a short technical description of how a write-ahead log keeps a database consistent across a can you give me the answer to all of these\n\n<think>\nThe user has provided 4003 identical requests (Request 0 through Request 4002), all asking for the same thing: a short technical description of how a write-ahead log (WAL) keeps a database consistent across a crash, covering the log record, the checkpoint, and recovery. They want it to be specific and not use lists.\n\nSince all requests are identical, I just need to provide one answer that satisfies all of them. Let me write a clear, specific, paragraph-based technical description covering:\n\n1. The log record - what it contains, how it's written before the data"
+      },
+      {
+        "rep": 2,
+        "decode": 59.94048262666246,
+        "prefill": 6.936219725568467,
+        "prompt_n": 4,
+        "accepted": 191,
+        "drafted": 251,
+        "wall": 5.132091045379639,
+        "content": "\nRequest 4000. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4001. Write a short technical description of how a write-ahead log keeps a database consistent across a crash. Cover the log record, the checkpoint, and recovery. Be specific and do not use lists.\nRequest 4002. Write a short technical description of how a write-ahead log keeps a database consistent across a can you give me the answer to all of these\n\n<think>\nThe user has provided 4003 identical requests (Request 0 through Request 4002), all asking for the same thing: a short technical description of how a write-ahead log (WAL) keeps a database consistent across a crash, covering the log record, the checkpoint, and recovery. They want it to be specific and not use lists.\n\nSince all requests are identical, I just need to provide one answer that satisfies all of them. Let me write a clear, specific, paragraph-based technical description covering:\n\n1. The log record - what it contains, how it's written before the data"
+      }
+    ],
+    "prefill_mean": 288.6,
+    "prefill_min": 6.9,
+    "prefill_max": 852.1,
+    "prefill_spread_pct": 292.82
+  }
+]

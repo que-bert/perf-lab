@@ -1,0 +1,164 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 149.19,
+   "tok_step": 2.552,
+   "accept": 0.7893,
+   "n": 4096,
+   "ms_step": 17.106
+  },
+  "pooled": {
+   "tps": 149.19,
+   "tok_step": 2.552,
+   "accept": 0.7893,
+   "n": 4096,
+   "ms_step": 17.106
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 1725.447,
+   "dn": 192,
+   "da": 158,
+   "text": " entry-level devices.\n\n## Build CLI binding using Android Studio\n\nImport the `examples/llama.android.cli` directory into Android Studio, then perform a Gradle sync and build the project.\n![Project imported into Android Studio](./android/imported-into-android-studio.jpg)\n\nThis Android binding supports hardware acceleration up to `SME2` for **Arm** and `AMX` for **x86-64** CPUs on Android and ChromeOS devices.\nIt automatically detects the host's hardware to load compatible kernels. As a result, it runs seamlessly on both the latest premium devices an entry-level devices.\n\n## Build CLI binding using CMake\n\n### Prerequisites\n\n- [Android NDK](https://developer.android.com/ndk/guides/ndk)\n- [CMake](https://cmake.org/)\n\n### Build\n\n```bash\n# Build the project\ncmake -B build-android -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_BUILD_TYPE=Release -DANDROID_STL=c++_shared -DANDROID_TOOLCHAIN=clang -DGGML_RPC=ON -DGGML_LLAMAFILE=ON -DGGML"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 1871.18,
+   "dn": 213,
+   "da": 148,
+   "text": "\n\n<think>\n\n</think>\n\nBased on the provided documentation, here is a structured summary and guide for using **llama.cpp** with **Ascend NPU** (Huawei CANN backend).\n\n### 1. Overview\nThis backend integrates llama.cpp with Huawei's Ascend NPU using the CANN Toolkit. It supports both inference and training (though primarily documented for inference here) and allows direct kernel usage on Ascend hardware.\n\n### 2. Supported Hardware & OS\n*   **OS:** Linux (Ubuntu 22.04, OpenEuler 22.03).\n*   **Supported Devices:**\n    *   **Atlas 300I A2 (Inference):** Chip 910B.\n    *   **Atlas 300I Duo (Inference):** Chip 310P.\n    *   *Note:* Training chips (910C, 910B) are listed but verification status is empty or pending.\n\n### 3. Model & Data Type Support\n\n#### Supported Models (Text-Only)\nThe backend supports a wide range of architectures including **Llama-2/3, Mistral, Qwen, Yi, Gemma,"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 2143.212,
+   "dn": 249,
+   "da": 130,
+   "text": " GNU GENERAL PUBLIC LICENSE\n            Version 1, February 1989\n\n Copyright (C) 1989 Free Software Foundation, Inc.\n 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.\n Everyone is permitted to copy and distribute verbatim copies\n of this license document, but changing it is not allowed.\n\n            Preamble\n\n  The license agreements of most software companies now put\npriorities for the developers and owners above the wishes of users,\ncustomers and co-workers.  Typically the software owner wants to\nenjoy the benefits of other developers' contributions, but does not\nallow them to make changes that suit their own purposes.\n\n  The general public is deprived of the right to improve the software,\nand sharing of software is made illegal (if you can get away with it).\nInsecure and buggy software is imposed on users who have no choice.\n\n  This General Public License, the \"GNU General Public License\", is\ndesigned to correct these problems.  It gives software developers and\nusers a real right to improve, test and share software in a social\ncommunity.  It is up to the developers and users to enforce"
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 256,
+   "ms": 1573.473,
+   "dn": 179,
+   "da": 165,
+   "text": "CodeQwen1.5-7B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/Phi-3.5-mini-instruct-q4_k_m](https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/Phi-4-mini-instruct-q4_k_m](https://github.com/microsoft/Phi-4-mini-instruct) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  | CPU (SL / SF) | GPU (SL / SF) | NPU (SL) |\n| [bartowski/Llama-3.2-1B-Instruct-Q4_K_M](https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/Llama-3.2-3B-Instruct-Q4_K_M](https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-G"
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 1657.213,
+   "dn": 191,
+   "da": 159,
+   "text": "ollow the [installation guide](https://www.intel.com/content/www/us/en/developer/articles/system-requirements/intel-oneapi-base-toolkit-system-requirements.html#inpage-nav-1-1) to install the toolkit.\n\n- **For other vendor GPU**\n\nPlease refer to the [oneAPI supported GPU](https://www.intel.com/content/www/us/en/developer/articles/system-requirements/intel-oneapi-base-toolkit-system-requirements.html#inpage-nav-1-1) page to check if your GPU is supported.\n\nIf your GPU is supported, please follow the [installation guide](https://www.intel.com/content/www/us/en/developer/articles/system-requirements/intel-oneapi-base-toolkit-system-requirements.html#inpage-nav-1-1) to install the toolkit.\n\n3. **Install other development tools**\n\n```sh\nsudo apt install build-essential cmake git\n```\n\n### II. Build\n\n1. **Build llama.cpp**\n\n```sh\ngit clone https://github.com/ggml-org/llama.cpp\ncd llama.cpp\nmkdir build && cd build\ncmake .. -DGGML_SYCL=ON -DCMAKE_BUILD_TYPE=Release\nmake -j\n```\n\n"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 1891.774,
+   "dn": 222,
+   "da": 144,
+   "text": " system and a licensee cannot\nimpose that choice.\n\nThis section is intended to make thoroughly clear what is intended as\nan alternative to the operating system on which the executable runs,\nand the specific language of the backend.\n\n  12. You may choose to offer warranty and in exchange for a fee.\nRelated royalties and other compensation received or paid by you\naccordingly waive any implied warranties arising out of the use or\nimplied warranty of merchantability or fitness for a particular\npurpose.\n\n  13. The Free Software Foundation may publish revised and/or new\nversions of the Lesser General Public License from time to time.\nSuch new versions will be similar in spirit to the present version,\nbut may differ in detail to address new problems or concerns.\n\nEach version is given a distinguishing version number.  If the Library\nspecifies a version number of this License which applies to it and\n\"any later version\", you have the option of following the terms and\nconditions either of that version or of any later version published by\nthe Free Software Foundation.  If the Library does not specify a\nlicense version number, you may choose any version ever published by\nthe file.\n\n  14. If you wish"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 256,
+   "ms": 1567.148,
+   "dn": 179,
+   "da": 165,
+   "text": "ith\n\n==== license/MPL-2.0 ====\nMozilla Public License Version 2.0\n==================================\n\n1. Definitions\n--------------\n\n1.1. \"Contributor\"\n    means each individual or python/_opcode_metadata.py\n# This file is generated by Tools/cases_generator/py_metadata_generator.py\n# from:\n#   Python/bytecodes.c\n# Do not edit!\n_specializations = {\n    \"RESUME\": [\n        \"RESUME_CHECK\",\n    ],\n    \"LOAD_CONST\": [\n        \"LOAD_CONST_MORTAL\",\n        \"LOAD_CONST_IMMORTAL\",\n    ],\n    \"TO_BOOL\": [\n        \"TO_BOOL_ALWAYS_TRUE\",\n        \"TO_BOOL_BOOL\",\n        \"TO_BOOL_INT\",\n        \"TO_BOOL_LIST\",\n        \"TO_BOOL_NONE\",\n        \"TO_BOOL_STR\",\n    ],\n    \"BINARY_OP\": [\n        \"BINARY_OP_MULTIPLY_INT\",\n        \"BINARY_OP_ADD_INT\",\n        \"BINARY_OP_SUBTRACT_INT\",\n        \"BINARY_OP_MULTIPLY_FLOAT\",\n        \"BINARY_OP_ADD_FLOAT\",\n        \"BINARY_OP_SUBTRACT_FLOAT\",\n        \"BINARY"
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 1611.804,
+   "dn": 188,
+   "da": 161,
+   "text": " while frame is not None:\n        if _is_internal_frame(frame):\n            frame = frame.f_back\n        elif _is_filename_to_skip(frame.f_code.co_filename, skip_file_prefixes):\n            frame = frame.f_back\n        else:\n            break\n    return frame\n\n\ndef _get_warning_metadata(frame, skip_file_prefixes):\n    \"\"\"Get the warning metadata for a frame.\"\"\"\n    frame = _next_external_frame(frame, skip_file_prefixes)\n    if frame is None:\n        return None, None, None\n    return frame.f_code.co_filename, frame.f_lineno, frame.f_code.co_name\n\n\ndef _get_source(location):\n    \"\"\"Get the source code for a warning location.\"\"\"\n    try:\n        import linecache\n        return linecache.getline(location[0], location[1])\n    except Exception:\n        return None\n\n\ndef _get_cause(exc_value, exc_tb):\n    \"\"\"Get the cause of an exception.\"\"\"\n    if exc_value is None:\n        return None\n    if exc_value.__cause__ is not None:\n        return exc_value.__cause__\n    if exc_value.__context__ is not None and not exc_value.__suppress_context__:"
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 1597.858,
+   "dn": 183,
+   "da": 162,
+   "text": ":\n                mytz = self._local_timezone()\n                myoffset = mytz.utcoffset(self)\n\n        if tz == mytz:\n            return self\n\n        myoffset = myoffset.total_seconds()\n\n        tzoffset = tz.utcoffset(self)\n        if tzoffset is None:\n            return self\n        tzoffset = tzoffset.total_seconds()\n\n        if tzoffset == myoffset:\n            return self.replace(tzinfo=tz)\n\n        newtime = self.replace(tzinfo=None) + tzoffset * timedelta(seconds=1) - myoffset * timedelta(seconds=1)\n        newtime = newtime.replace(tzinfo=tz)\n        return newtime\n\n    # Comparisons of datetime objects with other.\n\n    def __eq__(self, other):\n        if isinstance(other, datetime):\n            return self._cmp(other, allow_mixed=True) == 0\n        elif not isinstance(other, date):\n            return NotImplemented\n        else:\n            return False\n\n    def __le__(self, other):\n        if isinstance(other, datetime):\n            return self._cmp(other) <= 0\n        elif isinstance(other, date):\n            return date.__le"
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 256,
+   "ms": 1637.774,
+   "dn": 188,
+   "da": 160,
+   "text": " #      if prec < 0:\n  #          return 0\n        remainder = self._int[prec:]\n        if _all_zeros(remainder, prec):\n            return 0\n        elif remainder == '5'+'0'*(len(remainder)-1):\n            if self._int[prec-1] in '13579':\n                return 1\n            else:\n                return -1\n        elif int(remainder, 10) < 5000...:\n            return 0\n        else:\n            return 1\n\n    def _round_half_down(self, prec):\n        \"\"\"Round 5 down\"\"\"\n        if prec < 0:\n            return 0\n        remainder = self._int[prec:]\n        if _all_zeros(remainder, prec):\n            return 0\n        elif remainder == '5'+'0'*(len(remainder)-1):\n            if self._int[prec-1] in '13579':\n                return -1\n            else:\n                return 1\n        elif int(remainder, 10) <= 5000...:\n            return"
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 1522.753,
+   "dn": 174,
+   "da": 168,
+   "text": " \"\"\"\n        a = _convert_other(a, raiseit=True)\n        return a.compare_total(b, context=self)\n\n    def compare_total_mag(self, a, b):\n        \"\"\"Compares two operands using their abstract representation.\n\n        This is not like the standard compare_total, which include the sign.\n        Note that a total ordering is defined for all possible abstract\n        representations.\n\n        >>> ExtendedContext.compare_total_mag(Decimal('12.73'), Decimal('127.9'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('-127'),  Decimal('12'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.3'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.30'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('12.300'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('NaN'))\n       "
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 1800.736,
+   "dn": 210,
+   "da": 149,
+   "text": " read()\n    Reads and returns a string, or bytes for binary files.\n  readline()\n    Reads until a newline and returns the string.\n  readlines()\n    Reads and returns a list of lines.\n  writelines()\n    Writes a list of lines, not adding any line endings.\n  seek()\n    Moves to a new location in the file.\n  tell()\n    Returns the current file location.\n  truncate()\n    Resizes the file to a given size.\n  close()\n    Closes the file.\n\n    Attributes:\n      closed: True if the file is closed\n\n    \"\"\"\n\n    def __init__(self, *args, **kwds):\n        # IOBase.__init__() is always called from subclasses. IOBase.__init__()\n        # does not accept any arguments, and does not store any attributes.\n        if args or kwds:\n            raise TypeError(\"IOBase.__init__() takes no arguments\")\n        self._closed = False\n\n    @abc.abstractmethod\n    def close(self):\n        \"\"\"Close the IO object.\n\n        The methods read(), readline(), readlines(), write(), writelines(),\n        seek(), tell(),"
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 1666.1,
+   "dn": 192,
+   "da": 158,
+   "text": "ally formatted\n    # string from the binary representation of the number.\n    #\n    # The algorithm is based on the following observations:\n    #\n    # 1. The number of decimal digits in a binary number is\n    #    approximately 3.3219280948873626 * number_of_bits.\n    #\n    # 2. The number of decimal digits in a binary number is\n    #    floor(log_10(2^n)) + 1 = floor(n * log_10(2)) + 1.\n    #\n    # 3. The number of decimal digits in a binary number is\n    #    floor(log_10(2^n)) + 1 = floor(n * log_10(2)) + 1.\n    #\n    # 4. The number of decimal digits in a binary number is\n    #    floor(log_10(2^n)) + 1 = floor(n * log_10(2)) + 1.\n    #\n    # 5. The number of decimal digits in a binary number is\n    #    floor(log_10("
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 1697.09,
+   "dn": 196,
+   "da": 156,
+   "text": "mming-guide/index.html#env-vars) to control the behavior of the CUDA runtime.\n\n### CUDA Graphs\n\nllama.cpp supports CUDA graphs for faster inference. To enable it, use the `--cuda-graphs` flag.\n\n### CUDA Memory Pool\n\nllama.cpp supports CUDA memory pool for faster memory allocation. To enable it, use the `--cuda-mempool` flag.\n\n### CUDA Memory Alignment\n\nllama.cpp supports CUDA memory alignment for faster memory allocation. To enable it, use the `--cuda-mem-align` flag.\n\n### CUDA Async\n\nllama.cpp supports CUDA async for faster memory allocation. To enable it, use the `--cuda-async` flag.\n\n### CUDA Fallback\n\nllama.cpp supports CUDA fallback for faster memory allocation. To enable it, use the `--cuda-fallback` flag.\n\n### CUDA Stream\n\nllama.cpp supports CUDA stream for faster memory allocation. To enable it, use the `--cuda-stream` flag.\n\n### CUDA Graphs with Split Layers\n\nllama.cpp supports CUDA graphs with split layers for faster inference. To enable it, use the `--cuda-graphs` flag.\n\n### CUDA Graphs with Split Layers and Memory Pool\n\nllama.cpp supports"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 1826.273,
+   "dn": 208,
+   "da": 150,
+   "text": "SEG': 0,\n    'HAVE_CRYPT_H': 1,\n    'HAVE_CRYPT_R': 1,\n    'HAVE_CTERMID': 1,\n    'HAVE_CTERMID_R': 0,\n    'HAVE_CURSES': 1,\n    'HAVE_CURSES_FILTER': 1,\n    'HAVE_CURSES_H': 1,\n    'HAVE_CURSES_HAS_KEY': 1,\n    'HAVE_CURSES_IMMEDOK': 1,\n    'HAVE_CURSES_IS_PAD': 1,\n    'HAVE_CURSES_IS_TERM_RESIZED': 1,\n    'HAVE_CURSES_KEYPAD': 1,\n    'HAVE_CURSES_RESIZE_TERM': 1,\n    'HAVE_CURSES_RESIZETERM': 1,\n    'HAVE_CURSES_RESIZETERM_2ARGS': 0,\n    'HAVE_CURSES_SYNCOK': 1,\n    'HAVE_CURSES_TYPEAHEAD': 1,\n    'HAVE_CURSES_USE_EXTENSIONS': 1,\n    'HAVE_CURSES_USE_DEFAULT_COLORS': 1,\n    'HAVE_CURSES_WCHGAT': 1,\n    '"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 1665.059,
+   "dn": 192,
+   "da": 158,
+   "text": " N`) flag to configure the number of threads to use for inference. If you set this to a very large number, then the CPU will be oversaturated, and inference will be slower. To check if this is the case, run `htop` or `top` while running llama, and check if the CPU is oversaturated. If it is, then you should reduce the number of threads.\n\n## Verifying that the GPU is not oversaturated\nllama accepts a `-ngl N` (or `--n-gpu-layers N`) flag to configure the number of layers to offload to the GPU. If you set this to a very large number, then the GPU will be oversaturated, and inference will be slower. To check if this is the case, run `nvidia-smi` while running llama, and check if the GPU is oversaturated. If it is, then you should reduce the number of layers.\n\n## Verifying that the GPU is not running out of memory\nIf the GPU runs out of memory, then llama will fall back to using the CPU, which will be slower. To check if this is the case, run `nvidia-smi` while running llama, and check if the GPU is running out"
+  }
+ ]
+}

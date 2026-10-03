@@ -1,0 +1,164 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 41.736,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 3898,
+   "ms_step": 23.96
+  },
+  "pooled": {
+   "tps": 41.736,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 3898,
+   "ms_step": 23.96
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 6191.442,
+   "dn": 0,
+   "da": 0,
+   "text": " entry-level devices.\n\n## Build CLI binding using Android NDK\n\n### Prerequisites\n\n- [Android NDK](https://developer.android.com/ndk/guides)\n- [CMake](https://cmake.org/)\n\n### Build\n\n```bash\n# Clone the repository\ngit clone https://github.com/ggml-org/llama.cpp.git\ncd llama.cpp\n\n# Build the project\nmkdir -p build-android\ncd build-android\ncmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \\\n      -DANDROID_ABI=arm64-v8a \\\n      -DANDROID_PLATFORM=android-28 \\\n      -DCMAKE_BUILD_TYPE=Release \\\n      -DGGML_RPC=ON \\\n      -DGGML_LLAMAFILE=ON \\\n      -DGGML_AVX=OFF \\\n      -DGGML_AVX2=OFF \\\n      -DGGML_AVX512=OFF \\\n      -DGGML_FMA=OFF \\\n      -DGGML_F16C=OFF \\\n      ..\ncmake --build . --config Release -j $(nproc --all)"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 6135.475,
+   "dn": 0,
+   "da": 0,
+   "text": "\n\n<think>\n\n</think>\n\nBased on the provided documentation, here is a structured summary and guide for using **llama.cpp** with **Ascend NPU** (CANN backend).\n\n### 1. Overview\nThis backend integrates llama.cpp with Huawei's Ascend NPU using the CANN Toolkit. It supports both inference and training kernels via Ascend NPU directly.\n\n### 2. System Requirements\n\n#### Operating System\n*   **Linux** (Verified on Ubuntu 22.04 and OpenEuler 22.03).\n\n#### Hardware (Ascend NPU)\nYou can identify your device ID using:\n```sh\nlspci -n | grep -Eo '19e5:d[0-9a-f]{3}' | cut -d: -f2\n```\n\n| Device ID | Product Series | Chip Model | Status |\n| :--- | :--- | :--- | :--- |\n| `d802` | Atlas A2 Infer | 910B | **Support** |\n| `d500` | Atlas Infer (300I Duo) | 310P | **Support** |\n| `d8"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 6154.238,
+   "dn": 0,
+   "da": 0,
+   "text": " GNU GENERAL PUBLIC LICENSE\n            Version 1, February 1989\n\n            Copyright (C) 1989 Free Software Foundation, Inc.\n            51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA\n\n            Everyone is permitted to copy and distribute verbatim copies\n            of this license document, but changing it is not allowed.\n\n            Preamble\n\n            The license agreements of most companies and organizations use\n            the GNU General Public License, the GNU Lesser General Public\n            License, or the GNU Library General Public License as a basis\n            for their license agreements. All of these licenses vary in\n            detail, but all are designed to achieve the same basic goal: to\n            make software freely available and easy to modify.\n\n            We feel that this is a worthy goal, but we also feel that the\n            details of the existing licenses obscure this goal in a maze of\n            legal jargon and conditions that vary from license to license.\n            We at the Free Software Foundation have carefully drafted a new\n            license that we feel clarifies this goal and meets our needs\n            as well as the needs of other organizations that want to make\n           "
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 256,
+   "ms": 6131.416,
+   "dn": 0,
+   "da": 0,
+   "text": "CodeQwen1.5-7B-Qwen-Q4_K_M-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/Phi-3.5-mini-instruct-q4_k_m](https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/Phi-4-mini-instruct-q4_k_m](https://hugging3.co/bartowski/Phi-4-mini-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/Qwen2.5-1.5B-Instruct-Q4_K_M](https://huggingface.co/bartowski/Qwen2.5-1.5B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/Qwen2.5-7B-Instruct-Q4_K_M](https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF) | ✓ / ✓ |"
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 6132.564,
+   "dn": 0,
+   "da": 0,
+   "text": "ollow the [Intel® oneAPI Base toolkit installation guide](https://www.intel.com/content/www/us/en/developer/articles/guide/intel-oneapi-base-toolkit-installation-guide.html) to install the toolkit.\n\n*Note*: The installation of **Intel® oneAPI Base toolkit** and **Intel® Deep Learning Essentials** requires root privilege.\n\n- **For other vendor GPU**\n\nPlease refer to the [oneAPI supported GPU](https://www.intel.com/content/www/us/en/developer/articles/system-requirements/intel-oneapi-base-toolkit-system-requirements.html#inpage-nav-1-1) for the installation guide.\n\n3. **Install other development tools**\n\n```sh\nsudo apt install build-essential cmake git\n```\n\n### II. Build from source code\n\n1. **Clone the llama.cpp repository**\n\n```sh\ngit clone https://github.com/ggml-org/llama.cpp.git\ncd llama.cpp\n```\n\n2. **Build llama.cpp with SYCL backend**\n\n```sh\n# source oneAPI environment\nsource /opt/intel/oneapi/setvars.sh\n\n# build llama.cpp with SYCL backend\ncmake -B build -DGGML_SYCL=ON -DCMAKE"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 6116.044,
+   "dn": 0,
+   "da": 0,
+   "text": " system and a licensee cannot\nimpose that choice.\n\nThis section is intended to make thoroughly clear what is intended as\nan alternative to the operating system on which the executable runs,\nand the specific language of the backend.\n\n  12. You may choose any way of rewarding contribution to the wide\nrange of software distributed through that system in reliance on\nconsistent application of the that system; it is up to the\nauthor/donor to decide if he or she is willing to distribute software\nthrough any other system and a licensee cannot impose that choice.\n\nThis section is intended to make thoroughly clear what is intended as\nan alternative to the operating system on which the executable runs,\nand the specific language of the backend.\n\n  13. If, as a consequence of a court judgment or allegation of patent\ninfringement or for any other reason (not limited to metal issues),\nconditions are imposed on you (whether by court order, agreement or\notherwise) that contradict the conditions of this License, they do not\nexcuse you from the conditions of this License.  If you cannot\ndistribute so as to satisfy simultaneously your obligations under this\nLicense and any other pertinent obligations, then as a consequence you\nmay"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 58,
+   "ms": 1382.168,
+   "dn": 0,
+   "da": 0,
+   "text": "ith\n\n==== license/MPL-2.0 ====\nMozilla Public License Version 2.0\n==================================\n\n1. Definitions\n--------------\n\n1.1. \"Contributor\"\n    means each individual or legal entity that creates, contributes to\n    the creation of,"
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 6119.233,
+   "dn": 0,
+   "da": 0,
+   "text": " while frame is not None:\n        if _is_internal_frame(frame):\n            frame = frame.f_back\n        elif _is_filename_to_skip(frame.f_code.co_filename, skip_file_prefixes):\n            frame = frame.f_back\n        else:\n            return frame\n    return None\n\n\ndef _get_warning_metadata():\n    \"\"\"Get the warning metadata from the current frame.\"\"\"\n    import inspect\n    frame = inspect.currentframe()\n    if frame is None:\n        return None, None, None, None\n    try:\n        skip_file_prefixes = sys._getframe(1).f_locals.get(\n            '_skip_file_prefixes', ())\n        frame = _next_external_frame(frame, skip_file_prefixes)\n        if frame is None:\n            return None, None, None, None\n        filename = frame.f_code.co_filename\n        lineno = frame.f_lineno\n        function_name = frame.f_code.co_name\n        module_name = frame.f_globals.get('__name__', None)\n        return filename, lineno, function_name, module_name\n    finally:\n        # To correctly handle reference cycles, frame must be deleted.\n        del frame\n\n\ndef warn(message, category=None, stacklevel="
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 6130.687,
+   "dn": 0,
+   "da": 0,
+   "text": ":\n                mytz = self._local_timezone()\n                myoffset = mytz.utcoffset(self)\n\n        if tz == mytz:\n            return self\n\n        tzoffset = tz.utcoffset(self)\n        if tzoffset is None:\n            return self\n        offset_diff = tzoffset - myoffset\n\n        self += offset_diff\n        self = self.replace(tzinfo=tz)\n        return self\n\n    def strftime(self, format):\n        \"\"\"Format using strftime().  The date part of the timestamp passed\n        to underlying strftime should not be used.\n        \"\"\"\n        # The year must be >= 1000 else Python's strftime implementation\n        # can raise a bogus exception.\n        timetuple = (self.year, self.month, self.day,\n                     self.hour, self.minute, self.second,\n                     self.weekday(), 1, -1)\n        return _wrap_strftime(self, format, timetuple)\n\n    def __format__(self, fmt):\n        if not isinstance(fmt, str):\n            raise TypeError(\"must be str, not %s\" % type(fmt).__name__)\n        if len(fmt) != 0:\n"
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 256,
+   "ms": 6118.443,
+   "dn": 0,
+   "da": 0,
+   "text": " #      if prec < 0:\n  #          return 0\n        remainder = self._int[prec:]\n        if _all_zeros(remainder, len(remainder)):\n            return 0\n        if remainder[0] > '5':\n            return 1\n        if remainder[0] < '5':\n            return -1\n        if prec == 0 or self._int[prec-1] in '02468':\n            return 0\n        return 1\n\n    def _round_half_down(self, prec):\n        \"\"\"Round 5 down\"\"\"\n        if _all_zeros(self._int[:prec], prec):\n            return 0\n        remainder = self._int[prec:]\n        if _all_zeros(remainder, len(remainder)):\n            return 1\n        if remainder[0] > '5':\n            return -1\n        if remainder[0] < '5':\n            return 1\n        if prec == 0 or self._int[prec-1] in '02468':\n            return 1\n        return 0\n\n    def _round_half_even(self, prec):\n        \"\"\"Round"
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 6129.308,
+   "dn": 0,
+   "da": 0,
+   "text": " \"\"\"\n        a = _convert_other(a, raiseit=True)\n        return a.compare_total(b, context=self)\n\n    def compare_total_mag(self, a, b):\n        \"\"\"Compares two operands using their abstract representation.\n\n        This is not like the standard compare_total, which include their sign\n        bits. Note that a total ordering is defined for all possible abstract\n        representations.\n\n        >>> ExtendedContext.compare_total_mag(Decimal('12.73'), Decimal('127.9'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('-127'),  Decimal('12'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.3'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.30'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('12.300'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('NaN'))\n"
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 6122.001,
+   "dn": 0,
+   "da": 0,
+   "text": " read()\n    Read data and return it as bytes, without any arguments. This will\n    return the end of the file (an empty bytes object) once EOF is\n    reached.\n  readline()\n    Read until newline or EOF and return it. Newline is kept in the string\n    unless it is at the very end of the file, in which case it will be None.\n  write(data)\n    Write data to the stream. It will return the number of unwritten bytes\n    (as a number of bytes) if it is called with a buffer object (not\n    otherwise).\n  close()\n    Flush and close the IO object.\n\n    This object is automatically closed if invoked from the destructor.\n    \"\"\"\n\n    def __init__(self):\n        self._closed = False\n\n    def __del__(self):\n        try:\n            self.close()\n        except Exception:\n            pass\n\n    @abc.abstractmethod\n    def close(self):\n        \"\"\"Close the IO object.\n\n        The method cannot be called again after the first call.\n        \"\"\"\n\n    @property\n    @abc.abstractmethod\n    def closed(self):\n        \"\"\"File is closed?\"\"\""
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 6122.633,
+   "dn": 0,
+   "da": 0,
+   "text": "ally formatted\n    # string from the binary representation of the number.\n    #\n    # The algorithm is based on the following observations:\n    #\n    # 1. The number of decimal digits in a binary number is\n    #    approximately 3.3219280948873626 * number_of_bits.\n    #\n    # 2. The number of decimal digits in a binary number is\n    #    floor(log_10(2^n)) + 1 = floor(n * log_10(2)) + 1.\n    #\n    # 3. The number of decimal digits in a binary number is\n    #    floor(log_10(2^n)) + 1 = floor(n * log_10(2)) + 1.\n    #\n    # 4. The number of decimal digits in a binary number is\n    #    floor(log_10(2^n)) + 1 = floor(n * log_10(2)) + 1.\n    #\n    # 5. The number of decimal digits in a binary number is\n    #    floor(log_10("
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 6129.098,
+   "dn": 0,
+   "da": 0,
+   "text": "mming-guide/index.html#env-vars) to control the behavior of the CUDA runtime.\n\n### CUDA Graphs\n\nllama.cpp supports CUDA graphs for faster inference. To enable this feature, use the `-ngl 100` command-line argument.\n\n### CUDA Memory Pool\n\nllama.cpp supports CUDA memory pool for faster inference. To enable this feature, use the `--cuda-mempool` command-line argument.\n\n### CUDA Memory Alignment\n\nllama.cpp supports CUDA memory alignment for faster inference. To enable this feature, use the `--cuda-mem-align` command-line argument.\n\n### CUDA Memory Pool Alignment\n\nllama.cpp supports CUDA memory pool alignment for faster inference. To enable this feature, use the `--cuda-mempool-align` command-line argument.\n\n### CUDA Memory Pool Size\n\nllama.cpp supports CUDA memory pool size for faster inference. To enable this feature, use the `--cuda-mempool-size` command-line argument.\n\n### CUDA Memory Pool Size Alignment\n\nllama.cpp supports CUDA memory pool size alignment for faster inference. To enable this feature, use the `--cuda-mempool-size-align` command-line argument.\n\n### CUDA Memory Pool Size Alignment\n\nllama.cpp supports CUDA memory pool size"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 6161.381,
+   "dn": 0,
+   "da": 0,
+   "text": "SEG': 0,\n    'HAVE_CRYPT_H': 1,\n    'HAVE_CRYPT_R': 1,\n    'HAVE_CTERMID': 1,\n    'HAVE_CTERMID_R': 0,\n    'HAVE_CURSES': 1,\n    'HAVE_CURSES_H': 1,\n    'HAVE_CURSES_FILTER': 1,\n    'HAVE_CURSES_HAS_KEY': 1,\n    'HAVE_CURSES_IMMEDOK': 1,\n    'HAVE_CURSES_IS_PAD': 1,\n    'HAVE_CURSES_IS_TERM_RESIZED': 1,\n    'HAVE_CURSES_KEYPAD': 1,\n    'HAVE_CURSES_RESIZE_TERM': 1,\n    'HAVE_CURSES_RESIZETERM': 1,\n    'HAVE_CURSES_RESIZETERM_2ARGS': 0,\n    'HAVE_CURSES_SYNCOK': 1,\n    'HAVE_CURSES_TYPEAHEAD': 1,\n    'HAVE_CURSES_USE_EXTENSIONS': 1,\n    'HAVE_CURSES_USE_SCREEN': 1,\n    'HAVE_CURSES_WCHGAT': 1,\n    'HAVE"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 6120.794,
+   "dn": 0,
+   "da": 0,
+   "text": " N`) flag to configure the number of threads to use for inference. If you set this to a very large number, then the CPU will be oversaturated, and the GPU will be starved of data. This will result in poor performance.\n\nTo verify that the CPU is not oversaturated, you can use the `htop` command to monitor CPU usage. If you see that the CPU is at 100% usage, then you should reduce the number of threads.\n\n## Verifying that the GPU is not oversaturated\nllama accepts a `-ngl N` (or `--n-gpu-layers N`) flag to configure the number of layers to offload to the GPU. If you set this to a very large number, then the GPU will be oversaturated, and the CPU will be starved of data. This will result in poor performance.\n\nTo verify that the GPU is not oversaturated, you can use the `nvidia-smi` command to monitor GPU usage. If you see that the GPU is at 100% usage, then you should reduce the number of layers.\n\n## Verifying that the GPU is not underutilized\nllama accepts a `-ngl N` (or `--"
+  }
+ ]
+}

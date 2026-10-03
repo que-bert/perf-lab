@@ -1,0 +1,92 @@
+{
+ "summary": {
+  "heldout": {
+   "tps": 103.387,
+   "tok_step": 2.5924,
+   "accept": 0.5395,
+   "n": 2048,
+   "ms_step": 25.075
+  },
+  "pooled": {
+   "tps": 103.387,
+   "tok_step": 2.5924,
+   "accept": 0.5395,
+   "n": 2048,
+   "ms_step": 25.075
+  }
+ },
+ "rows": [
+  {
+   "set": "heldout",
+   "i": 0,
+   "n": 256,
+   "ms": 5528.367,
+   "dn": 325,
+   "da": 146,
+   "text": "김치는 한국의 대표적인 발효 음식으로, 유네스코 무형문화유산으로 등재될 만큼 한국인들에게 깊은 정서적, 문화적 의미를 지니고 있습니다. 요청하신 대로 김치의 **역사**, **종류**, 그리고 **만드는 방법**을 자세히 설명해 드리겠습니다.\n\n---\n\n### 1. 김치의 역사\n\n김치의 기원은 고대부터 시작되어 수천 년에 걸쳐 진화해 왔습니다.\n\n*   **기원 (삼국시대 이전):**\n    *   초기에는 채소를 소금에 절여 저장하는 **'포(菹)'**라는 형태로 시작되었습니다.\n    *   삼국시대에는 '김치'라는 명칭이 사용되기 시작했으며, 《삼국사기》와 《삼국유사》에도 김치와 관련된 기록이 남아 있습니다.\n*   **고추의 도입 (조선시대 중기):**\n    *   원래 김치는 소금, 간장, 된장, 젓갈 등을 이용해 담갔지만, **고추가 없었습니다**.\n    *   16세기 말~17세기 초(임진왜란 직후) 고추가 일본을 통해 한국에 들어오면서 김치의 색"
+  },
+  {
+   "set": "heldout",
+   "i": 1,
+   "n": 256,
+   "ms": 2572.792,
+   "dn": 243,
+   "da": 173,
+   "text": "Солнечная система — это гравитационно связанная система, состоящая из Солнца и всех объектов, вращающихся вокруг него. Она сформировалась около 4,6 миллиарда лет назад из гигантского молекулярного облака.\n\nНиже представлено подробное описание структуры Солнечной системы и всех входящих в неё планет.\n\n---\n\n### 1. Центральная часть: Солнце\n**Солнце** — это звезда главной последовательности (желтый карлик), на которую приходится **99,86% всей массы** Солнечной системы.\n- **Роль:** Благодаря своей огромной массе Солнце создает гравитационное поле, которое удерживает планеты, астероиды, кометы и другие объекты на их орбитах.\n- **Энергия:** В ядре Солнца происходят термоядерные реакции превращения водорода в гелий, что выделяет колоссальное количество энергии в виде света и тепла, необходимых для жизни на Земле.\n\n---\n\n### 2. Внутренние планеты (Планеты земной группы)\nЭ"
+  },
+  {
+   "set": "heldout",
+   "i": 2,
+   "n": 256,
+   "ms": 2245.835,
+   "dn": 345,
+   "da": 140,
+   "text": "Ecco una guida pratica ed essenziale per scoprire Roma in tre giorni, bilanciando i grandi classici, la storia e il buon cibo.\n\n### **Giorno 1: L’Impero Romano e il Cuore Barocco**\nInizia con la grandezza dell’antica Roma e termina nel centro storico più vivace.\n\n*   **Mattina: Colosseo, Foro Romano e Palatino**\n    *   Prenota i biglietti in anticipo per evitare code infinite. Visita il Colosseo, poi esplora il Foro Romano (il cuore politico dell’antica Roma) e sali al Palatino per una vista panoramica mozzafiato.\n*   **Pranzo:**\n    *   Zona: *Monti* o *Colosseo*.\n    *   Consiglio: Prova una **Pizza al Taglio** veloce o un primo piatto semplice in una trattoria tipica. Evita i ristoranti con i \"menu fotografici\" fuori dal Colosseo.\n*   **Pomeriggio: Piazza Venezia e Vittoriano**\n    *   Ammira il Monumento a Vittorio Emanuele II (il \"Treno\" bianco). Se hai energie, sali in terrazza per una vista a 360°"
+  },
+  {
+   "set": "heldout",
+   "i": 3,
+   "n": 256,
+   "ms": 1921.585,
+   "dn": 293,
+   "da": 157,
+   "text": "O sistema de saúde pública do Brasil é conhecido mundialmente como **SUS (Sistema Único de Saúde)**. Criado pela Constituição Federal de 1988, o SUS é considerado um dos maiores sistemas de saúde pública universal do mundo, oferecendo atendimento gratuito a todos os cidadãos, independentemente de contribuição previdenciária ou condição socioeconômica.\n\nAbaixo, explico detalhadamente como ele funciona, sua estrutura, princípios e os principais desafios que enfrenta.\n\n---\n\n### 1. Princípios Fundamentais do SUS\n\nO SUS é baseado em três pilares constitucionais:\n\n*   **Universalidade:** A saúde é um direito de todos e um dever do Estado. Qualquer pessoa, seja brasileira ou estrangeira, tem acesso ao sistema.\n*   **Integralidade:** O sistema deve garantir atenção à saúde em todos os níveis (prevenção, tratamento e reabilitação), de forma contínua e completa, considerando o indivíduo como um todo.\n*   **Equidade:** É o princípio mais importante. Significa dar mais atenção a quem mais precisa, buscando reduzir desigualdades. Por exemplo, regiões com maior carência recebem mais recursos e profissionais.\n\nAlém desses, há o princípio da **Participação Social"
+  },
+  {
+   "set": "heldout",
+   "i": 4,
+   "n": 256,
+   "ms": 1873.353,
+   "dn": 287,
+   "da": 159,
+   "text": "Chào bạn, **Tết Nguyên Đán** (thường gọi tắt là Tết) là dịp lễ quan trọng nhất, mang ý nghĩa văn hóa và tâm linh sâu sắc nhất trong đời sống của người Việt Nam. Dưới đây là phần giải thích chi tiết về nguồn gốc, lịch sử và ý nghĩa của ngày lễ này.\n\n---\n\n### 1. Nguồn gốc và Lịch sử\n\n#### a. Ý nghĩa tên gọi\n*   **Nguyên**: Có nghĩa là khởi đầu, bắt đầu.\n*   **Đán**: Có nghĩa là buổi sáng sớm.\n*   **Nguyên Đán**: Nghĩa là buổi sáng đầu tiên của năm mới.\n*   **Tết**: Xuất phát từ chữ **\"Tiết\"** trong tiếng Hán, chỉ các khoảng thời gian trong năm (như Tiết Xuân, Tiết Hạ...). Người Việt gọi là \"Tết Nguyên Đán\" để chỉ **Tiết Nguyên Đán**, tức là tiết đầu tiên của mùa Xuân.\n\n#### b. Lịch sử hình thành\nTết Nguyên Đán ở Việt Nam có nguồn gốc từ nền văn minh lúa nước phương Đông, chịu ảnh hưởng sâu sắc từ văn hóa Trung Hoa nhưng đã được Việt hóa qua hàng ngàn năm.\n\n*   **Thời kỳ phong kiến**: Người"
+  },
+  {
+   "set": "heldout",
+   "i": 5,
+   "n": 256,
+   "ms": 2028.171,
+   "dn": 303,
+   "da": 153,
+   "text": "لفهم كيفية عمل الإنترنت، يمكننا تخيله كشبكة ضخمة من الطرق السريعة التي تربط بين ملايين الأجهزة (الخوادم) والمستخدمين (أجهزتك). عندما تكتب عنواناً في المتصفح وتضغط \"دخول\"، تحدث سلسلة معقدة وسريعة جداً من الخطوات. إليك الشرح التفصيلي خطوة بخطوة:\n\n### 1. كتابة العنوان (URL)\nكل شيء يبدأ عندما تكتب عنواناً مثل `www.example.com` في شريط المتصفح. هذا العنوان ليس مجرد نص، بل هو \"عنوان منزلي\" للصفحة التي تريد زيارتها.\n\n### 2. البحث عن العنوان الرقمي (DNS Resolution)\nالإنترنت لا يفهم أسماء النطاقات مثل `www.example.com`. الأجهزة تتواصل فقط عبر **عناوين IP** رقمية (مثل `93.184.216.34`).\n- **ما يحدث:** يقوم متصفحك بالاتصال بخادم **DNS** (نظام أسماء النطاقات)، وهو بمثابة \"دليل الهاتف\" للإنترنت.\n- **النتيجة:** يسأل DNS: \"ما هو العنوان الرقمي لـ `www.example.com`؟\"، فيرد عليه بالعنوان الرقمي الصحيح.\n\n###"
+  },
+  {
+   "set": "heldout",
+   "i": 6,
+   "n": 256,
+   "ms": 1713.755,
+   "dn": 251,
+   "da": 171,
+   "text": "```python\nfrom collections import OrderedDict\n\n\nclass LRUCache:\n    \"\"\"\n    LRU（Least Recently Used，最近最少使用）缓存类\n    \n    使用 OrderedDict 来实现 O(1) 时间复杂度的 get 和 put 操作。\n    OrderedDict 维护键值对的插入顺序，我们可以利用这一点来模拟 LRU 行为：\n    - 当访问某个键时（get 或 put 更新），将其移到末尾（表示最近使用）\n    - 当缓存满时，移除最前面的键（表示最久未使用）\n    \n    时间复杂度：\n    - get: O(1)\n    - put: O(1)\n    \n    空间复杂度：O(capacity)，最多存储 capacity 个键值对\n    \"\"\"\n\n    def __init__(self, capacity: int):\n        \"\"\"\n        初始化 LRU 缓存\n        \n        参数:\n            capacity (int): 缓存的最大容量，即最多能存储多少个键值对\n        \"\"\"\n        # 如果容量小于等于0，抛出异常，因为缓存容量必须为正整数\n        if capacity <= 0:\n            raise ValueError(\"Cache capacity must be a positive integer\")"
+  },
+  {
+   "set": "heldout",
+   "i": 7,
+   "n": 256,
+   "ms": 1925.17,
+   "dn": 285,
+   "da": 159,
+   "text": "以下是该句的自然中文翻译及用词解析：\n\n### 中文翻译\n> 委员会推迟了决定，待更多田间试验数据出炉后再作定夺，理由是出于对长期安全性和成本的担忧。\n\n---\n\n### 用词解析 (Word Choice Explanation)\n\n为了将英文原文转化为符合中文表达习惯的自然语句，我在翻译时做了以下调整：\n\n1.  **\"Postponed its decision\" → \"推迟了决定\"**\n    *   **直译 vs. 意译**：虽然直译是“推迟其决定”，但在中文里，“推迟决定”略显生硬。更自然的说法是“推迟了决定”或“暂缓决定”。这里选择“推迟了决定”以保留原文的正式感，同时符合中文动宾搭配习惯。\n\n2.  **\"Until more data... became available\" → \"待更多...数据出炉后再作定夺\"**\n    *   **\"Until... became available\"**：直译为“直到……变得可用”不符合中文逻辑。中文习惯用“待……后”或“等到……时”来表达时间条件。\n    *   **\"Data\"**：译为“数据”。\n    *   **\"Field trials\"**：译为“田间试验”。这是农业"
+  }
+ ]
+}

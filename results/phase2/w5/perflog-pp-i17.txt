@@ -1,0 +1,85 @@
+WARNING: radv is not a conformant Vulkan implementation, testing use only.
+WARNING: radv is not a conformant Vulkan implementation, testing use only.
+ggml_vulkan: Found 2 Vulkan devices:
+ggml_vulkan: 0 = AMD Radeon RX 9060 XT (RADV GFX1200) (radv) | arch: RDNA4 | uma: 0 | fp16: 1 | bf16: 1 | fp4: 0 | warp size: 64 | shared memory: 65536 | int dot: 1 | matrix cores: KHR_coopmat
+ggml_vulkan: 1 = AMD Radeon AI PRO R9700 (RADV GFX1201) (radv) | arch: RDNA4 | uma: 0 | fp16: 1 | bf16: 1 | fp4: 0 | warp size: 64 | shared memory: 65536 | int dot: 1 | matrix cores: KHR_coopmat
+| model                          |       size |     params | backend    | ngl |  fa | dev          |            test |                  t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | --: | ------------ | --------------: | -------------------: |
+----------------
+Vulkan Timings:
+CONT: 1 x 113.56 us = 113.56 us
+FLASH_ATTN_EXT dst(256,8,512,1),  q(256,512,8,1),  k(256,512,2,1),  v(256,512,2,1),  m(512,512,1,1): 35 x 97.108 us = 3398.8 us (22114.3 GFLOPS/s)
+FLASH_ATTN_EXT dst(512,8,512,1),  q(512,512,8,1),  k(512,512,2,1),  v(512,512,2,1),  m(512,512,1,1): 7 x 173.531 us = 1214.72 us (24750.4 GFLOPS/s)
+GELU: 1 x 6.72 us = 6.72 us
+GELU_MUL GELU: 41 x 4.779 us = 195.96 us
+GET_ROWS: 1 x 4.24 us = 4.24 us
+GLU: 42 x 87.545 us = 3676.92 us
+MUL: 1 x 6.76 us = 6.76 us
+MUL_MAT bf16 m=10752 n=512 k=2560: 1 x 1031.48 us = 1031.48 us (27320.2 GFLOPS/s)
+MUL_MAT q4_K m=1024 n=512 k=2560: 8 x 62.395 us = 499.16 us (43013.5 GFLOPS/s)
+MUL_MAT q4_K m=10240 n=512 k=2560: 84 x 435.209 us = 36557.6 us (61667.5 GFLOPS/s)
+MUL_MAT q4_K m=2048 n=512 k=2560: 35 x 157.448 us = 5510.71 us (34091.5 GFLOPS/s)
+MUL_MAT q4_K m=256 n=512 k=2560: 42 x 38.87 us = 1632.56 us (17261.4 GFLOPS/s)
+MUL_MAT q4_K m=2560 n=512 k=10240: 21 x 645 us = 13545 us (41615.8 GFLOPS/s)
+MUL_MAT q4_K m=2560 n=512 k=2048: 35 x 145.6 us = 5096 us (36864 GFLOPS/s)
+MUL_MAT q4_K m=2560 n=512 k=256: 42 x 26.178 us = 1099.48 us (25585.4 GFLOPS/s)
+MUL_MAT q4_K m=2560 n=512 k=4096: 7 x 266.52 us = 1865.64 us (40282.6 GFLOPS/s)
+MUL_MAT q4_K m=4096 n=512 k=2560: 7 x 175.348 us = 1227.44 us (61222.7 GFLOPS/s)
+MUL_MAT q4_K m=512 n=512 k=2560: 29 x 403.268 us = 11694.8 us (3327.59 GFLOPS/s)
+MUL_MAT q6_K m=2560 n=512 k=10240: 21 x 519.225 us = 10903.7 us (51696.7 GFLOPS/s)
+MUL_MAT q6_K m=512 n=512 k=2560: 11 x 84.472 us = 929.2 us (15885.8 GFLOPS/s)
+MUL_MAT_VEC q6_K m=262144 n=1 k=2560: 1 x 908.28 us = 908.28 us (1477.42 GFLOPS/s)
+RMS_NORM_MUL RMS_NORM(2560,512,1,1): 85 x 16.095 us = 1368.08 us
+RMS_NORM_MUL_ADD RMS_NORM(256,42,512,1): 1 x 204.76 us = 204.76 us
+RMS_NORM_MUL_ADD RMS_NORM(2560,512,1,1): 84 x 20.176 us = 1694.8 us
+RMS_NORM_MUL_ADD_MUL RMS_NORM(2560,512,1,1): 42 x 17.995 us = 755.8 us
+RMS_NORM_MUL_ROPE RMS_NORM(256,8,512,1): 35 x 35.7 us = 1249.52 us
+RMS_NORM_MUL_ROPE RMS_NORM(512,8,512,1): 7 x 40.16 us = 281.12 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(256,2,512,1): 20 x 16.976 us = 339.52 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(512,2,512,1): 4 x 16.68 us = 66.72 us
+RMS_NORM_VIEW_SET_ROWS RMS_NORM(256,2,512,1): 20 x 11.426 us = 228.52 us
+RMS_NORM_VIEW_SET_ROWS RMS_NORM(512,2,512,1): 4 x 12.13 us = 48.52 us
+SCALE: 6 x 66.673 us = 400.04 us
+TANH: 1 x 6.76 us = 6.76 us
+Total time: 107763 us.
+----------------
+Vulkan Timings:
+CONT: 1 x 112.52 us = 112.52 us
+FLASH_ATTN_EXT dst(256,8,512,1),  q(256,512,8,1),  k(256,512,2,1),  v(256,512,2,1),  m(512,512,1,1): 35 x 93.426 us = 3269.92 us (22985.9 GFLOPS/s)
+FLASH_ATTN_EXT dst(512,8,512,1),  q(512,512,8,1),  k(512,512,2,1),  v(512,512,2,1),  m(512,512,1,1): 7 x 171.331 us = 1199.32 us (25068.2 GFLOPS/s)
+GELU: 1 x 6.64 us = 6.64 us
+GELU_MUL GELU: 41 x 4.55 us = 186.56 us
+GET_ROWS: 1 x 4.32 us = 4.32 us
+GLU: 42 x 86.015 us = 3612.64 us
+MUL: 1 x 6.72 us = 6.72 us
+MUL_MAT bf16 m=10752 n=512 k=2560: 1 x 1069.4 us = 1069.4 us (26351.4 GFLOPS/s)
+MUL_MAT q4_K m=1024 n=512 k=2560: 8 x 61.8 us = 494.4 us (43427.7 GFLOPS/s)
+MUL_MAT q4_K m=10240 n=512 k=2560: 84 x 406.953 us = 34184.1 us (65949.3 GFLOPS/s)
+MUL_MAT q4_K m=2048 n=512 k=2560: 35 x 123.524 us = 4323.36 us (43454.2 GFLOPS/s)
+MUL_MAT q4_K m=256 n=512 k=2560: 42 x 38.095 us = 1600 us (17612.6 GFLOPS/s)
+MUL_MAT q4_K m=2560 n=512 k=10240: 21 x 601.506 us = 12631.6 us (44625 GFLOPS/s)
+MUL_MAT q4_K m=2560 n=512 k=2048: 35 x 143.233 us = 5013.16 us (37473.2 GFLOPS/s)
+MUL_MAT q4_K m=2560 n=512 k=256: 42 x 25.204 us = 1058.6 us (26573.5 GFLOPS/s)
+MUL_MAT q4_K m=2560 n=512 k=4096: 7 x 256.182 us = 1793.28 us (41908 GFLOPS/s)
+MUL_MAT q4_K m=4096 n=512 k=2560: 7 x 172.622 us = 1208.36 us (62189.5 GFLOPS/s)
+MUL_MAT q4_K m=512 n=512 k=2560: 29 x 40.248 us = 1167.2 us (33340.9 GFLOPS/s)
+MUL_MAT q6_K m=2560 n=512 k=10240: 21 x 368.617 us = 7740.96 us (72818.7 GFLOPS/s)
+MUL_MAT q6_K m=512 n=512 k=2560: 11 x 80.821 us = 889.04 us (16603.4 GFLOPS/s)
+MUL_MAT_VEC q6_K m=262144 n=1 k=2560: 1 x 906.6 us = 906.6 us (1480.16 GFLOPS/s)
+RMS_NORM_MUL RMS_NORM(2560,512,1,1): 85 x 15.428 us = 1311.44 us
+RMS_NORM_MUL_ADD RMS_NORM(256,42,512,1): 1 x 202.92 us = 202.92 us
+RMS_NORM_MUL_ADD RMS_NORM(2560,512,1,1): 84 x 19.53 us = 1640.6 us
+RMS_NORM_MUL_ADD_MUL RMS_NORM(2560,512,1,1): 42 x 17.644 us = 741.08 us
+RMS_NORM_MUL_ROPE RMS_NORM(256,8,512,1): 35 x 34.241 us = 1198.44 us
+RMS_NORM_MUL_ROPE RMS_NORM(512,8,512,1): 7 x 39.542 us = 276.8 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(256,2,512,1): 20 x 16.096 us = 321.92 us
+RMS_NORM_MUL_ROPE_VIEW_SET_ROWS RMS_NORM(512,2,512,1): 4 x 16.41 us = 65.64 us
+RMS_NORM_VIEW_SET_ROWS RMS_NORM(256,2,512,1): 20 x 10.596 us = 211.92 us
+RMS_NORM_VIEW_SET_ROWS RMS_NORM(512,2,512,1): 4 x 12.16 us = 48.64 us
+SCALE: 6 x 101.5 us = 609 us
+TANH: 1 x 6.68 us = 6.68 us
+Total time: 89113.8 us.
+| gemma4 E4B Q4_K - Medium       |   4.95 GiB |     7.52 B | Vulkan     |  99 |   1 | Vulkan1      |           pp512 |       2894.61 ± 0.00 |
+
+build: ea791a0fb (11147)
+gpu_lock: CLEAN maxload=1.16 vram<=2.9GiB gtt<=0.53GiB

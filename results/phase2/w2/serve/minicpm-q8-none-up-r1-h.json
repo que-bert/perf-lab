@@ -1,0 +1,92 @@
+{
+ "summary": {
+  "heldout": {
+   "tps": 165.291,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 1943,
+   "ms_step": 6.05
+  },
+  "pooled": {
+   "tps": 165.291,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 1943,
+   "ms_step": 6.05
+  }
+ },
+ "rows": [
+  {
+   "set": "heldout",
+   "i": 0,
+   "n": 256,
+   "ms": 1551.636,
+   "dn": 0,
+   "da": 0,
+   "text": "한국의 전통 음식인 **김치**는 단순한 간식이나 조미료가 아니라, 한국의 역사와 문화, 그리고 한인계의 정체성을 담고 있는 중요한 음식입니다. 김치의 역사, 종류, 그리고 만드는 방법에 대해 자세히 알아보겠습니다.\n\n---\n\n### 1. 김치의 역사\n\n김치는 **한반도**에서 오랜 기간 사랑받아 온 음식입니다. 가장 오래된 기록은 **1000 년 전**의 **'김치'**라는 이름이 등장한 것으로 알려져 있습니다. 그러나 그보다 더 오래된 전통은 **'김'**(김나무)과 **'치'**(치마)라는 단어의 조합에서 비롯된 것으로 추정됩니다.\n\n- **고대 시대**: 김치는 **한반도의 식량 안정을 위해** 만들어졌습니다. 한반도에는 식량이 부족했기 때문에, 김나무의 껍질을 이용해 김을 만들고, 이를 다양한 재료와 함께 간을 넣어 저장할 수 있었습니다.\n- **고려 시대**: 김치는 **식단의 다양성**을 높이는 데 사용되었습니다. 고려 시대에는"
+  },
+  {
+   "set": "heldout",
+   "i": 1,
+   "n": 256,
+   "ms": 1546.952,
+   "dn": 0,
+   "da": 0,
+   "text": "Солнечная система — это наше космическое пространство, в котором все объекты находятся в постоянном движении. Она включает в себя Солнце, Землю, а также другие планеты, астероиды, кometы и другие небесные тела. Важно понимать, что Солнце является центром этой системы, а все остальные объекты вращаются вокруг него. \n\nПланеты, входящие в Солнечную систему, можно разделить на внутренние и внешние. Внутренние планеты — это Меркурий, Венера, Земля и Марс. Они расположены ближе к Солнцу и имеют более плотные составы. Внешние планеты — это Юпитер, Сатурн, Уран и Нептун. Они находятся дальше от Солнца и имеют более разреженные составы. \n\nТакже стоит упомянуть о карликовых планетах, которые также входят в Солнечную систему. Карликовые планеты — это Плутон, Койпос, Харумейс и Селад"
+  },
+  {
+   "set": "heldout",
+   "i": 2,
+   "n": 256,
+   "ms": 1547.629,
+   "dn": 0,
+   "da": 0,
+   "text": "Ecco una guida semplice per scoprire Roma in tre giorni:\n\n**Giorno 1: Il Cuore Storico**\nInizia da **Castel Sant'Angelo** e poi cammina lungo il **Ponte di Sforza**. Dedica del tempo a passeggiare nel **Piazza Navona** e ammira i fontani. Per pranzo, prova una pizza al forno a base di pizza napoletana in un piccolo locale vicino al Pantheon.\n\n**Giorno 2: Arte e Relax**\nDedica la mattina al **Vaticano**: visita la **Santa Maria Maggiore** e poi il **Vaticano**. Nel pomeriggio, rilassati nel **Parco del Bosco** o passeggia lungo il **Largo di Trastevere**. Per cena, prova una caffetteria con un piatto di carciofi o una pizza in un bar di Trastevere.\n\n**Giorno 3: Panorami e Tradizione**\nSali sul **Monti Ceneri** per una vista panoramica sulla città"
+  },
+  {
+   "set": "heldout",
+   "i": 3,
+   "n": 256,
+   "ms": 1550.492,
+   "dn": 0,
+   "da": 0,
+   "text": "O sistema de saúde pública no Brasil é uma das maiores e mais complexas na América Latina, mas também enfrenta desafios significativos. Abaixo, explico detalhadamente como funciona esse sistema e os problemas que ele enfrenta.\n\n---\n\n### **1. Como funciona o sistema de saúde pública no Brasil?**\n\nO sistema de saúde no Brasil é baseado na **Organização Mundial da Saúde (OMS)** e na **Lei de Saúde**, que estabelece a **atenção universal** como um princípio. A estrutura principal é dividida em três níveis:\n\n#### **A. Atenção Primária (Primeira Linha)**\n- **Foco:** Prevenção, diagnóstico inicial e manejo de doenças crônicas.\n- **Atendimento:** Ocupa a maior parte do sistema, com médicos, enfermeiros e enfermeiros de saúde pública.\n- **Acesso:** O ideal é que o paciente chegue ao médico de família ou a um serviço de saúde pública.\n\n#### **B. Atenção Secundária (Segunda Linha)**\n- **Foco:** Diagnóstico mais específico e tratamento de doenças mais complexas.\n"
+  },
+  {
+   "set": "heldout",
+   "i": 4,
+   "n": 256,
+   "ms": 1550.865,
+   "dn": 0,
+   "da": 0,
+   "text": "Tết Nguyên Đán (Lễ Tết Nguyên Đán) là một dịp lễ hội quan trọng, đầy ý nghĩa văn hóa và tâm linh của người Việt Nam. Đây không chỉ là một ngày nghỉ ngơi, mà còn là một cuộc tái sinh văn hóa, tâm linh và gắn kết cộng đồng. Dưới đây là giải thích chi tiết về lịch sử và ý nghĩa của Tết Nguyên Đán.\n\n### 1. Lịch sử của Tết Nguyên Đán\n\n**A. Lịch sử lâu đời**\n- **Tết N"
+  },
+  {
+   "set": "heldout",
+   "i": 5,
+   "n": 256,
+   "ms": 1547.514,
+   "dn": 0,
+   "da": 0,
+   "text": "على الرغم من أن الإنترنت يبدو سهلاً، إلا أنه يعتمد على مئات الخطوات التي تتحكم بها عملية الوصول إلى الصفحات. فيما يلي التفاصيل التفصيلية لعملية الإنترنت من حيث الطلب حتى وصول الصفحة إلى المتصفح.\n\n### 1. فهم الإنترنت\nالإنترنت ليس موقفاً واحداً، بل هو شبكة عالمية تتصل بها آلاف ال"
+  },
+  {
+   "set": "heldout",
+   "i": 6,
+   "n": 256,
+   "ms": 1547.626,
+   "dn": 0,
+   "da": 0,
+   "text": "下面是一个使用 Python 实现的 LRU（最近最少使用）缓存类。它使用 **哈希表（字典）** 配合 **双向链表** 来保证 `get` 和 `put` 操作的时间复杂度均为 **O(1)**。\n\n---\n\n### 代码实现\n\n```python\nclass Node:\n    \"\"\"\n    双向链表节点类，用于存储缓存键值对。\n    每个节点包含 key、value 以及前后两个指针。\n    \"\"\"\n    def __init__(self, key, value):\n        self.key = key\n        self.value = value\n        self.prev = None   # 前一个节点\n        self.next = None   # 后一个节点\n\n\nclass LRUCache:\n    \"\"\"\n    LRU 缓存类。\n    核心思想：\n    1. 使用字典（hash map）快速查找节点（O(1)）。\n    2. 使用双向链表维护访问顺序，最近访问的节点移到链表头部，\n       最久未访问的节点移到链表尾部。\n    \"\"\"\n    def __init__(self, capacity: int):\n        \"\"\"\n        初始化 LRU 缓存。\n        :param capacity: 缓存的最大容量（最大可存储的键值对数量）\n       "
+  },
+  {
+   "set": "heldout",
+   "i": 7,
+   "n": 151,
+   "ms": 912.278,
+   "dn": 0,
+   "da": 0,
+   "text": "\"委员会将决定推迟，直到更多田间试验数据可用，并因长期安全性和成本问题而提出。\"\n\n**词义选择说明：**\n- **\"committee\"** 译为“委员会”，指代负责决策的机构。\n- **\"postponed\"** 译为“推迟”，强调时间上的延后。\n- **\"field trials\"** 译为“田间试验”，特指在真实环境中的实验。\n- **\"cited\"** 译为“提出”，体现原因的陈述方式。\n- **\"long-term safety\"** 译为“长期安全性”，突出时间维度与安全性的关联。\n- **\"cost\"** 译为“成本”，保持原意简洁。"
+  }
+ ]
+}

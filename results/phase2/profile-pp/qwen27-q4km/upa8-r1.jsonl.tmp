@@ -1,0 +1,40 @@
+{"build_commit": "a868c3e3c", "build_number": 11345, "cpu_info": "AMD Ryzen 9 3900X 12-Core Processor", "gpu_info": "AMD Radeon RX 9060 XT (RADV GFX1200), AMD Radeon AI PRO R9700 (RADV GFX1201)", "backends": "Vulkan", "model_filename": "/mnt/8724062a-75f8-4edf-8ca8-b7dd4e77ed30/models/qwen3.8:27b/unsloth/Qwen3.8-27B-Q4_K_M.gguf", "model_type": "qwen35 27B Q4_K - Medium", "model_size": 17095778304, "model_n_params": 27320697856, "n_batch": 2048, "n_ubatch": 512, "n_threads": 12, "cpu_mask": "0x0", "cpu_strict": false, "poll": 50, "type_k": "f16", "type_v": "f16", "n_gpu_layers": 99, "n_cpu_moe": 0, "split_mode": "layer", "main_gpu": 0, "no_kv_offload": false, "flash_attn": 1, "devices": "Vulkan1", "tensor_split": "0.00", "tensor_buft_overrides": "none", "load_mode": "auto", "lazy_mode": "auto", "embeddings": false, "no_op_offload": 0, "no_host": false, "repack": true, "fit_target": 0, "fit_min_ctx": 0, "n_prompt": 512, "n_gen": 0, "n_depth": 0, "test_time": "2026-10-02T08:31:56Z", "avg_ns": 2770077595, "stddev_ns": 56810282, "avg_ts": 184.894309, "stddev_ts": 3.775485, "samples_ns": [ 2751685092, 2828309976, 2713758975, 2832505319, 2724128617 ],"samples_ts": [ 186.068, 181.027, 188.668, 180.759, 187.95 ]}
+[New LWP 1346916]
+[New LWP 1346915]
+[New LWP 1346914]
+[New LWP 1346913]
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.ubuntu.com>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+__syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+#0  __syscall_cancel_arch () at ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S:56
+56	in ../sysdeps/unix/sysv/linux/x86_64/syscall_cancel.S
+#1  0x000076b6d8ea039c in __internal_syscall_cancel (a1=<optimized out>, a2=<optimized out>, a3=<optimized out>, a4=<optimized out>, a5=0, a6=0, nr=61) at ./nptl/cancellation.c:49
+#2  __syscall_cancel (a1=<optimized out>, a2=<optimized out>, a3=<optimized out>, a4=<optimized out>, a5=a5@entry=0, a6=a6@entry=0, nr=61) at ./nptl/cancellation.c:75
+75	in ./nptl/cancellation.c
+#3  0x000076b6d8f1cacf in __GI___wait4 (pid=<optimized out>, stat_loc=<optimized out>, options=<optimized out>, usage=<optimized out>) at ../sysdeps/unix/sysv/linux/wait4.c:30
+#4  0x000076b6d9141773 in ggml_print_backtrace () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libggml-base.so.0
+#5  0x000076b6d91569ef in ggml_uncaught_exception() () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libggml-base.so.0
+#6  0x000076b6d92c364a in ?? () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#7  0x000076b6d92abc6c in std::terminate() () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#8  0x000076b6d92abc86 in ?? () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#9  0x000076b6d4e2c945 in vk_queue_handle_synchronized::submit(vk::ArrayProxy<vk::SubmitInfo const>, vk::Fence) [clone .cold] () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libggml-vulkan.so.0
+#10 0x000076b6d4e81b45 in ggml_vk_submit(std::shared_ptr<vk_context_struct>&, vk::Fence) () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libggml-vulkan.so.0
+#11 0x000076b6d4f6a494 in ggml_vk_buffer_write_2d(std::shared_ptr<vk_buffer_struct>&, unsigned long, void const*, unsigned long, unsigned long, unsigned long, unsigned long) () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libggml-vulkan.so.0
+#12 0x000076b6d4f6a755 in ggml_vk_buffer_write(std::shared_ptr<vk_buffer_struct>&, unsigned long, void const*, unsigned long) () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libggml-vulkan.so.0
+#13 0x000076b6d4e6f528 in ggml_backend_vk_buffer_set_tensor(ggml_backend_buffer*, ggml_tensor*, void const*, unsigned long, unsigned long) () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libggml-vulkan.so.0
+#14 0x000076b6d91606f0 in ggml_backend_sched_graph_compute_async () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libggml-base.so.0
+#15 0x000076b6d860cf70 in llama_context::graph_compute(ggml_cgraph*, bool) () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libllama.so.0
+#16 0x000076b6d8610c23 in llama_context::process_ubatch(llama_ubatch const&, llm_graph_type, llama_memory_context_i*, ggml_status&) () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libllama.so.0
+#17 0x000076b6d861948a in llama_context::decode(llama_batch_ext const&) () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libllama.so.0
+#18 0x000076b6d9528bfb in test_prompt(llama_context*, int, int, int) () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libllama-bench-impl.so
+#19 0x000076b6d953949e in llama_bench(int, char**) () from /home/bbuckham/git/perf-lab/runners/llama.cpp/upstream-a868c3e/build/bin/libllama-bench-impl.so
+#20 0x000076b6d8e2a601 in __libc_start_call_main (main=main@entry=0x58b432c032f0 <main>, argc=argc@entry=19, argv=argv@entry=0x7ffdcb2c5d58) at ../sysdeps/nptl/libc_start_call_main.h:59
+#21 0x000076b6d8e2a718 in __libc_start_main_impl (main=0x58b432c032f0 <main>, argc=19, argv=0x7ffdcb2c5d58, init=<optimized out>, fini=<optimized out>, rtld_fini=<optimized out>, stack_end=0x7ffdcb2c5d48) at ../csu/libc-start.c:360
+#22 0x000058b432c03325 in _start ()
+[Inferior 1 (process 1346912) detached]

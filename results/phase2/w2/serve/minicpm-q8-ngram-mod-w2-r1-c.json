@@ -1,0 +1,164 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 178.498,
+   "tok_step": 1.1454,
+   "accept": 0.4333,
+   "n": 4096,
+   "ms_step": 6.417
+  },
+  "pooled": {
+   "tps": 178.498,
+   "tok_step": 1.1454,
+   "accept": 0.4333,
+   "n": 4096,
+   "ms_step": 6.417
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 1599.6,
+   "dn": 0,
+   "da": 0,
+   "text": " older Android device.\n\n## Build GUI binding using Gradle\n\nIf you are using Android Studio, you can build the GUI binding using Gradle.\n\n```sh\n./gradlew android\n```\n\n## Build GUI binding using CMake\n\nIf you are using CMake, you can build the GUI binding using CMake.\n\n```sh\ncmake -B build -DLLAMA_ANDROID=ON\ncmake --build build\n```\n\n## Build GUI binding using Make\n\nIf you are using Make, you can build the GUI binding using Make.\n\n```sh\nmake android\n```\n\n## Build GUI binding using Docker\n\nIf you are using Docker, you can build the GUI binding using Docker.\n\n```sh\ndocker build -t llama-android .\n```\n\n## Build GUI binding using Docker with GPU\n\nIf you are using Docker, you can build the GUI binding using Docker with GPU.\n\n```sh\ndocker build -t llama-android-gpu .\n```\n\n## Build GUI binding using Docker with GPU and ARM\n\nIf you are using Docker, you can build the GUI binding using Docker with GPU and ARM.\n\n```sh\ndocker build -t llama-android-gpu-arm .\n```\n\n## Build GUI binding using Docker"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 1598.138,
+   "dn": 0,
+   "da": 0,
+   "text": "owngments or Credits\", list the\n   principal authors or authors or entities responsible for authorship\n   of the modifications in the Modified Version, along with the\n   publisher of the Modified Version as given in the Title Page.\nL. Preserve the reaction of the publisher as stated in the title page,\n   if the publisher has indicated it is in the public interest.\nM. Preserve attention to any lists of other works and contents\n   in the Document, and preserve the fact that if the Document mentions\n   integers as bounds on quantities or with other valid usage,\n   an integer may be given for those quantities in the Modified\n   Version.\n\nYou must not, however, omit any copyright notice that appears in the\nDocument, or replace any text with another version of the text.\nYou must not change or translate the title of the Document, or\nany section title.\n\nYou may add small items to the History section in the form of \"Added by\nthe Project author\" or \"Removed by the Project author\", where applicable\nand appropriate.\n\nYou must not delete or remove any Invariant Sections, or remove\nsubsections from any Section heading or Invariant Section header,\nor delete or merge sections containing any Invariant Sections.\nYou may delete sub"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 1595.431,
+   "dn": 0,
+   "da": 0,
+   "text": " Copyright (C) 2007-2017 The Linux Foundation, Inc.\n\n            This program and the accompanying materials are made\n            available under the terms of the GNU General Public\n            License as published by the Free Software Foundation,\n            either version 2 of the License, or (at your option)\n            any later version.\n\n            This program is distributed in the hope that it will\n            be useful, but WITHOUT ANY WARRANTY; without even the\n            implied warranty of MERCHANTABILITY or FITNESS FOR A\n            PARTICULAR PURPOSE.  See the GNU General Public\n            License for more details.\n\n            You should have received a copy of the GNU General\n            Public License along with this program.  If not,\n            see <http://www.gnu.org/licenses/>.\n\n            The GNU General Public License is published by the\n            Free Software Foundation; <http://www.gnu.org/copyleft/>\n\n            This program is free software: you can redistribute it\n            and/or modify it under the terms of the GNU General\n            Public License as published by the Free Software\n            Foundation; either version 2 of the License, or (at\n            your option) any later version.\n\n            This program is distributed in the form"
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 256,
+   "ms": 1204.416,
+   "dn": 429,
+   "da": 97,
+   "text": "Qwen2.5-Coder-7B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [Qwen/qwen2.5-coder-7b-instruct-q4_k_m](https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/Qwen2.5-3B-Instruct-Q4_K_M](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [Qwen/Qwen2.5-7B-Instruct-Q4_K_M](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/Qwen2.5-32B-Instruct-Q4_K_M](https://h"
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 1162.31,
+   "dn": 128,
+   "da": 83,
+   "text": " the latest version, refer to [Intel® oneAPI Base Toolkit release notes](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html#release-notes).\n\n- **For client iGPU**\n\nThe **Intel® oneAPI Base toolkit** and **Intel® Deep Learning Essentials** can be obtained from the official [Intel® oneAPI Base Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html) page.\n\nPlease fo the latest version, refer to [Intel® oneAPI Base Toolkit release notes](https://www.intel.com/content/www/us/en/developer/tools/oneapi/base-toolkit.html#release-notes).\n\n3. **Install development tools**\n\n```sh\nsudo apt install build-essential git cmake libclang-dev libssl-dev libgmp-dev libmpc-dev libmpfr-dev libgcc-dev libgcc-11-dev libstdc++-11-dev\n```\n\n4. **Install CUDA toolkit**\n\nSYCL backend supports CUDA GPU, but it's not recommended to use CUDA GPU with SYCL backend. Please refer to [CUDA GPU"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 1119.036,
+   "dn": 82,
+   "da": 82,
+   "text": " means and also to allow\nother parts of the free software community to force the open source\nnature of the software.  We want your work to be both free and\nopen source!\n\n  All those those who make a contribution, pass on the contribution\n(or even their own work), are expected to recognize the original\nauthor and contributor of the material provided\nthat they are in the role of a contributor, at least.  Otherwise\nyour work will be not free.\n\n  The 9th and 10th sections grant permission to charge any fee or\nconsideration to any purchaser of copyright material that restates\nor distributes a portion of the Library.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc.\n\n  etc"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 256,
+   "ms": 1570.731,
+   "dn": 43,
+   "da": 15,
+   "text": ".g. a license under a different license or a license for\n    a different work.\n\n1.13. \"Source Code Form\"\n    means the form of the work as received, including any modifications\n    made to it.\n\n1.14. \"Substantial Portions\"\n    means more than 10% (one-tenths) of the Covered Software.\n\n2. License Grant\n--------------\n\n2.1. Grant of Copyright License.\n    Subject to the terms and conditions of this License, each Contributor\n    grants to Contributor and its heirs and assigns a non-exclusive,\n    worldwide, royalty-free patent license to make, use, sell, offer for\n    sale, have made, import and otherwise transfer the Contributor's\n    Contributions, in such form and for any purpose, in any case,\n    subject to the terms and conditions of this License.\n\n2.2. Grant of Patent License.\n    Subject to the terms and conditions of this License, each Contributor\n    grants to Contributor and its heirs and assigns a non-exclusive,\n    worldwide, royalty-free patent license, subject to specific terms\n    and conditions set forth in this document, for making, using, selling,\n    offering for sale, having made"
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 1198.107,
+   "dn": 100,
+   "da": 72,
+   "text": " while frame is not None:\n        if not _is_internal_frame(frame):\n            return frame\n        frame = frame.f_back\n    return None\n\n\ndef _is_warning_active():\n    \"\"\"Return True if a warning is currently being processed.\"\"\"\n    return _wm._get_context().log is not None\n\n\ndef _is_warning_active_or_ignored():\n    \"\"\"Return True if a warning is currently being processed or ignored.\"\"\"\n    return _wm._get_context().log is not None or _wm._get_context().filters\n\n\ndef _is_warning_active_or_ignored_or_ignored_once():\n    \"\"\"Return True if a warning is currently being processed or ignored.\"\"\"\n    return _wm._get_context().log is not None or _wm._get_context().filters\n\n\ndef _is_warning_active_or_ignored_or_ignored_once_or_ignored_once():\n    \"\"\"Return True if a warning is currently being processed or ignored.\"\"\"\n    return _wm._get_context().log is not None or _wm._get_context().filters\n\n\ndef _is_warning_active_or_ignored_or_ignored_once_or_ignored_once_or_ignored_once"
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 1594.914,
+   "dn": 0,
+   "da": 0,
+   "text": ":\n                myoffset = timedelta(0)\n\n        # If there's a time zone change in the process, set myoffset to None\n        # to preserve the current value in the calculation.\n        if myoffset is None:\n            myoffset = self.utcoffset()\n\n        if tz is None:\n            tz = mytz\n        offset = tz.utcoffset(self)\n        if offset is None:\n            offset = timedelta(0)\n\n        if myoffset is None:\n            offset = offset\n        elif offset == myoffset:\n            return self\n        else:\n            if self.tzinfo is None:\n                # Replace the original tzinfo with a fixed offset\n                self = tz.fromutc(self)\n                return self\n            else:\n                return self.astimezone(tz)\n\n    def utcoffset(self):\n        if self._tzinfo is None:\n            return None\n        return self._tzinfo.utcoffset(None)\n\n    def tzname(self):\n        if self._tzinfo is None:\n            return None\n        return self._tzinfo.tzname(None)\n\n    def dst(self):\n        if self._tzinfo is None:\n"
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 256,
+   "ms": 1544.035,
+   "dn": 104,
+   "da": 13,
+   "text": " #    if _all_zeros(self._int, prec):\n    #        return 0\n    #    elif self._int[prec] == '5':\n    #        return 1\n    #    else:\n    #        return -1\n        if _all_zeros(self._int, prec):\n            return 0\n        elif self._int[prec] == '5':\n            return 1\n        else:\n            return -1\n\n    def _round_half_down(self, prec):\n        \"\"\"Rounds 5 down (towards 0)\"\"\"\n        if _all_zeros(self._int, prec):\n            return 0\n        elif self._int[prec] == '5':\n            return -1\n        else:\n            return 1\n\n    def _round_half_to_even(self, prec):\n        \"\"\"Rounds to even, ties to even.\"\"\"\n        if _all_zeros(self._int, prec):\n            return 0\n        elif self._int[prec] == '5':\n            # tie to even\n            if prec == 0:\n                return -1 if self._sign else 1\n            else:\n                return 1 if self._int[prec+1] !="
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 1584.63,
+   "dn": 128,
+   "da": 8,
+   "text": " 1)\n        >>> ExtendedContext.quantize(Decimal('1.00'), Decimal('1.00'))\n        Decimal('1.00')\n        >>> ExtendedContext.quantize(Decimal('1.00'), Decimal('1.000'))\n        Decimal('1.000')\n        >>> ExtendedContext.quantize(Decimal('1.00'), Decimal('0.1'))\n        Decimal('1.1')\n        >>> ExtendedContext.quantize(Decimal('1.00'), Decimal('0.00'))\n        Decimal('1.00')\n        >>> ExtendedContext.quantize(Decimal('1.00'), Decimal('0.000'))\n        Decimal('1.000')\n        >>> ExtendedContext.quantize(Decimal('1.00'), Decimal('0.0000'))\n        Decimal('1.0000')\n        >>> ExtendedContext.quantize(Decimal('1.00'), Decimal('0.000000'))\n        Decimal('1.000000')\n        >>> ExtendedContext.quantize(Decimal('1.00'), Decimal('0.0000001'))\n        Decimal('1.0000001')\n        >>> ExtendedContext.quantize(Decimal('1.00'), Decimal('0.000"
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 1588.643,
+   "dn": 0,
+   "da": 0,
+   "text": " \"\"\"\n\n    def __new__(cls, *args, **kwargs):\n        self = object.__new__(cls)\n        try:\n            return self.__init__(*args, **kwargs)\n        except Exception:\n            if cls is io.RawIOBase:\n                self._raw_buf = io.FileIO(*args, **kwargs)\n            elif cls is io.BufferedIOBase:\n                self._raw_buf = io.FileIO(*args, **kwargs)\n            elif cls is io.BufferedRandom:\n                self._raw_buf = io.FileIO(*args, **kwargs)\n            elif cls is io.BufferedReader:\n                self._raw_buf = io.FileIO(*args, **kwargs)\n            elif cls is io.BufferedWriter:\n                self._raw_buf = io.FileIO(*args, **kwargs)\n            elif cls is io.BufferedRWPair:\n                self._raw_buf = io.FileIO(*args, **kwargs)\n            else:\n                raise\n            return self\n\n    def __init__(self, *args, **kwargs):\n        # The file position is read before the file is opened.\n        # This is done to ensure that the file object is positioned\n        # correctly before any other operation"
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 1581.742,
+   "dn": 0,
+   "da": 0,
+   "text": "ally-rounded\n    # Decimal from the input int.\n    #\n    # The algorithm is described in Tim Peters' paper\n    # \"A Fast Algorithm for Big Decimal to Big Integer Conversion\"\n    # https://www.cl.cam.ac.uk/~tim/papers/decimal.html\n    # The algorithm is also described in\n    # https://github.com/python/cpython/issues/90716\n\n    # The algorithm is based on the idea of \"divide and conquer\" to\n    # convert a big integer to a big decimal.  The idea is to find a\n    # power of 10 such that the integer is between 10**lo and 10**hi,\n    # where lo and hi are as close as possible.  Then we can convert\n    # the integer to a decimal by converting the integer divided by\n    # 10**lo to a decimal, and then multiplying the result by 10**lo.\n    # The integer divided by 10**lo is smaller than 10**hi, so we can\n    # use the algorithm recursively to convert it to a decimal.\n    # The integer multiplied by 10**lo is larger than 10**hi, so we can\n    # use the algorithm recursively to"
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 1564.329,
+   "dn": 20,
+   "da": 7,
+   "text": "-101/getting-started-with-cuda/environment-variables.html) to make llama.cpp use a specific GPU.\n\n```bash\nexport CUDA_VISIBLE_DEVICES=0\n```\n\n### CUDA Build Options\n\nThe following options are available:\n\n- `GGML_CUDA=ON` or `GGML_CUDA=OFF` (default is ON)\n- `GGML_CUDA_ARCHS` (default is `auto`)\n- `GGML_CUDA_LAUNCH_BLOCKING=ON` or `GGML_CUDA_LAUNCH_BLOCKING=OFF` (default is ON)\n- `GGML_CUDA_LAUNCH_BLOCKING_ON_CPU=ON` or `GGML_CUDA_LAUNCH_BLOCKING_ON_CPU=OFF` (default is OFF)\n- `GGML_CUDA_LAUNCH_BLOCKING_ON_CPU_ON_CPU=ON` or `GGML_CUDA_LAUNCH_BLOCKING_ON_CPU_ON_CPU=OFF` (default is OFF)\n- `GGML_CUDA_LAUNCH_BLOCKING_ON_CPU_ON_CPU_ON_CPU=ON` or `GGML_CUDA_"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 1649.462,
+   "dn": 0,
+   "da": 0,
+   "text": "ROM_FILENAME': 1,\n    'HAVE_COPY_FROM_FILENAME_64': 1,\n    'HAVE_COPY_FROM_FILENAME_64_2': 1,\n    'HAVE_COPY_FROM_FILENAME_64_3': 1,\n    'HAVE_COPY_FROM_FILENAME_64_4': 1,\n    'HAVE_COPY_FROM_FILENAME_64_5': 1,\n    'HAVE_COPY_FROM_FILENAME_64_6': 1,\n    'HAVE_COPY_FROM_FILENAME_64_7': 1,\n    'HAVE_COPY_FROM_FILENAME_64_8': 1,\n    'HAVE_COPY_FROM_FILENAME_64_9': 1,\n    'HAVE_COPY_FROM_FILENAME_64_10': 1,\n    'HAVE_COPY_FROM_FILENAME_64_11': 1,\n    'HAVE_COPY_FROM_FILENAME_64_12':"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 791.458,
+   "dn": 166,
+   "da": 143,
+   "text": "okens-per-tensor N`) flag to control the number of tokens per tensor. If you see the following lines in the output:\n```shell\nllama_model_load_internal: [cublas] offloading 60 layers to GPU\nllama_model_load_internal: [cublas] offloading output layer to GPU\nllama_model_load_internal: [cublas] total VRAM used: 17223 MB\nllama_model_load_internal: [cublas] offloading 0 layers to CPU\nllama_model_load_internal: [cublas] offloading output layer to CPU\nllama_model_load_internal: [cublas] total VRAM used: 17223 MB\nllama_model_load_internal: [cublas] offloading 0 layers to CPU\nllama_model_load_internal: [cublas] offloading output layer to CPU\nllama_model_load_internal: [cublas] total VRAM used: 17223 MB\nllama_model_load_internal: [cublas] offloading 0 layers to CPU\nllama_model_load_internal: [cublas] offloading output layer to CPU\nllama_model_load_in"
+  }
+ ]
+}

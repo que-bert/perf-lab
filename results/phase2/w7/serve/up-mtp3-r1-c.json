@@ -1,0 +1,164 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 94.997,
+   "tok_step": 2.9362,
+   "accept": 0.6585,
+   "n": 4096,
+   "ms_step": 30.909
+  },
+  "pooled": {
+   "tps": 94.997,
+   "tok_step": 2.9362,
+   "accept": 0.6585,
+   "n": 4096,
+   "ms_step": 30.909
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 3136.24,
+   "dn": 297,
+   "da": 155,
+   "text": " entry-level devices.\n\n## Build CLI binding using CMake\n\n### Prerequisites\n\n- [Android NDK](https://developer.android.com/ndk/guides/cmake)\n- [CMake](https://cmake.org/)\n\n### Build\n\n```bash\n# Build the CLI tool\ncmake -B build-android -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-28 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake\ncmake --build build-android --parallel --config Release\n```\n\n==== docs/development/token_generation_performance_tips.md ====\n\n# Token generation performance tips\n\n## General\n\n- Use the latest version of `llama.cpp`\n- Use the latest version of the model\n- Use the latest version of the hardware\n- Use the latest version of the drivers\n- Use the latest version of the OS\n- Use the latest version of the compiler\n- Use the latest version of the build flags\n- Use the latest version of the model format (GGUF)\n- Use the latest version of the quantization format (Q4_0, Q4_1, Q5_0, Q5_1, Q"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 2654.111,
+   "dn": 252,
+   "da": 170,
+   "text": "\n\n<think>\n\n</think>\n\nBased on the provided documentation, here is a structured summary and guide for using **llama.cpp** with **Ascend NPU** (CANN backend).\n\n### 1. Overview\nThis backend integrates llama.cpp with Huawei's Ascend NPU using the CANN Toolkit. It supports both inference and training kernels via Ascend NPU directly.\n\n### 2. System Requirements\n\n#### Operating System\n*   **Linux** (Verified on Ubuntu 22.04 and OpenEuler 22.03).\n\n#### Hardware (Ascend NPU)\nYou can identify your device ID using:\n```sh\nlspci -n | grep -Eo '19e5:d[0-9a-f]{3}' | cut -d: -f2\n```\n\n| Device ID | Product Series | Chip Model | Status |\n| :--- | :--- | :--- | :--- |\n| `d802` | Atlas A2 Infer | 910B | **Support** |\n| `d500` | Atlas Infer (300I Duo) | 310P | **Support** |\n| `d8"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 3791.954,
+   "dn": 363,
+   "da": 133,
+   "text": " GNU GENERAL PUBLIC LICENSE\n            Version 1, February 1989\n\n Copyright (C) 1989 Free Software Foundation, Inc.\n                    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA\n Everyone is permitted to copy and distribute verbatim copies\n of this license document, but changing it is not allowed.\n\n            Preamble\n\n  The license agreements of most companies and organizations use them\nto destroy or at least impair the freedom of users.  We want to\ndistinguish the GNU General Public License from such license\nagreements in order to make clear that it is our intention to improve\nthis license's protection of users.\n\n  The precise motivation for developing a new license for the GNU\nProject was the change in control of the manufacturer of the UNIX\noperating system.  This new owner appears to want to shrink considerably\nthe area that is open for cooperative work.  We can best protect\nagainst this development by developing a general-purpose free software\nlicense which protects against such misuse of the license, and\ndistributing all our programs under it.  Since many programs are\nprobably best kept proprietary, a general-purpose free software license"
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 256,
+   "ms": 2239.065,
+   "dn": 213,
+   "da": 184,
+   "text": "CodeQwen1.5-7B-Q4_K_M-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/Phi-3.5-mini-instruct-q4_k_m](https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/Phi-4-mini-instruct-q4_k_m](https://hugging3.co/bartowski/Phi-4-mini-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/Qwen2.5-1.5B-Instruct-Q4_K_M](https://huggingface.co/bartowski/Qwen2.5-1.5B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/Qwen2.5-7B-Instruct-Q4_K_M](https://huggingface.co/bartowski/Qwen2.5-7B-Instruct-GGUF) | ✓ / ✓ | ✓ /"
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 2556.049,
+   "dn": 246,
+   "da": 173,
+   "text": "ollow the [official installation guide](https://www.intel.com/content/www/us/en/developer/articles/guide/intel-oneapi-installation-guide-linux.html) to install the toolkit.\n\n- **For other vendor GPU**\n\nPlease refer to the [oneAPI supported GPU](https://www.intel.com/content/www/us/en/developer/articles/system-requirements/intel-oneapi-base-toolkit-system-requirements.html#inpage-nav-1-1) page to check if your GPU is supported.\n\nIf your GPU is supported, please follow the [official installation guide](https://www.intel.com/content/www/us/en/developer/articles/guide/intel-oneapi-installation-guide-linux.html) to install the toolkit.\n\n3. **Install other development tools**\n\n```sh\nsudo apt install build-essential cmake git\n```\n\n### II. Build from source code\n\n1. **Clone the llama.cpp repository**\n\n```sh\ngit clone https://github.com/ggml-org/llama.cpp.git\ncd llama.cpp\n```\n\n2. **Build llama.cpp with SYCL backend**\n\n```sh\n./examples/sycl/build.sh\n```\n\n### III. Run llama.cpp\n\n1. **Run llama.cpp with SYCL backend**\n\n"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 3099.686,
+   "dn": 297,
+   "da": 155,
+   "text": " system and a licensee cannot\nimpose that choice.\n\nThis section is intended to make thoroughly clear what is intended as\nan alternative to the operating system on which the executable runs,\nand any general information about how to use it.\n\n  12. If the distribution and/or use of executables is prohibited by\ncopyright laws, and this License is the only license which permits\nyou to distribute the Library in executable form under those\ncircumstances, you may distribute the Library in executable form\ninstead of this License, provided that you meet the terms of this\nLicense.\n\n  13. The Free Software Foundation may publish revised and/or new\nversions of the Lesser General Public License from time to time.\nSuch new versions will be similar in spirit to the present version,\nbut may differ in detail to address new problems or concerns.\n\nEach version is given a distinguishing version number.  If the Library\nspecifies a version number of this License which applies to it and\n\"any later version\", you have the option of following the terms and\nconditions either of that version or of any later version published by\nthe Free Software Foundation (FSF).  If the Library does not specify a\nlicense version number, you can"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 256,
+   "ms": 2272.706,
+   "dn": 213,
+   "da": 183,
+   "text": "ith\n\n==== license/MPL-2.0 ====\nMozilla Public License Version 2.0\n==================================\n\n1. Definitions\n--------------\n\n1.1. \"Contributor\"\n    means each individual or legal entity that creates, contributes to\n    the creation of,\n\n==== license/Mozilla-Public-License-2.0 ====\nMozilla Public License Version 2.0\n==================================\n\n1. Definitions\n--------------\n\n1.1. \"Contributor\"\n    means each individual or legal entity that creates, contributes to\n    the creation of, or owns Covered Software.\n\n1.2. \"Contributor Version\"\n    means the combination of the Contributions of others (if any) used\n    by a Contributor and that particular Contributor's Contribution.\n\n1.3. \"Contribution\"\n    means Covered Software of a particular Contributor.\n\n1.3. \"Contribution\"\n    means Covered Software of a particular Contributor.\n\n1.4. \"Covered Software\"\n    means Source Code Form to which the initial Contributor has attached\n    the notice in Exhibit A, the Executable Form of such Source Code\n    Form, and Modifications of such Source Code Form, in each case\n    including portions thereof."
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 2745.533,
+   "dn": 262,
+   "da": 167,
+   "text": " while frame is not None:\n        if _is_internal_frame(frame):\n            frame = frame.f_back\n        elif _is_filename_to_skip(frame.f_code.co_filename, skip_file_prefixes):\n            frame = frame.f_back\n        else:\n            return frame\n    return None\n\n\ndef _is_cython(filename):\n    return filename.endswith('.pyx') or filename.endswith('.pyi')\n\n\ndef _is_internal_module(module):\n    \"\"\"Signal whether the module is an internal CPython implementation detail.\"\"\"\n    return module in {'importlib', '_frozen_importlib', '_frozen_importlib_external',\n                      '_warnings', 'warnings', '_thread'}\n\n\ndef _is_module_to_skip(module, skip_file_prefixes):\n    \"\"\"Signal whether the module is an internal CPython implementation detail.\"\"\"\n    return any(module.startswith(prefix) for prefix in skip_file_prefixes)\n\n\ndef _is_module_to_skip_by_name(module, skip_file_prefixes):\n    \"\"\"Signal whether the module is an internal CPython implementation detail.\"\"\"\n    return any(module.startswith(prefix) for prefix in skip_file_prefixes)\n\n\ndef _is_internal_module_by_name(module, skip_file_prefixes):\n    \"\"\"Signal whether the module is an internal"
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 2562.16,
+   "dn": 246,
+   "da": 173,
+   "text": ":\n                mytz = self._local_timezone()\n                myoffset = mytz.utcoffset(self)\n\n        if tz == mytz:\n            return self\n\n        myoffset = myoffset.total_seconds()\n\n        tzoffset = tz.utcoffset(self)\n        if tzoffset is None:\n            return self\n        tzoffset = tzoffset.total_seconds()\n        if tzoffset == myoffset:\n            return self.replace(tzinfo=tz)\n\n        offset = self - timedelta(seconds=myoffset - tzoffset)\n        return offset.replace(tzinfo=tz)\n\n    def __add__(self, other):\n        if isinstance(other, timedelta):\n            # for CPython compatibility, we cannot use\n            # our __class__ here, but need a real timedelta\n            return datetime._fromtimestamp(self._mktime() + other.total_seconds(),\n                                           False, self._tzinfo)\n        return NotImplemented\n    __radd__ = __add__\n\n    def __sub__(self, other):\n        \"\"\"Return self - other.\"\"\"\n        if isinstance(other, timedelta):\n            # for CPython compatibility, we cannot use\n            # our __class__ here, but need a real"
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 256,
+   "ms": 2500.706,
+   "dn": 238,
+   "da": 175,
+   "text": " #      if prec < 0:\n  #          return 0\n        remainder = self._int[prec:]\n        if _all_zeros(remainder, prec):\n            return 0\n        elif remainder == '5'+'0'*(len(remainder)-1):\n            if self._int[prec-1] in '13579':\n                return 1\n            else:\n                return -1\n        elif _all_zeros(self._int[:prec-1], prec-1) and self._int[prec-1] == '1' and \\\n                remainder == '5'+'0'*(len(remainder)-1):\n            return -1\n        else:\n            if prec == 0:\n                return 1\n            elif int(remainder) > int('5'+'0'*(len(remainder)-1)):\n                return 1\n            else:\n                return -1\n\n    def _round_half_down(self, prec):\n        \"\"\"Round 5 down\"\"\"\n        if _all_zeros(self._int, prec):\n            return 0\n        remainder = self._int[prec:]\n        if remainder == '5'+'0"
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 2119.816,
+   "dn": 198,
+   "da": 188,
+   "text": " \"\"\"\n        a = _convert_other(a, raiseit=True)\n        return a.compare_total(b, context=self)\n\n    def compare_total_mag(self, a, b):\n        \"\"\"Compares two operands using their abstract representation.\n\n        This is not like the standard compare, which use their numerical\n        value. Note that a total ordering is defined for all possible abstract\n        representations.\n\n        >>> ExtendedContext.compare_total_mag(Decimal('12.73'), Decimal('127.9'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('-127'),  Decimal('12'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.3'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.30'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('12.300'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('NaN'))\n       "
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 3387.148,
+   "dn": 327,
+   "da": 145,
+   "text": " read()\n    Read data and return it as bytes, without any arguments.\n\n  readline()\n    Read until EOF and return one line per call, with the line ending\n    included in the returned data (unless it's the last line, in which case\n    the ending may be omitted).\n\n  write(data)\n    Write data to the stream.\n\n  close()\n    Flush and close the IO object.\n\n    This method has no effect if the file is already closed.\n\n  tell()\n    Return the stream's current position.\n\n  seek(pos, mode=SEEK_SET)\n    Move to position `pos` pointed to by `mode`.\n\n    `mode` defaults to SEEK_SET and can be SEEK_SET (relative to the start of\n    the stream), SEEK_CUR (relative to the current position), SEEK_END\n    (relative to the end of the stream), SEEK_HOLE (relative to the next hole\n    in the stream), or SEEK_DATA (relative to the next data in the stream).\n\n    It returns the new absolute position.\n\n  seekable()\n    Return a bool, indicating whether the stream supports random access.\n\n    Return False if seek() raises UnsupportedOperation.\n\n "
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 2273.282,
+   "dn": 216,
+   "da": 183,
+   "text": "ally significant\n    # Decimal from an int.\n    #\n    # The algorithm is based on the following observations:\n    #\n    # 1. The number of decimal digits in an integer is approximately\n    #    log10(2) * log2(n).\n    # 2. The number of decimal digits in an integer is approximately\n    #    log10(2) * log2(n).\n    # 3. The number of decimal digits in an integer is approximately\n    #    log10(2) * log2(n).\n    # 4. The number of decimal digits in an integer is approximately\n    #    log10(2) * log2(n).\n    # 5. The number of decimal digits in an integer is approximately\n    #    log10(2) * log2(n).\n    # 6. The number of divide-and-conquer algorithm that is faster for large numbers.\n    # 7. The number of decimal digits in an integer is approximately\n    #    log10(2) * log2(n).\n    # 8. The number of decimal digits in an integer is approximately\n    #    log"
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 2566.15,
+   "dn": 244,
+   "da": 173,
+   "text": "mming-guide/index.html#env-vars) to control the behavior of the CUDA runtime.\n\n### CUDA Graphs\n\nllama.cpp supports CUDA graphs for faster inference. To enable it, use the `--cuda-graphs` flag.\n\n### CUDA Memory Pool\n\nllama.cpp supports CUDA memory pool for faster memory allocation. To enable it, use the `--cuda-mempool` flag.\n\n### CUDA Memory Alignment\n\nllama.cpp supports CUDA memory alignment for faster memory allocation. To enable it, use the `--cuda-mem-align` flag.\n\n### CUDA Async\n\nllama.cpp supports CUDA async for faster memory allocation. To enable it, use the `--cuda-async` flag.\n\n### CUDA Fallback\n\nllama.cpp supports CUDA fallback for faster memory allocation. To enable it, use the `--cuda-fallback` flag.\n\n### CUDA Stream\n\nllama.cpp supports CUDA stream for faster memory allocation. To enable it, use the `--cuda-stream` flag.\n\n### CUDA Graphs with Split Layers\n\nllama.cpp supports CUDA graphs with split layers for faster inference. To enable it, use the `--cuda-graphs` flag.\n\n### CUDA Graphs with Split Layers and Memory Pool\n\nllama.cpp supports"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 2569.899,
+   "dn": 238,
+   "da": 174,
+   "text": "SEG': 0,\n    'HAVE_CRYPT_H': 1,\n    'HAVE_CRYPT_R': 1,\n    'HAVE_CTERMID': 1,\n    'HAVE_CTERMID_R': 0,\n    'HAVE_CURSES': 1,\n    'HAVE_CURSES_H': 1,\n    'HAVE_CURSES_FILTER': 1,\n    'HAVE_CURSES_HAS_KEY': 1,\n    'HAVE_CURSES_IMMEDOK': 1,\n    'HAVE_CURSES_IS_PAD': 1,\n    'HAVE_CURSES_IS_PAD2': 1,\n    'HAVE_CURSES_IS_TERM_RESIZED': 1,\n    'HAVE_CURSES_KEYPAD': 1,\n    'HAVE_CURSES_RESIZE_TERM': 1,\n    'HAVE_CURSES_RESIZETERM': 1,\n    'HAVE_CURSES_RESIZETERM2': 1,\n    'HAVE_CURSES_RESIZETERM3': 1,\n    'HAVE_CURSES_RESIZETERM4': 1,\n    'HAVE_CURSES_RESIZETERM5': 1,\n    'LLAMA_BUILD_NUMBER': 30"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 2642.865,
+   "dn": 252,
+   "da": 170,
+   "text": " N`) flag to configure the number of threads to use for inference. If you set this to a very large number, the CPU will be oversaturated, and inference will be slower. To check if this is the case, you can use the `htop` command to monitor CPU usage. If you see CPU usage at 100%, then you should reduce the number of threads.\n\n## Verifying that the GPU is not oversaturated\nllama accepts a `-ngl N` (or `--n-gpu-layers N`) flag to configure the number of layers to offload to the GPU. If you set this to a very large number, the GPU will be oversaturated, and inference will be slower. To check if this is the case, you can use the `nvidia-smi` command to monitor GPU usage. If you see GPU usage at 100%, then you should reduce the number of layers.\n\n## Verifying that the GPU is not running out of memory\nIf you see an error message like `CUDA out of memory`, then the GPU is running out of memory. You can reduce the number of layers to offload to the GPU by reducing the `-ngl N` (or `--n-gpu"
+  }
+ ]
+}

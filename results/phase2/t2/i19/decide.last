@@ -1,0 +1,5 @@
+minicpm-q4km pp512 d0: GAIN mean +2.37% bound90 [+2.04%, +2.71%] k=2
+minicpm-q4km tg128 d0: GAIN mean +7.95% bound90 [+7.89%, +8.00%] k=2
+minicpm-q4km pp512 d8192: EQUIV mean -0.13% bound90 [-0.40%, +0.13%] k=2
+minicpm-q4km tg128 d8192: GAIN mean +1.59% bound90 [+1.42%, +1.76%] k=2
+DECISION STOP all axes decided at k=2 (tol +-0.5%)

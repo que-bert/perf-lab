@@ -1,0 +1,164 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 194.544,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 4096,
+   "ms_step": 5.14
+  },
+  "pooled": {
+   "tps": 194.544,
+   "tok_step": 1.0,
+   "accept": null,
+   "n": 4096,
+   "ms_step": 5.14
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 1311.874,
+   "dn": 0,
+   "da": 0,
+   "text": " older Android device.\n\n## Build GUI binding using Gradle\n\nThe `llama.android` directory contains a Gradle build script that can be used to build the project.\n\n```sh\n# Build the project\n./gradlew build\n\n# Run the project\n./gradlew run\n```\n\n## Build GUI binding using CMake\n\nThe `llama.android` directory contains a CMake build script that can be used to build the project.\n\n```sh\n# Build the project\ncmake -B build -G \"Unix Makefiles\"\ncmake --build build\n\n# Run the project\n./build/llama.android\n```\n\n## Build GUI binding using Make\n\nThe `llama.android` directory contains a Makefile that can be used to build the project.\n\n```sh\n# Build the project\nmake\n\n# Run the project\n./llama.android\n```\n\n## Build GUI binding using Python\n\nThe `llama.android` directory contains a Python script that can be used to build the project.\n\n```sh\n# Build the project\npython build.py\n\n# Run the project\n./llama.android\n```\n\n## Build GUI binding using Docker\n\nThe `llama.android` directory contains a Dockerfile that can be"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 1315.62,
+   "dn": 0,
+   "da": 0,
+   "text": "owngments or Other Non-Obvious\n   Comments\", add a paragraph stating that the section is not part of\n   the Document.\nL. Preserve the property \"Invariant Sections\" (set to First Page if\n   there are no Invariant Sections) in the license notice.\nM. Preserve the property \"Cover Texts\" in the license notice.\n\n---\n\nEND OF LICENSE\n</details>\n\n## References\n\n- [Llama.cpp](https://github.com/llama-cpp-ai/llama.cpp)\n- [ACL NN](https://github.com/apache/incubator-accelerate)\n- [Ascend NPU](https://developer.huawei.com/consumer/en/ai-solutions/ascend-npu)\n- [CANN Toolkit](https://github.com/HuaweiAscend/CANN-Toolkit)\n- [ACL NN](https://github.com/apache/incubator-accelerate)\n- [ACL NN](https://github.com/HuaweiAscend/CANN-Toolkit)\n- [ACL NN](https://github.com/HuaweiAscend/CANN-Toolkit)\n- [ACL NN](https://github.com/HuaweiAscend/CANN-Tool"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 1309.707,
+   "dn": 0,
+   "da": 0,
+   "text": " Copyright (C) 2001 Free Software Foundation, Inc.\n            <http://fsf.org/>\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License as\n            by the Free Software Foundation, either version 2 of the\n            License, or (at your option) any later version.\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License as\n            by the Free Software Foundation, either version 2 of the\n            License, or (at your option) any later version.\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License as\n            by the Free Software Foundation, either version 2 of the\n            License, or (at your option) any later version.\n\n            This program is free software: you can redistribute it and/or\n            modify it under the terms of the GNU General Public License as\n            by the Free Software Foundation, either version 2 of the\n            License, or (at your option) any later version.\n\n            This program is free software: you can redistribute"
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 256,
+   "ms": 1318.586,
+   "dn": 0,
+   "da": 0,
+   "text": "Qwen2.5-Coder-7B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/qwen2.5-32b-instruct-q4_k_m](https://huggingface.co/Qwen/qwen2.5-32B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/qwen2.5-72b-instruct-q4_k_m](https://huggingface.co/Qwen/qwen2.5-72B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/qwen2.5-32b-instruct-q4_k_m](https://huggingface.co/Qwen/qwen2.5-32B-Instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [Qwen/qwen2.5-72b-instruct"
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 1330.054,
+   "dn": 0,
+   "da": 0,
+   "text": " the latest version, refer to [oneAPI supported GPU](https://www.intel.com/content/www/us/en/developer/articles/system-requirements/intel-oneapi-base-toolkit-system-requirements.html#inpage-nav-1-1).\n\n- **For Ubuntu 24.04**\n\nThe release packages for Ubuntu 24.04 x64 (FP32/FP16) only include the binary files of the llama.cpp SYCL backend. They require the target machine to have pre-installed Intel GPU drivers and oneAPI packages that are the same version as the build package. To get the version and installation info, refer to [.github/workflows/release.yml#L713](../../.github/workflows/release.yml#L713): ubuntu-24-sycl -> Download & Install oneAPI.\n\nIt is recommended to use them with [Intel Docker](https://hub.docker.com/r/intel/deep-learning-essentials).\n\n- **For Fedora Silverblue 39**\n\nThe release packages for Fedora Silverblue 39 x64 (FP32/FP16) only include the binary files of the llama.cpp SYCL backend. They require the target machine to have pre-installed Intel GPU drivers and oneAPI packages that"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 1278.956,
+   "dn": 0,
+   "da": 0,
+   "text": " means and with any other\nconditions; but the author/donor on this change may not effective\nexcuse you within this section to refuse to do so.\n\n  12. If you convey a covered work, you require receiving terms in\n   any case any further terms or conditions than those set forth in this\n  this License, and also require packetors to follow the terms of this\n  License.\n\n  #### END OF TERMS AND CONDITIONS\n\n  ---------------------------------------------------------------------------\n  APPENDIX\n\n  How to apply the GPL: Copy a File named GPL-LICENSE in this file\n  to a file named GPL-LICENSE in your own software application for\n  further modifications made there.  Add any notice of its presence to the\n  application using this method.\n\n  ***********************************************************************************\n\n  Copyright (C) 2024-2025 The Virtual GPU Library contributors\n\"\"\"\n\n# -*- coding: utf-8 -*-\n\n# This file is part of the VirglRenderer project.\n# It is licensed under the GNU Lesser General Public License v2.1.\n# See the file LICENSE for details.\n\n# This file is part of the VirglRenderer project.\n# It is licensed under the GNU Lesser General Public License v2"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 256,
+   "ms": 1348.308,
+   "dn": 0,
+   "da": 0,
+   "text": ".g. a license under a different license or a license for a\n    different work.\n\n1.13. \"Special Terms\"\n    means terms that other than the License have special meaning to\n    Contributor version.\n\n1.14. \"Source Code Form\"\n    means the form of the work as those Contributor Versions make it\n    available for distribution.\n\n1.15. \"System\" means a computer system.\n\n2. Grant of Copyright License\n-----------------------------\n\n2.1. License Grant\n    Subject to the terms and conditions of this License, each Contributor\n    hereby grants to You a perpetual, worldwide, non-exclusive, no-charge,\n    no-trademark, non-conditional, royalty-free copyright license to\n    reproduce, prepare, display, publicly perform, sublicense, distribute,\n    and other use the Contributor Version.\n\n2.2. Grant of Patent License\n    Subject to the terms and conditions of this License, each Contributor\n    hereby grants to You a perpetual, worldwide, non-exclusive, no-charge,\n    no-trademark, non-conditional, royalty-free patent license to\n    make, use, sell, offer for sale, import, or other transfer or disclose\n"
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 1309.358,
+   "dn": 0,
+   "da": 0,
+   "text": " while frame is not None and _is_internal_frame(frame):\n        frame = frame.f_back\n    return frame\n\n\ndef _is_warning_active():\n    \"\"\"Return True if the current frame is a warning handler.\"\"\"\n    frame = _next_external_frame(sys._getframe(), skip_file_prefixes=())\n    return frame is not None and frame.f_code.co_name == 'showwarning'\n\n\ndef _is_warning_active():\n    \"\"\"Return True if the current frame is a warning handler.\"\"\"\n    frame = _next_external_frame(sys._getframe(), skip_file_prefixes=())\n    return frame is not None and frame.f_code.co_name == 'showwarning'\n\n\ndef _is_warning_active():\n    \"\"\"Return True if the current frame is a warning handler.\"\"\"\n    frame = _next_external_frame(sys._getframe(), skip_file_prefixes=())\n    return frame is not None and frame.f_code.co_name == 'showwarning'\n\n\ndef _is_warning_active():\n    \"\"\"Return True if the current frame is a warning handler.\"\"\"\n    frame = _next_external_frame(sys._getframe(), skip_file_prefixes=())\n    return frame is not None and frame.f"
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 1304.255,
+   "dn": 0,
+   "da": 0,
+   "text": ":\n                myoffset = timedelta(0)\n\n        # Convert to the desired timezone\n        tz = self.__class__(self.year, self.month, self.day,\n                             self.hour, self.minute, self.second,\n                             self.microsecond, tz, self.fold)\n        if tz is not None and mytz is not None:\n            tzoffset = tz.utcoffset(self)\n            if tzoffset is None:\n                raise ValueError(\"tzinfo is None and utcoffset() returned None\")\n            if myoffset is None:\n                myoffset = tzoffset\n            elif myoffset != tzoffset:\n                raise ValueError(\"utcoffset() mismatch\")\n        return tz\n\n    def utcoffset(self):\n        \"\"\"Return the timezone offset in seconds, positive east of UTC.\"\"\"\n        if self._tzinfo is None:\n            return None\n        return self._tzinfo.utcoffset(None)\n\n    def tzname(self):\n        \"\"\"Return the timezone name.\"\"\"\n        if self._tzinfo is None:\n            return None\n        return self._tzinfo.tzname(None)\n\n    def dst(self):\n        \"\"\"Return the timezone"
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 256,
+   "ms": 1301.329,
+   "dn": 0,
+   "da": 0,
+   "text": " 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,"
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 1302.984,
+   "dn": 0,
+   "da": 0,
+   "text": "  # 1.0\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.000'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1.0000'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total(Decimal('1.0'), Decimal('1."
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 1312.091,
+   "dn": 0,
+   "da": 0,
+   "text": " \"\"\"\n\n    __slots__ = ()\n\n    @abc.abstractmethod\n    def __enter__(self):\n        return self\n\n    @abc.abstractmethod\n    def __exit__(self, exc_type, exc_value, traceback):\n        pass\n\n    @abc.abstractmethod\n    def close(self):\n        \"\"\"Closes the file.\"\"\"\n\n    @property\n    @abc.abstractmethod\n    def closed(self):\n        \"\"\"Returns the status of the file, False if it is opened.\"\"\"\n\n    @property\n    @abc.abstractmethod\n    def mode(self):\n        \"\"\"The mode the file is opened as, a string.\"\"\"\n\n    def __getstate__(self):\n        raise TypeError(\"IOBase can't be pickled\")\n\n    def __setstate__(self, state):\n        raise TypeError(\"IOBase can't be pickled\")\n\n    @abc.abstractmethod\n    def seekable(self):\n        \"\"\"Can the position of the file be set?\"\"\"\n\n    @abc.abstractmethod\n    def seek(self, offset, whence=0):\n        \"\"\"Change the current position of the file to offset.\n\n        If whence is zero, the default, the current position may be advanced\n        (thus"
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 1310.148,
+   "dn": 0,
+   "da": 0,
+   "text": "ally equivalent\n    # Decimal from the integer.\n    #\n    # The algorithm is described in the paper \"Fast conversion between\n    # integers and decimal fractions\" by David H. Bailey, Don K.20,\n    # and David H. Bailey.  The paper is available at\n    # https://www.cc.polytechnique.fr/work/precision/conversion.html\n    #\n    # The algorithm is described in the paper \"Fast conversion between\n    # integers and decimal fractions\" by David H. Bailey, Don K.20,\n    # and David H. Bailey.  The paper is available at\n    # https://www.cc.polytechnique.fr/work/precision/conversion.html\n    #\n    # The algorithm is described in the paper \"Fast conversion between\n    # integers and decimal fractions\" by David H. Bailey, Don K.20,\n    # and David H. Bailey.  The paper is available at\n    # https://www.cc.polytechnique.fr/work/precision/conversion.html\n    #\n    # The algorithm is described in the paper \"Fast conversion between\n    # integers and decimal fractions\" by David H. Bailey, Don K.20,\n    # and David H. Bailey.  The paper"
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 1320.375,
+   "dn": 0,
+   "da": 0,
+   "text": "-with-cuda-toolkit/) to make llama.cpp run on your GPU.\n\n```bash\nexport CUDA_VISIBLE_DEVICES=0\nexport PATH=/usr/local/cuda/bin:$PATH\nexport LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH\nexport CUDART_ROOT=/usr/local/cuda\nexport CUDNN_ROOT=/usr/local/cuda\nexport CUDNN_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_ROOT_PATH=/usr/local/cuda\nexport CUDNN_"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 1366.394,
+   "dn": 0,
+   "da": 0,
+   "text": "ROM_WINDOWS': 0,\n    'HAVE_COPY_FROM_WINDOWS_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM_WINDOWS_EXT_ONLY_DYNAMIC': 0,\n    'HAVE_COPY_FROM"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 1314.332,
+   "dn": 0,
+   "da": 0,
+   "text": "okens-per-token N`) flag to limit the number of tokens generated per token. If you see the following lines in the output:\n```shell\nllama_model_load_internal: [cublas] offloading 60 layers to GPU\nllama_model_load_internal: [cublas] offloading output layer to GPU\nllama_model_load_internal: [cublas] total VRAM used: 17223 MB\nllama_model_load_internal: [cublas] offloading 60 layers to GPU\nllama_model_load_internal: [cublas] offloading output layer to GPU\nllama_model_load_internal: [cublas] total VRAM used: 17223 MB\n...\n```\nthen the CPU is oversaturated. The CPU is not able to keep up with the GPU, and the CPU is being used to offload work to the GPU. The CPU is not able to keep up with the GPU, and the CPU is being used to offload work to the GPU. The CPU is not able to keep up with the GPU, and the CPU is being used to offload work to the GPU. The CPU is not able to keep up with the GPU, and the CPU is being"
+  }
+ ]
+}

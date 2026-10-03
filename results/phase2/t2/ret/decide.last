@@ -1,0 +1,5 @@
+dec70: EQUIV mean +0.09% bound90 [+0.00%, +0.17%] k=2
+pf70: EQUIV mean -0.11% bound90 [-0.36%, +0.15%] k=2
+dec176: OPEN mean -0.13% bound90 [-0.98%, +0.72%] k=2
+pf176: EQUIV mean -0.01% bound90 [-0.27%, +0.25%] k=2
+DECISION STOP kmax reached (k=2); open: dec176

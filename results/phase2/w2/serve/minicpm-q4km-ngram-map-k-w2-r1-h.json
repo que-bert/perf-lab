@@ -1,0 +1,92 @@
+{
+ "summary": {
+  "heldout": {
+   "tps": 231.176,
+   "tok_step": 1.0278,
+   "accept": 0.6,
+   "n": 1888,
+   "ms_step": 4.446
+  },
+  "pooled": {
+   "tps": 231.176,
+   "tok_step": 1.0278,
+   "accept": 0.6,
+   "n": 1888,
+   "ms_step": 4.446
+  }
+ },
+ "rows": [
+  {
+   "set": "heldout",
+   "i": 0,
+   "n": 256,
+   "ms": 1143.648,
+   "dn": 0,
+   "da": 0,
+   "text": "한국의 전통 음식인 **김치**는 단순한 간을 더하는 조미료가 아니라, 한국의 역사와 문화, 그리고 한계의 표현을 담고 있는 중요한 음식입니다. 아래에 김치의 역사, 종류, 그리고 만드는 방법을 자세히 설명해 드리겠습니다.\n\n---\n\n### 1. 김치의 역사\n\n김치는 한국에서 오랜 기간 사랑받는 음식입니다. 가장 오래된 기록은 **1000년 이상**으로 거슬러 올라갑니다. 그러나 현대에 와서 김치를 만들기 위해 사용된 재료와 방식은 크게 변화했습니다.\n\n- **초기 사용**: 김치는 처음에는 단백질이 부족한 농촌 지역에서 생선이나 고기를 보존하기 위한 방법이었습니다.\n- **식단 변화**: 식단이 점차 건강에 대한 관심이 높아지면서, 김치는 단순한 보존재료에서 식단의 일부로 자리 잡았습니다.\n- **문화적 상징**: 김치는 한국의 한계를 표현하는 상징으로, 한계의 의미를 이해하는 데 도움이 됩니다.\n\n---\n\n### 2. 김치의 종류\n\n김치는 다양한 종류로 나뉩니다. 가장 일반적인 종류는"
+  },
+  {
+   "set": "heldout",
+   "i": 1,
+   "n": 256,
+   "ms": 1135.412,
+   "dn": 1,
+   "da": 1,
+   "text": "Вот подробный рассказ о нашей Солнечной системе и о планетах, которые в ней входят.\n\n**1. Солнечная система — это масштабное явление**\nСолнечная система — это всё, что находится вращающемся вокруг Солнца. Она включает не только Солнце, но и Землю, Луну, а также все планеты, астероиды, кometы, метеориты и другие объекты, которые вращаются вокруг Солнца. Солнце — это центр системы, а все остальные объекты — вращаются вокруг него.\n\n**2. Солнце — главный источник энергии**\nСолнце — это звезда, которая светит и нагревает Землю. Солнечная система не только включает Солнце, но и все объекты, которые вращаются вокруг него. Солнце является источником энергии для нашей планеты, а также для всех других планет.\n\n**3. Планеты в Солнечной системе**\nВ Солнечной системе есть несколько планет, которые вращаются вокруг Солнца. Солнце —"
+  },
+  {
+   "set": "heldout",
+   "i": 2,
+   "n": 256,
+   "ms": 1131.417,
+   "dn": 0,
+   "da": 0,
+   "text": "Ecco una breve guida per visitare Roma in tre giorni, con consigli su cosa vedere e dove mangiare.\n\n**Giorno 1: Il Cuore Storico**\nInizia da **Roma Centrale**. La Piazza di Spagna e la Cattedrale di San Pietro sono imperdibili. Poi, per una pausa rilassante, rilassati al **Parco del Bosco**. Per il pranzo, prova la cucina napoletana in un piccolo ristorante vicino al parco.\n\n**Giorno 2: I Grandi Appuntamenti**\nDedica la mattina al **Vaticano**. Visita la Basilica di San Pietro e la Cappella Sistina. Nel pomeriggio, spostati a **Vatican City** per una passeggiata tra i musei. Per pranzo, non perdere la **Trastevere** per il suo caffè e la vista sul fiume.\n\n**Giorno 3: La Magia a Roma**\nRipassate i monumenti iconici come il **Pantheon**"
+  },
+  {
+   "set": "heldout",
+   "i": 3,
+   "n": 256,
+   "ms": 945.876,
+   "dn": 84,
+   "da": 50,
+   "text": "O sistema de saúde pública no Brasil é uma das questões mais complexas e controvérsias da saúde global. Abaixo, explico detalhadamente como funciona esse sistema e os desafios que ele enfrenta.\n\n## Como funciona o sistema de saúde pública no Brasil\n\nO sistema de saúde pública no Brasil é composto por três grandes níveis:\n\n1. **Sistema Único de Saúde (SUS):** O SUS é a base do sistema de saúde no Brasil. Ele é composto por três níveis:\n   - **Nível de Previdência:** O SUS oferece assistência gratuita para pessoas que não têm seguro privado.\n   - **Nível de Previdência:** O SUS oferece assistência gratuita para pessoas que não têm seguro privado.\n   - **Nível de Previdência:** O SUS oferece assistência gratuita para pessoas que não têm seguro privado.\n\n2. **Sistema de Assistência Médica:** O sistema de saúde pública é composto por três níveis:\n   - **Nível de Previdência:** O SUS oferece assistência gratuita para pessoas que não têm seguro privado.\n   - **Nível de Previdência:** O SUS oferece assistência"
+  },
+  {
+   "set": "heldout",
+   "i": 4,
+   "n": 256,
+   "ms": 1127.008,
+   "dn": 0,
+   "da": 0,
+   "text": "Tết Nguyên Đán là một cuộc đời lớn, nghệ thuật và tinh thần của người Việt Nam. Để hiểu rõ hơn về nó, chúng ta cần xem xét cả lịch sử, ý nghĩa và cách thức thực hiện của Tết.\n\n### 1. Lịch sử: Từ nguyên tục đến thế giới\n- **Nguyên tục Tết:** Từ thời Tây Sơn, người Việt Nam đã có nhu cầu thực hiện Tết. Từ thời Tổ Tập, Tết đã trở thành một nghệ thuật lễ"
+  },
+  {
+   "set": "heldout",
+   "i": 5,
+   "n": 256,
+   "ms": 1132.569,
+   "dn": 0,
+   "da": 0,
+   "text": "عندما نقول \"الإنترنت\"، فهو حلقة متصلة من عدة عناصر تعمل بشكل دقيق ومتكامل. لفهم ذلك بشكل أفضل، يجب أننا ننقر على عملية الإنترنت من خلط عدة عناصر، وهو ما سنقوم بذلك في هذا التفسير.\n\n**1. إرسال الطلب (الطلب الأولي)**\nعندما نختار صفحة أو عنوان على متصفحنا، فإن ذلك يتم عب"
+  },
+  {
+   "set": "heldout",
+   "i": 6,
+   "n": 256,
+   "ms": 1128.779,
+   "dn": 0,
+   "da": 0,
+   "text": "下面是一个完整的 Python 实现，包含详细的注释说明：\n\n```python\nfrom collections import OrderedDict\n\nclass LRUCache:\n    \"\"\"\n    双向链表 + OrderedDict 实现 LRU 缓存\n    - get(key): 获取值，如果不存在则返回 None\n    - put(key, value): 插入或更新键值对\n    - 当缓存容量满时，删除最久未使用的节点\n    - 时间复杂度均为 O(1)\n    \"\"\"\n\n    def __init__(self, capacity: int):\n        \"\"\"\n        初始化 LRU 缓存。\n\n        :param capacity: 缓存的最大容量（键值对的最大数量）\n        \"\"\"\n        # OrderedDict 本身就维护了插入顺序，\n        # 删除最久未使用的键值对时，popitem(last=False) 会删除最旧的键值对。\n        # 为了实现 LRU 逻辑，我们使用 OrderedDict 来管理键值对。\n        self.capacity = capacity\n        self.cache = OrderedDict()\n\n    def get(self, key):\n        \"\"\"\n        获取指定键对应的值。\n\n        如果键存在：\n            - 将该键对应的值移动到 OrderedDict 的末尾（表示最近使用过"
+  },
+  {
+   "set": "heldout",
+   "i": 7,
+   "n": 96,
+   "ms": 422.216,
+   "dn": 0,
+   "da": 0,
+   "text": "这句话翻译成中文是：“委员会将决定推迟，直到更多田间试验的数据可用，并因长期安全性和成本问题而提出。”\n\n在解释我的用词选择时，我选择“推迟”而不是“延迟”，因为“推迟”更符合中文中处理决策的委婉表达；“田间试验”对应“field trials”，强调试验的实际应用场景；“长期安全性和成本问题”则准确传达了原文中关于安全与经济考量的核心关切。"
+  }
+ ]
+}

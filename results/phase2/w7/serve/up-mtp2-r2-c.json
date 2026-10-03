@@ -1,0 +1,164 @@
+{
+ "summary": {
+  "corpus": {
+   "tps": 62.992,
+   "tok_step": 2.5035,
+   "accept": 0.7638,
+   "n": 3898,
+   "ms_step": 39.743
+  },
+  "pooled": {
+   "tps": 62.992,
+   "tok_step": 2.5035,
+   "accept": 0.7638,
+   "n": 3898,
+   "ms_step": 39.743
+  }
+ },
+ "rows": [
+  {
+   "set": "corpus",
+   "i": 0,
+   "n": 256,
+   "ms": 4391.645,
+   "dn": 215,
+   "da": 147,
+   "text": " entry-level devices.\n\n## Build CLI using NDK\n\n### Prerequisites\n\n- Install [Android NDK](https://developer.android.com/ndk)\n- Install [CMake](https://cmake.org/)\n\n### Build\n\n```bash\nmkdir -p build-android-arm64\ncd build-android-arm64\ncmake -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \\\n      -DANDROID_ABI=arm64-v8a \\\n      -DANDROID_ABI=arm64-v8a \\\n      -DANDROID_PLATFORM=android-28 \\\n      -DGGML_RPC=ON \\\n      -DGGML_LTO=ON \\\n      -DGGML_NATIVE=OFF \\\n      -DGGML_LOG_LEVEL=1 \\\n      -DCMAKE_BUILD_TYPE=Release \\\n      -DCMAKE_INSTALL_PREFIX=install \\\n      ..\ncmake --build . --parallel\ncmake --install .\n```\n\nThe build artifacts will be in `build-android-arm64/install/`.\n\n#### Build options\n\n| Option | Description |\n| --- | --- |\n| `ANDROID_ABI` | Target ABI. Supported values:"
+  },
+  {
+   "set": "corpus",
+   "i": 1,
+   "n": 256,
+   "ms": 3978.664,
+   "dn": 196,
+   "da": 156,
+   "text": "\n\n<think>\n\n</think>\n\nBased on the provided documentation, here is a structured summary and guide for using **llama.cpp** with **Ascend NPU** (Huawei CANN backend).\n\n### 1. Overview\nThis backend integrates llama.cpp with Huawei's Ascend NPU using the CANN Toolkit. It supports both training and inference scenarios on specific Ascend hardware.\n\n### 2. Hardware & OS Support\n\n#### Supported Operating Systems\n*   **Linux**: Ubuntu 22.04, OpenEuler 22.03.\n\n#### Supported Ascend NPU Devices\nYou can identify your device ID using: `lspci -n | grep -Eo '19e5:d[0-9a-f]{3}' | cut -d: -f2`\n\n| Device ID | Product Series | Chip Model | Status |\n| :--- | :--- | :--- | :--- |\n| **d802** | Atlas A2 Infer | 910B | **Support** |\n| **d500** | Atlas Infer (300I Duo) | 310P | **Support** |\n| d803 | Atlas A"
+  },
+  {
+   "set": "corpus",
+   "i": 2,
+   "n": 256,
+   "ms": 5068.243,
+   "dn": 251,
+   "da": 128,
+   "text": " GNU GENERAL PUBLIC LICENSE\n            Version 1, February 1989\n\n            Copyright (C) 1989 Free Software Foundation, Inc.\n            51 Franklin St, Fifth Floor, Boston, MA 02110, USA\n\n            Everyone is permitted to copy and distribute verbatim copies\n            of this license document, but changing it is not allowed.\n\n            Preamble\n\n            The license agreements of most companies and organizations use\n            the copyright system to restrict use and distribution, thereby\n            increasing their own power.  Our purpose is to design a license\n            which avoids this danger for programs which we distribute.  We\n            want to be free to share and modify the programs, so that no one\n            can make them proprietary.  We want to be sure that every user\n            will be free to distribute copies and share them with anyone, and\n            to receive source code or get it on request, so that it is not\n            useless.\n\n            This applies to teachers and students at schools and\n            universities, researchers in companies and independent research\n            institutes, and hobbyists who write programs for their own use\n            and share them.\n\n            Most software -- even \"public domain"
+  },
+  {
+   "set": "corpus",
+   "i": 3,
+   "n": 256,
+   "ms": 3710.355,
+   "dn": 184,
+   "da": 163,
+   "text": "CodeQwen1.5-7B-Qwen-Q4_K_M-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  |  |\n| [bartowski/Phi-3.5-mini-instruct-q4_k_m](https://hoffa.dev/Phi-3.5-mini-instruct-q4_k_m) | ✓ / ✓ | ✓ / ✓ | ✓ |\n| [bartowski/Phi-4-mini-instruct-q4_k_m](https://huggingface.co/bartowski/Phi-4-mini-instruct-GGUF) | ✓ / ✓ | ✓ / ✓ | ✓ |\n|  |  |  | python/_colorize.py ====\nimport os\nimport sys\n\nfrom collections.abc import Callable, Iterator, Mapping\nfrom dataclasses import dataclass, field, Field\n\nCOLORIZE = True\n\n\n# types\nif False:\n    from typing import IO, Self, ClassVar\n    _theme: Theme\n\n\nclass ANSIColors:\n    RESET = \"\\x1b[0m\"\n\n    BLACK = \"\\x1b[30m\"\n    BLUE = \"\\x1b[34m\"\n"
+  },
+  {
+   "set": "corpus",
+   "i": 4,
+   "n": 256,
+   "ms": 3931.776,
+   "dn": 195,
+   "da": 157,
+   "text": "ollow the [official installation guide](https://www.intel.com/content/www/us/en/developer/articles/guide/intel-oneapi-installation-guide-linux.html) to install the toolkit.\n\n- **For other vendor GPU**\n\nPlease refer to the [oneAPI supported GPU](https://www.intel.com/content/www/us/en/developer/articles/system-requirements/intel-oneapi-base-toolkit-system-requirements.html#inpage-nav-1-1) for the supported GPU.\n\n3. **Install other development tools**\n\n```sh\nsudo apt install build-essential cmake git\n```\n\n### II. Build\n\n1. **Build from source code**\n\n```sh\n./examples/sycl/build.sh\n```\n\n2. **Build with CMake**\n\n```sh\nmkdir build && cd build\ncmake .. -DGGML_SYCL=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx\nmake -j\n```\n\n### III. Run\n\n1. **Run unit test cases**\n\n```sh\n./build/bin/test-backend-ops -b SYCL0\n```\n\n2. **Run LLM**\n\n```sh\n./examples/sycl/test.sh -m xxxx.gguf\n```"
+  },
+  {
+   "set": "corpus",
+   "i": 5,
+   "n": 256,
+   "ms": 4159.652,
+   "dn": 206,
+   "da": 151,
+   "text": " system and a licensee cannot\nimpose that choice.\n\nThis section is intended to make thoroughly clear what is intended as\nan alternative to the operating system on which the executable runs,\nand the specific operating system on which the executable runs.\n\n  12. You may not copy, modify, sublicense, link with, or distribute\nthe Library except as expressly provided under this License.  Any\nattempt otherwise to copy, modify, sublicense, link with, or\ndistribute the GGML is void, and will automatically terminate your\nrights under this License.  However, parties who have received copies,\nor rights, from you under this License will not have their licenses\nterminated so long as such parties remain in full compliance.\n\n  13. You may choose to forward the responsibilities commensurate\nwith any such change.\n\n  14. If the distribution and/or use of the Library is restricted in\ncertain countries either by patents or by copyrighted interfaces, the\noriginal copyright holder who places the Library under this License may add\nan explicit geographical distribution limitation excluding those countries,\nso that distribution is permitted only in or among countries not thus\nexcluded.  In that case, this License incorporates the limitation as if"
+  },
+  {
+   "set": "corpus",
+   "i": 6,
+   "n": 58,
+   "ms": 903.232,
+   "dn": 44,
+   "da": 35,
+   "text": "ith\n\n==== license/MPL-2.0 ====\nMozilla Public License Version 2.0\n==================================\n\n1. Definitions\n--------------\n\n1.1. \"Contributor\"\n    means each individual or legal entity that creates, contributes to\n    the creation of,"
+  },
+  {
+   "set": "corpus",
+   "i": 7,
+   "n": 256,
+   "ms": 4022.742,
+   "dn": 200,
+   "da": 154,
+   "text": " while frame is not None:\n        if _is_internal_frame(frame):\n            frame = frame.f_back\n        elif _is_filename_to_skip(frame.f_code.co_filename, skip_file_prefixes):\n            frame = frame.f_back\n        else:\n            return frame\n    return None\n\n\ndef _get_warning_metadata():\n    \"\"\"Get the warning metadata from the current frame.\"\"\"\n    import inspect\n    frame = inspect.currentframe()\n    if frame is None:\n        return None, None, None\n    try:\n        skip_file_prefixes = sys._getframe(1).f_locals.get(\n            '_get_warning_metadata_skip_file_prefixes', ())\n        frame = _next_external_frame(frame, skip_file_prefixes)\n        if frame is None:\n            return None, None, None\n        return frame.f_code.co_filename, frame.f_lineno, frame.f_locals\n    finally:\n        # Avoid a reference cycle to the frame (see bpo-39572).\n        del frame\n\n\nclass WarningMessage:\n    \"\"\"A collection representing a warning.\"\"\"\n\n    def __init__(self, message, category, filename, lineno, file=None, line=None):\n        self._filename"
+  },
+  {
+   "set": "corpus",
+   "i": 8,
+   "n": 256,
+   "ms": 3958.49,
+   "dn": 198,
+   "da": 156,
+   "text": ":\n                mytz = self._local_timezone()\n                myoffset = mytz.utcoffset(self)\n\n        if tz == mytz:\n            return self\n\n        tzoffset = tz.utcoffset(self)\n        if tzoffset is None:\n            return self\n        offset = tzoffset - myoffset\n        diff = self - offset\n        return tz.fromutc(diff)\n\n    def __add__(self, other):\n        if isinstance(other, timedelta):\n            # for CPython compatibility, we cannot use\n            # our __class__ here, but need a real timedelta\n            return datetime._fromtimestamp(self._mktime() + other.total_seconds(),\n                                           self._tzinfo is not None, self._tzinfo)\n        return NotImplemented\n\n    __radd__ = __add__\n\n    def __sub__(self, other):\n        \"\"\"Return delta, a timedelta object.\"\"\"\n        if isinstance(other, timedelta):\n            return self + timedelta(-other.days, -other.seconds, -other.microseconds)\n        elif isinstance(other, datetime):\n            offset1 = self.utcoffset()\n            offset2 = other.utcoffset()\n            return (self - other) - ("
+  },
+  {
+   "set": "corpus",
+   "i": 9,
+   "n": 256,
+   "ms": 3798.667,
+   "dn": 187,
+   "da": 160,
+   "text": " #      if prec < 0:\n  #          return 0\n        remainder = self._int[prec:]\n        if _all_zeros(remainder, len(remainder)):\n            return 0\n        if remainder[0] > '5':\n            return 1\n        if remainder[0] < '5':\n            return -1\n        if prec == 0 or self._int[prec-1] in '02468':\n            return -1\n        return 1\n\n    def _round_half_down(self, prec):\n        \"\"\"Round 5 down\"\"\"\n        if prec < 0:\n            return 0\n        remainder = self._int[prec:]\n        if _all_zeros(remainder, len(remainder)):\n            return 0\n        if remainder[0] > '5':\n            return 1\n        if remainder[0] < '5':\n            return -1\n        if prec == 0 or self._int[prec-1] in '13579':\n            return 1\n        return -1\n\n    def _round_half_even(self, prec):\n        \"\"\"Round 5 to even, rest"
+  },
+  {
+   "set": "corpus",
+   "i": 10,
+   "n": 256,
+   "ms": 3590.459,
+   "dn": 178,
+   "da": 166,
+   "text": " \"\"\"\n        a = _convert_other(a, raiseit=True)\n        return a.compare_total(b, context=self)\n\n    def compare_total_mag(self, a, b):\n        \"\"\"Compares two operands using their abstract representation.\n\n        This is not like the standard compare_total, which include their sign.\n        Note that a total ordering is defined for all possible abstract\n        representations.\n\n        >>> ExtendedContext.compare_total_mag(Decimal('12.73'), Decimal('127.9'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('-127'),  Decimal('12'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.3'))\n        Decimal('-1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.30'), Decimal('12.30'))\n        Decimal('0')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('12.300'))\n        Decimal('1')\n        >>> ExtendedContext.compare_total_mag(Decimal('12.3'),  Decimal('NaN'))\n       "
+  },
+  {
+   "set": "corpus",
+   "i": 11,
+   "n": 256,
+   "ms": 4773.143,
+   "dn": 238,
+   "da": 135,
+   "text": " read()\n    Read data and return it as bytes, without any arguments. This will\n    return the end of the file (an empty bytes object) once EOF is\n    reached.\n  readline()\n    Read until newline or EOF and return it.  Newline is on the end of the\n    returned string.\n    To specify how a newline is delimited, pass the keyword argument\n    `newline`. If newline is '' or '\\n', only a '\\n' is returned.\n    If newline is a non-empty string, that is the newline terminator.\n    If newline is None (the default), any of the three universal newlines\n    ('\\n', '\\r', '\\r\\n') are translated to '\\n' before being returned.\n    If the file is not in text mode, the `newline` argument is ignored.\n  readlines()\n    Read and return a list of all lines.\n  write(s)\n    Write the given bytes or string to the stream.\n    Return the number of objects written.\n  tell()\n    Return an integer giving the file object's current position.\n  seek(offset[, whence])\n    Change the stream position to the byte given by offset."
+  },
+  {
+   "set": "corpus",
+   "i": 12,
+   "n": 256,
+   "ms": 3768.173,
+   "dn": 188,
+   "da": 161,
+   "text": "ally significant\n    # string representation of the integer.\n    #\n    # The algorithm is based on the following observations:\n    #\n    # 1. The number of decimal digits in a binary integer is\n    #    approximately 3.3219280948873626 * log2(n).\n    #\n    # 2. The number of decimal digits in a binary integer is\n    #    approximately 3.3219280948873626 * log2(n).\n    #\n    # 3. The number of decimal digits in a binary integer is\n    #    approximately 3.3219280948873626 * log2(n).\n    #\n    # 4. The number of decimal digits in a binary integer is\n    #    approximately 3.3219280948873626 * log2(n).\n    #\n    # 5. The number of decimal digits in a binary integer is\n    #    approximately 3.32192809486"
+  },
+  {
+   "set": "corpus",
+   "i": 13,
+   "n": 256,
+   "ms": 3858.49,
+   "dn": 192,
+   "da": 159,
+   "text": "mming-guide/index.html#env-vars) to control the behavior of the CUDA runtime.\n\n### CUDA Graphs\n\nllama.cpp supports CUDA graphs for faster inference. To enable it, use the `--cuda-graphs` flag.\n\n### CUDA Memory Pool\n\nllama.cpp supports CUDA memory pool for faster inference. To enable it, use the `--cuda-mempool` flag.\n\n### CUDA Memory Alignment\n\nllama.cpp supports CUDA memory alignment for faster inference. To enable it, use the `--cuda-mem-align` flag.\n\n### CUDA Async\n\nllama.cpp supports CUDA async for faster inference. To enable it, use the `--cuda-async` flag.\n\n### CUDA Batch\n\nllama.cpp supports CUDA batch for faster inference. To enable it, use the `--cuda-batch` flag.\n\n### CUDA Stream\n\nllama.cpp supports CUDA stream for faster inference. To enable it, use the `--cuda-stream` flag.\n\n### CUDA Graphs\n\nllama.cpp supports CUDA graphs for faster inference. To enable it, use the `--cuda-graphs` flag.\n\n### CUDA Memory Pool\n\nllama.cpp supports CUDA memory pool for faster inference. To enable it, use the `--cuda-memp"
+  },
+  {
+   "set": "corpus",
+   "i": 14,
+   "n": 256,
+   "ms": 4209.808,
+   "dn": 205,
+   "da": 152,
+   "text": "SEG': 0,\n    'HAVE_CRYPT_H': 1,\n    'HAVE_CRYPT_R': 1,\n    'HAVE_CTERMID': 1,\n    'HAVE_CTERMID_R': 0,\n    'HAVE_CURSES': 1,\n    'HAVE_CURSES_FILTER': 1,\n    'HAVE_CURSES_H': 1,\n    'HAVE_CURSES_HAS_KEY': 1,\n    'HAVE_CURSES_IMMEDOK': 1,\n    'HAVE_CURSES_IS_PAD': 0,\n    'HAVE_CURSES_IS_TERM_RESIZED': 1,\n    'HAVE_CURSES_KEYPAD': 1,\n    'HAVE_CURSES_RESIZE_TERM': 1,\n    'HAVE_CURSES_RESIZETERM': 1,\n    'HAVE_CURSES_RESIZETERM_NO_ARGS': 0,\n    'HAVE_CURSES_SYNCOK': 1,\n    'HAVE_CURSES_TYPEAHEAD': 1,\n    'HAVE_CURSES_USE_EXTENSIONS': 1,\n    'HAVE_CURSES_USE_TINFO': 1,\n    'HAVE_CURSES_WCHGAT': 1,\n    'HAVE"
+  },
+  {
+   "set": "corpus",
+   "i": 15,
+   "n": 256,
+   "ms": 3756.897,
+   "dn": 188,
+   "da": 161,
+   "text": " N`) flag to configure the number of threads to use for inference. If you set this to a very large number, then the CPU will be oversaturated, and the GPU will be starved of data. This will result in poor performance.\n\nTo verify that the CPU is not oversaturated, you can use the `htop` command to monitor CPU usage. If you see that the CPU is at 100% usage, then you should reduce the number of threads.\n\n## Verifying that the GPU is not oversaturated\nllama accepts a `-ngl N` (or `--n-gpu-layers N`) flag to configure the number of layers to offload to the GPU. If you set this to a very large number, then the GPU will be oversaturated, and the CPU will be starved of data. This will result in poor performance.\n\nTo verify that the GPU is not oversaturated, you can use the `nvidia-smi` command to monitor GPU usage. If you see that the GPU is at 100% usage, then you should reduce the number of layers.\n\n## Verifying that the GPU is not underutilized\nllama accepts a `-ngl N` (or `--"
+  }
+ ]
+}
