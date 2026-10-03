@@ -131,3 +131,21 @@ Caveats on what "off" means:
 
 ### Table B paths that cannot be disabled by env
 int8 cm1 MMQ (MUL_MAT + MUL_MAT_ID) and its `quantize_y`/`y_non_contig` changes; RDNA4 arch split (enum, DEVICE_ARCH spec const); cm1 FA shader/pvsh-shmem changes (only the packed and int8-QK variants are switchable); rms_norm small (ne0<=128) pipelines; concat_t; small-BAR host-visible-vidmem rule (upstream `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM` forces the same result, never the old one); GDN alloc deps in graph_optimize; pinned-host sync skip; split-K prealloc sizing; kv-cells dirty tracking; server `spec_prompt` reuse and `common_dft_flush` hooks; graph-reuse key addition. The only way to remove these is to build upstream `ce8caa6e6`.
+
+## 6. Switch count per tag (retirement rule, phase-2 plan "Maintenance rules")
+
+Kill switches = `getenv` of `GGML_VK_NO_*`, `GGML_VK_FA_NO_*`, `LLAMA_NO_*`, `GGML_VK_DISABLE_FA_SHMEM_STAGING` in `ggml/ src/ common/ tools/` (the 39 of section 1 A1). Counted by `git grep` at each tag.
+
+| tag | kill switches | change |
+|---|---|---|
+| integrate16 | 39 | anchor |
+| integrate17 | 39 | none |
+| integrate18 | 40 | + `GGML_VK_FA_NO_LEGACY_CM1` |
+| integrate19 | 40 | none |
+| after retirement (branch `r9700-ar-retire`, commit a387da98c) | 26 | -14 |
+
+**Retired** (existed and default-on at integrate17, so default-on and gated through the i18 and i19 T2 tags; env check dropped, path kept): `GGML_VK_NO_Q6K_LEANQ`, `_Q6K_UPAR`, `_Q6K_SPLITK`, `GGML_VK_NO_FA_PREFILL_RDNA4_VT`, `_RS`, `_V64`, `GGML_VK_NO_FOV`, `GGML_VK_NO_FV2`, `GGML_VK_NO_MASK_OPT_CACHE`, `GGML_VK_NO_GR_SMALL`, `GGML_VK_NO_VSUB`, `GGML_VK_NO_KEEP_RMS_SCALE`, `LLAMA_NO_RS_INDEX`, `LLAMA_NO_MTP_KVONLY`. Fork-internal tuning variants nested under a switch that stays (umbrellas `GGML_VK_NO_MMQ_Q6K_RDNA4`, `GGML_VK_NO_FA_PREFILL_RDNA4`, `GGML_VK_NO_RMS_NORM_SCALE`), plus implementation and qwen35-only switches not flagged in section 4.
+
+**Kept on purpose, default-on and old enough:** the only env route back to upstream behaviour on paths section 4 flags as loosely guarded or verified on qwen35 only: `GGML_VK_NO_DECODE_Q8`, `GGML_VK_FA_NO_DECODE_V2`, `GGML_VK_FA_NO_PACK`, `GGML_VK_NO_FA_PREFILL_RDNA4` (umbrella), `GGML_VK_NO_MMQ_Q6K_RDNA4`, `GGML_VK_NO_Q6K_SWIGLU`, `GGML_VK_NO_SOP_GLU`, `GGML_VK_NO_Q8_GEMM_TUNE`, `GGML_VK_NO_MQ5_TUNE`, `GGML_VK_NO_DMMV_F32_WIDE`, `GGML_VK_NO_GDN_CACHE`, `GGML_VK_NO_GDN_GATE`, `GGML_VK_NO_RMS_NORM_FAST`, `_RMS_NORM_GATE`, `_RMS_NORM_SCALE`, `GGML_VK_NO_SOP_ADDRMS`, `GGML_VK_NO_KEEP_UNARY_MUL`, `GGML_VK_NO_MMV_ADD_BATCH`, `GGML_VK_DISABLE_FA_SHMEM_STAGING`, `LLAMA_NO_MFL`, `LLAMA_NO_KQ_MASK_CACHE` (21).
+
+**Not eligible:** `GGML_VK_FA_NO_LEGACY_CM1` (added after integrate17); `GGML_VK_FA_NO_DECODE_V3`, `GGML_VK_NO_Q6K_N256`, `GGML_VK_NO_Q6K_SWIGLU_N256` (the path they gate is default off: N256 needs `GGML_VK_Q6K_LEANQ_N256`, V3 needs INT8_QK); `GGML_VK_FA_NO_MASK_OPT` (disables upstream's own mask_opt, not a fork path). 21 + 5 = 26.
